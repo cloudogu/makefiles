@@ -40,7 +40,7 @@ package: $(TARGETDIR)/$(ARTIFACT_ID)
 	cd $(TARGETDIR) && tar cvzf $(ARTIFACT_ID)-$(VERSION).tar.gz $(ARTIFACT_ID)
 
 .PHONY: compile
-compile: $(TARGETDIR)/$(ARTIFACT_ID) $(TARGETDIR)/$(ARTIFACT_ID).sha256sum $(TARGETDIR)/$(ARTIFACT_ID).asc
+compile: $(TARGETDIR)/$(ARTIFACT_ID) $(TARGETDIR)/$(ARTIFACT_ID).sha256sum
 
 $(TMPDIR): $(BUILDDIR)
 	mkdir $(TMPDIR)
@@ -70,5 +70,5 @@ go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(TARGETDIR)/$(ARTIFACT
 $(TARGETDIR)/$(ARTIFACT_ID).sha256sum:
 	cd $(TARGETDIR); shasum -a 256 $(ARTIFACT_ID) > $(ARTIFACT_ID).sha256sum
 
-$(TARGETDIR)/$(ARTIFACT_ID).asc:
-	gpg --detach-sign -o $(TARGETDIR)/$(ARTIFACT_ID).asc $(TARGETDIR)/$(ARTIFACT_ID)
+#$(TARGETDIR)/$(ARTIFACT_ID).asc:
+#	gpg --detach-sign -o $(TARGETDIR)/$(ARTIFACT_ID).asc $(TARGETDIR)/$(ARTIFACT_ID)
