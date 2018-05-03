@@ -1,3 +1,6 @@
+XUNIT_XML=target/unit-tests.xml
+
+.PHONY: unit-test
 unit-test: ${XUNIT_XML}
 
 ${XUNIT_XML}: ${GOPATH}/bin/go2xunit
