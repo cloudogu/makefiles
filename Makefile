@@ -7,7 +7,6 @@ VERSION=
 BUILD_TIME:=$(shell date +%FT%T%z)
 COMMIT_ID:=$(shell git rev-parse HEAD)
 WORKDIR=$(shell pwd)
-MAKEFILES_VERSION=
 
 # choose the environment, if BUILD_URL environment variable is available then we are on ci (jenkins)
 ifdef BUILD_URL
@@ -35,10 +34,4 @@ include build/make/static-analysis.mk
 # clean lifecycle
 include build/make/clean.mk
 
-.PHONY: update-makefiles
-update-makefiles:
-	@echo Updating makefiles...
-	curl -L --silent https://github.com/cloudogu/makefiles/archive/v$(MAKEFILES_VERSION).tar.gz > ./build/tmp/makefiles-v$(MAKEFILES_VERSION).tar.gz
-
-	tar -xzf ./build/tmp/makefiles-v$(MAKEFILES_VERSION).tar.gz -C ./build/tmp
-	cp -r ./build/tmp/makefiles-$(MAKEFILES_VERSION)/build/make ./build/
+include build/make/update-makefiles.mk
