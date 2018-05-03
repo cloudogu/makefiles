@@ -2,8 +2,8 @@
 PACKAGES=$(shell go list ./... | grep -v /vendor/)
 
 # Set these to the desired values
-ARTIFACT_ID=cesapp
-VERSION=6.6.6
+ARTIFACT_ID=
+VERSION=
 BUILD_TIME:=$(shell date +%FT%T%z)
 COMMIT_ID:=$(shell git rev-parse HEAD)
 WORKDIR=$(shell pwd)
@@ -11,7 +11,6 @@ WORKDIR=$(shell pwd)
 # choose the environment, if BUILD_URL environment variable is available then we are on ci (jenkins)
 ifdef BUILD_URL
 ENVIRONMENT=ci
-GLIDEFLAGS+=--no-color
 else
 ENVIRONMENT=local
 endif
