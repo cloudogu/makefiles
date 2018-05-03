@@ -8,20 +8,20 @@ BUILD_TIME:=$(shell date +%FT%T%z)
 COMMIT_ID:=$(shell git rev-parse HEAD)
 
 # Defaults
-include defaults.mk
+include build/make/defaults.mk
 
 # updating dependencies
-include dependencies_glide.mk
+include build/make/dependencies_glide.mk
 
 # Build step
-include build.mk
+include build/make/build.mk
 
 # unit tests
-include unit-test.mk
+include build/make/unit-test.mk
 
 # static analysis
-include static-analysis.mk
+include build/make/static-analysis.mk
 
 # clean lifecycle
-include clean.mk
+include build/make/clean.mk
 
