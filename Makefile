@@ -7,7 +7,7 @@ VERSION=
 BUILD_TIME:=$(shell date +%FT%T%z)
 COMMIT_ID:=$(shell git rev-parse HEAD)
 WORKDIR=$(shell pwd)
-MAKEFILES_VERSION=0.0.1b
+MAKEFILES_VERSION=
 
 # choose the environment, if BUILD_URL environment variable is available then we are on ci (jenkins)
 ifdef BUILD_URL
@@ -24,7 +24,7 @@ endif
 include build/make/dependencies_glide.mk
 
 # Build step
-nclude build/make/build.mk
+include build/make/build.mk
 
 # unit tests
 include build/make/unit-test.mk
