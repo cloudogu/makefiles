@@ -8,7 +8,7 @@ UID_NR:=$(shell id -u)
 GID_NR:=$(shell id -g)
 GLIDE=glide
 GLIDEFLAGS=
-LDFLAGS=-ldflags "-extldflags -static -X main.Version=${VERSION} -X main.CommitID=${COMMIT_ID}"
+LDFLAGS=-ldflags "-extldflags -static -X main.Version=$(VERSION) -X main.CommitID=$(COMMIT_ID)"
 TARGETDIR=target
 BUILDDIR=$(WORKDIR)/build
 TMPDIR=$(BUILDDIR)/tmp
@@ -40,7 +40,7 @@ package: $(TARGETDIR)/$(ARTIFACT_ID)
 	cd $(TARGETDIR) && tar cvzf $(ARTIFACT_ID)-$(VERSION).tar.gz $(ARTIFACT_ID)
 
 .PHONY: compile
-compile: $(TARGETDIR)/$(ARTIFACT_ID)
+compile: $(TARGETDIR)/$(ARTIFACT_ID) $(TARGETDIR)/$(ARTIFACT_ID).sha256sum $(TARGETDIR)/$(ARTIFACT_ID).asc
 
 $(TMPDIR): $(BUILDDIR)
 	mkdir $(TMPDIR)
@@ -65,3 +65,10 @@ $(TARGETDIR)/$(ARTIFACT_ID): dependencies $(PASSWD) $(HOMEDIR) $(TARGETDIR)
 	 -w /go/src/github.com/cloudogu/$(ARTIFACT_ID) \
 	 cloudogu/golang:1.10 \
 go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(TARGETDIR)/$(ARTIFACT_ID)
+
+
+$(TARGETDIR)/$(ARTIFACT_ID).sha256sum:
+	cd $(TARGETDIR); shasum -a 256 $(ARTIFACT_ID) > $(ARTIFACT_ID).sha256sum
+
+$(TARGETDIR)/$(ARTIFACT_ID).asc:
+	gpg --detach-sign -o $(TARGETDIR)/$(ARTIFACT_ID).asc $(TARGETDIR)/$(ARTIFACT_ID)
