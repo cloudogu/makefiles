@@ -19,9 +19,6 @@ endif
 #
 .DEFAULT_GOAL:=compile
 
-# Defaults
-include build/make/defaults.mk
-
 # updating dependencies
 include build/make/dependencies_glide.mk
 
