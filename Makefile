@@ -7,6 +7,7 @@ VERSION=
 BUILD_TIME:=$(shell date +%FT%T%z)
 COMMIT_ID:=$(shell git rev-parse HEAD)
 WORKDIR=$(shell pwd)
+TARGET_DIR=target
 
 # choose the environment, if BUILD_URL environment variable is available then we are on ci (jenkins)
 ifdef BUILD_URL
@@ -35,3 +36,7 @@ include build/make/static-analysis.mk
 include build/make/clean.mk
 
 include build/make/update-makefiles.mk
+
+include build/make/package-debian.mk
+
+package-debian: $(DEBIAN_PACKAGE)
