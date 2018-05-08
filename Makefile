@@ -38,5 +38,3 @@ include build/make/clean.mk
 include build/make/update-makefiles.mk
 
 include build/make/package-debian.mk
-
-package-debian: $(DEBIAN_PACKAGE)
