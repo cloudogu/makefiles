@@ -30,11 +30,6 @@ info:
 	@echo "Branch-Type: $(BRANCH_TYPE)"
 	@echo "Packages   : $(PACKAGES)"
 
-.PHONY: dependencies
-dependencies: info
-	@echo "installing dependencies ..."
-	$(GLIDE) $(GLIDEFLAGS) install -v
-
 package: $(TARGET_DIR)/$(ARTIFACT_ID)
 	cd $(TARGET_DIR) && tar cvzf $(ARTIFACT_ID)-$(VERSION).tar.gz $(ARTIFACT_ID)
 
@@ -53,7 +48,7 @@ $(HOMEDIR): $(TMPDIR)
 $(PASSWD): $(TMPDIR)
 	echo "$(USER):x:$(UID_NR):$(GID_NR):$(USER):/home/$(USER):/bin/bash" > $(PASSWD)
 
-$(TARGET_DIR)/$(ARTIFACT_ID): dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR)
+$(TARGET_DIR)/$(ARTIFACT_ID): update-dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR)
 	docker run --rm -ti \
 	 -e GOOS=linux \
 	 -e GOARCH=amd64 \
