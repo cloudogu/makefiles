@@ -6,7 +6,7 @@ ifeq ($(ENVIRONMENT), ci)
 endif
 
 .PHONY: update-dependencies
-update-dependencies: glide.lock
+update-dependencies: $(GLIDE) glide.lock
 
 .PHONY: dependencies
 dependencies: $(GLIDE)
