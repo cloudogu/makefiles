@@ -16,5 +16,3 @@ dependencies: $(GLIDE)
 $(GLIDE): 
 	curl https://glide.sh/get | sh
 
-glide.lock: glide.yaml $(GLIDE)
-	$(GLIDE) $(GLIDEFLAGS) up -v
