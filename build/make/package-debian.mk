@@ -24,7 +24,7 @@ $(DEBIAN_PACKAGE): compile $(TARGET_DIR)/debian-binary prepare-package
 
 	@for dir in $$(find deb -mindepth 1 -not -name "DEBIAN" -a -type d |sed s@"^deb/"@"$(DEBIAN_TARGET_DIR)/data/"@) ; do install -m 0755 -d $${dir} ; done
 	@for file in $$(find deb -mindepth 1 -type f | grep -v "DEBIAN") ; do install -m 0644 $${file} $(DEBIAN_TARGET_DIR)/data/$${file#deb/}; done
-	@install -m 0755 $(ARTIFACT_ID) $(DEBIAN_TARGET_DIR)/data/usr/sbin/
+	@install -m 0755 $(TARGET_DIR)/$(ARTIFACT_ID) $(DEBIAN_TARGET_DIR)/data/usr/sbin/
 
 # creating data.tar.gz
 	@tar cvzf $(DEBIAN_TARGET_DIR)/data.tar.gz -C $(DEBIAN_TARGET_DIR)/data --owner=0 --group=0 .
