@@ -1,11 +1,16 @@
 DEBIAN_TARGET_DIR=$(TARGET_DIR)/deb/content
 DEBIAN_PACKAGE=$(TARGET_DIR)/deb/$(ARTIFACT_ID)_$(VERSION).deb
 
+package: $(DEBIAN_PACKAGE) sign-package
+
+.PHONY: prepare-package
+prepare-package:
+	echo "Default prepare-package, to write your own, simply define a prepare-package goal in the base Makefile (AFTER importing package-debian.mk)"
 
 $(TARGET_DIR)/debian-binary:
 	echo "2.0" > $@
 
-$(DEBIAN_PACKAGE): compile $(TARGET_DIR)/debian-binary
+$(DEBIAN_PACKAGE): compile $(TARGET_DIR)/debian-binary prepare-package
 	@echo "Creating Ubuntu 16.04 (Deb Xerus) package..."
 
 	install -m 0755 -d $(DEBIAN_TARGET_DIR)/control
@@ -21,13 +26,15 @@ $(DEBIAN_PACKAGE): compile $(TARGET_DIR)/debian-binary
 	for dir in $$(find deb -mindepth 1 -not -name "DEBIAN" -a -type d |sed s@"^deb/"@"$(DEBIAN_TARGET_DIR)/data/"@) ; do install -m 0755 -d $${dir} ; done
 	for file in $$(find deb -mindepth 1 -type f | grep -v "DEBIAN") ; do install -m 0644 $${file} $(DEBIAN_TARGET_DIR)/data/$${file#deb/}; done
 	install -m 0755 $(ARTIFACT_ID) $(DEBIAN_TARGET_DIR)/data/usr/sbin/
-	cp $(GOPATH)/src/github.com/cloudogu/cesapp/vendor/github.com/codegangsta/cli/autocomplete/bash_autocomplete $(DEBIAN_TARGET_DIR)/data/etc/bash_completion.d/cesapp
 
 # creating data.tar.gz
 	tar cvzf $(DEBIAN_TARGET_DIR)/data.tar.gz -C $(DEBIAN_TARGET_DIR)/data --owner=0 --group=0 .
 # creating package
 	ar rc $@ $(TARGET_DIR)/debian-binary $(DEBIAN_TARGET_DIR)/control.tar.gz $(DEBIAN_TARGET_DIR)/data.tar.gz
 	@echo "... deb package can be found at $@"
+
+sign-package: $(DEBIAN_PACKAGE)
+	cd $(TARGET_DIR)/deb/; shasum -a 256 $(ARTIFACT_ID)_$(VERSION).deb > $(ARTIFACT_ID)_$(VERSION).deb.sha256sum
 
 # deployment
 #

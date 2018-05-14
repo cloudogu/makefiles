@@ -6,37 +6,12 @@
 
 UID_NR:=$(shell id -u)
 GID_NR:=$(shell id -g)
-GLIDE=glide
-GLIDEFLAGS=
 LDFLAGS=-ldflags "-extldflags -static -X main.Version=$(VERSION) -X main.CommitID=$(COMMIT_ID)"
+WORKDIR=$(shell pwd)
 BUILDDIR=$(WORKDIR)/build
 TMPDIR=$(BUILDDIR)/tmp
 HOMEDIR=$(TMPDIR)/home
 PASSWD=$(TMPDIR)/passwd
-
-
-ifeq ($(ENVIRONMENT), ci)
-	GLIDEFLAGS+=--no-color
-endif
-
-.PHONY: info
-info:
-	@echo "dumping build information ..."
-	@echo "Version    : $(VERSION)"
-	@echo "Snapshot   : $(SNAPSHOT)"
-	@echo "Commit-ID  : $(COMMIT_ID)"
-	@echo "Environment: $(ENVIRONMENT)"
-	@echo "Branch     : $(BRANCH)"
-	@echo "Branch-Type: $(BRANCH_TYPE)"
-	@echo "Packages   : $(PACKAGES)"
-
-.PHONY: dependencies
-dependencies: info
-	@echo "installing dependencies ..."
-	$(GLIDE) $(GLIDEFLAGS) install -v
-
-package: $(TARGET_DIR)/$(ARTIFACT_ID)
-	cd $(TARGET_DIR) && tar cvzf $(ARTIFACT_ID)-$(VERSION).tar.gz $(ARTIFACT_ID)
 
 .PHONY: compile
 compile: $(TARGET_DIR)/$(ARTIFACT_ID) $(TARGET_DIR)/$(ARTIFACT_ID).sha256sum
