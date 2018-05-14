@@ -34,4 +34,4 @@ target/static-analysis-cs.log:
 	@$(LINT) $(LINTFLAGS) --checkstyle ./... > $@ | true
 
 $(GOPATH)/bin/reviewdog:
-	go get -u github.com/haya14busa/reviewdog/cmd/reviewdog
+	@go get -u github.com/haya14busa/reviewdog/cmd/reviewdog

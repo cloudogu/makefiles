@@ -9,10 +9,12 @@ endif
 update-dependencies: $(GLIDE) glide.lock
 
 .PHONY: dependencies
-dependencies: $(GLIDE)
-	@echo "installing dependencies ..."
-	$(GLIDE) $(GLIDEFLAGS) install -v
+dependencies: vendor
+
+vendor: $(GLIDE)
+	@echo "Installing dependencies using Glide..."
+	@$(GLIDE) $(GLIDEFLAGS) install -v
 
 $(GLIDE): 
-	curl https://glide.sh/get | sh
+	@curl https://glide.sh/get | sh
 

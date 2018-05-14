@@ -17,19 +17,19 @@ PASSWD=$(TMPDIR)/passwd
 compile: $(TARGET_DIR)/$(ARTIFACT_ID) $(TARGET_DIR)/$(ARTIFACT_ID).sha256sum
 
 $(TMPDIR): $(BUILDDIR)
-	mkdir $(TMPDIR)
+	@mkdir $(TMPDIR)
 
 $(TARGET_DIR):
-	mkdir $(TARGET_DIR)
+	@mkdir $(TARGET_DIR)
 
 $(HOMEDIR): $(TMPDIR)
-	mkdir $(HOMEDIR)
+	@mkdir $(HOMEDIR)
 
 $(PASSWD): $(TMPDIR)
-	echo "$(USER):x:$(UID_NR):$(GID_NR):$(USER):/home/$(USER):/bin/bash" > $(PASSWD)
+	@echo "$(USER):x:$(UID_NR):$(GID_NR):$(USER):/home/$(USER):/bin/bash" > $(PASSWD)
 
 $(TARGET_DIR)/$(ARTIFACT_ID): dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR)
-	docker run --rm -ti \
+	@docker run --rm -ti \
 	 -e GOOS=linux \
 	 -e GOARCH=amd64 \
 	 -u "$(UID_NR):$(GID_NR)" \
@@ -42,7 +42,7 @@ go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(TARGET_DIR)/$(ARTIFAC
 
 
 $(TARGET_DIR)/$(ARTIFACT_ID).sha256sum:
-	cd $(TARGET_DIR); shasum -a 256 $(ARTIFACT_ID) > $(ARTIFACT_ID).sha256sum
+	@cd $(TARGET_DIR); shasum -a 256 $(ARTIFACT_ID) > $(ARTIFACT_ID).sha256sum
 
 #$(TARGET_DIR)/$(ARTIFACT_ID).asc:
 #	gpg --detach-sign -o $(TARGET_DIR)/$(ARTIFACT_ID).asc $(TARGET_DIR)/$(ARTIFACT_ID)
