@@ -6,8 +6,8 @@ prepare-package:
 package: targz-package sign-package
 
 targz-package: $(TARGET_DIR)/$(ARTIFACT_ID) prepare-package
-	cd @$(TARGET_DIR) && tar cvzf $(ARTIFACT_ID)-$(VERSION).tar.gz $(ARTIFACT_ID)
+	@cd $(TARGET_DIR) && tar cvzf $(ARTIFACT_ID)-$(VERSION).tar.gz $(ARTIFACT_ID)
 
 sign-package: targz-package
 	@echo "Signing tar.gz packae"
-	cd @$(TARGET_DIR) ; shasum -a 256 $(ARTIFACT_ID)-$(VERSION).tar.gz > $(ARTIFACT_ID)-$(VERSION).tar.gz.sha256sum
+	@cd $(TARGET_DIR) ; shasum -a 256 $(ARTIFACT_ID)-$(VERSION).tar.gz > $(ARTIFACT_ID)-$(VERSION).tar.gz.sha256sum
