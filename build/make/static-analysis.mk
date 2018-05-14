@@ -1,5 +1,5 @@
 TARGETDIR=target
-LINT=$(GOPATH)/bin/geometalinter
+LINT=$(GOPATH)/bin/gometalinter
 LINTFLAGS=--vendor --exclude="vendor" --exclude="_test.go"
 LINTFLAGS+=--disable-all --enable=errcheck --enable=vet --enable=golint
 LINTFLAGS+=--deadline=2m
