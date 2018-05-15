@@ -6,7 +6,7 @@ prepare-package:
 package: targz-package checksum-package
 
 targz-package: $(TARGET_DIR)/$(ARTIFACT_ID) prepare-package
-	@cd $(TARGET_DIR) && tar cvf $(ARTIFACT_ID)-$(VERSION).tar $(ARTIFACT_ID) && gzip -fcn $(ARTIFACT_ID)-$(VERSION).tar >$(ARTIFACT_ID)-$(VERSION).tar.gz
+	@cd $(TARGET_DIR) && tar cvf $(ARTIFACT_ID)-$(VERSION).tar $(ARTIFACT_ID) --mtime="$(LAST_COMMIT_DATE)" && gzip -fcn $(ARTIFACT_ID)-$(VERSION).tar >$(ARTIFACT_ID)-$(VERSION).tar.gz
 
 checksum-package: targz-package
 	@echo "Calculating checksum of tar.gz package"
