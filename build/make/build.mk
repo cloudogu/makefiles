@@ -43,7 +43,7 @@ compile-local: dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR)
 	 -v $(HOMEDIR):/home/$(USER) \
 	 -v $(WORKDIR):/go/src/github.com/cloudogu/$(ARTIFACT_ID) \
 	 -w /go/src/github.com/cloudogu/$(ARTIFACT_ID) \
-	 cloudogu/golang:1.10 \
+	 cloudogu/golang:1.10.0 \
   make compile-generic
 
 
