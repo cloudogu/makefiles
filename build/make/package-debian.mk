@@ -38,7 +38,7 @@ $(DEBIAN_PACKAGE): compile $(TARGET_DIR)/debian-binary prepare-package
 	@echo "... deb package can be found at $@"
 
 sign-package: $(DEBIAN_PACKAGE)
-	@echo "Signing .deb package"
+	@echo "Calculating checksum of .deb package"
 	@cd $(TARGET_DIR)/deb/; shasum -a 256 $(ARTIFACT_ID)_$(VERSION).deb > $(ARTIFACT_ID)_$(VERSION).deb.sha256sum
 
 # deployment
