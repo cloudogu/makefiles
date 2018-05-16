@@ -28,7 +28,8 @@ $(PASSWD): $(TMPDIR)
 	@echo "$(USER):x:$(UID_NR):$(GID_NR):$(USER):/home/$(USER):/bin/bash" > $(PASSWD)
 
 compile-generic:
-	go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(TARGET_DIR)/$(ARTIFACT_ID)
+	@echo "Compiling..."
+	@go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(TARGET_DIR)/$(ARTIFACT_ID)
 
 compile-ci: dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR) compile-generic
 	@echo "Built on CI server"
