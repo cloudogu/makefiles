@@ -33,7 +33,7 @@ $(DEBIAN_PACKAGE): compile $(TARGET_DIR)/debian-binary prepare-package
 	fi
 
 # creating data.tar.gz
-	@tar cvf $(DEBIAN_TARGET_DIR)/data.tar -C $(DEBIAN_TARGET_DIR)/data --owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name.
+	@tar cvf $(DEBIAN_TARGET_DIR)/data.tar -C $(DEBIAN_TARGET_DIR)/data --owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name .
 	@gzip -fcn $(DEBIAN_TARGET_DIR)/data.tar > $(DEBIAN_TARGET_DIR)/data.tar.gz
 # creating package
 	@ar roc $@ $(TARGET_DIR)/debian-binary $(DEBIAN_TARGET_DIR)/control.tar.gz $(DEBIAN_TARGET_DIR)/data.tar.gz
