@@ -6,7 +6,8 @@ prepare-package:
 package: targz-package checksum-package
 
 targz-package: $(TARGET_DIR)/$(ARTIFACT_ID) prepare-package
-	@cd $(TARGET_DIR) && tar cvf $(ARTIFACT_ID)-$(VERSION).tar $(ARTIFACT_ID) --mtime="$(LAST_COMMIT_DATE)" && gzip -fcn $(ARTIFACT_ID)-$(VERSION).tar >$(ARTIFACT_ID)-$(VERSION).tar.gz
+	# Check owner and group id
+	@cd $(TARGET_DIR) && tar cvf $(ARTIFACT_ID)-$(VERSION).tar $(ARTIFACT_ID) --owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name && gzip -fcn $(ARTIFACT_ID)-$(VERSION).tar >$(ARTIFACT_ID)-$(VERSION).tar.gz
 
 checksum-package: targz-package
 	@echo "Calculating checksum of tar.gz package"
