@@ -1,6 +1,5 @@
 TARGETDIR=target
-LINT=gometalinter
-GO2XUNIT=go2xunit
+LINT=$(GOPATH)/bin/gometalinter
 LINTFLAGS=--vendor --exclude="vendor" --exclude="_test.go"
 LINTFLAGS+=--disable-all --enable=errcheck --enable=vet --enable=golint
 LINTFLAGS+=--deadline=2m
@@ -20,6 +19,9 @@ static-analysis-local: target/static-analysis-cs.log target/static-analysis.log
 	@echo ""
 	@cat $< | reviewdog -f checkstyle -diff "git diff develop"
 
+$(LINT): 
+	go get -u gopkg.in/alecthomas/gometalinter.v2
+
 target/static-analysis.log: 
 	@mkdir -p $(TARGETDIR)
 	@echo ""
@@ -32,4 +34,4 @@ target/static-analysis-cs.log:
 	@$(LINT) $(LINTFLAGS) --checkstyle ./... > $@ | true
 
 $(GOPATH)/bin/reviewdog:
-	go get -u github.com/haya14busa/reviewdog/cmd/reviewdog
+	@go get -u github.com/haya14busa/reviewdog/cmd/reviewdog

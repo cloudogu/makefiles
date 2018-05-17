@@ -1,40 +1,31 @@
-# collect packages and dependencies for later usage
-PACKAGES=$(shell go list ./... | grep -v /vendor/)
-
 # Set these to the desired values
 ARTIFACT_ID=
 VERSION=
-BUILD_TIME:=$(shell date +%FT%T%z)
-COMMIT_ID:=$(shell git rev-parse HEAD)
-WORKDIR=$(shell pwd)
-TARGET_DIR=target
 
-# choose the environment, if BUILD_URL environment variable is available then we are on ci (jenkins)
-ifdef BUILD_URL
-ENVIRONMENT=ci
-else
-ENVIRONMENT=local
-endif
+MAKEFILES_VERSION= # Set this once we have a stable release
 
-# default goal is "compile"
-#
 .DEFAULT_GOAL:=compile
 
-# updating dependencies
+include build/make/variables.mk
+
+include build/make/info.mk
+
 include build/make/dependencies_glide.mk
 
-# Build step
 include build/make/build.mk
 
-# unit tests
 include build/make/unit-test.mk
 
-# static analysis
 include build/make/static-analysis.mk
 
-# clean lifecycle
 include build/make/clean.mk
 
-include build/make/update-makefiles.mk
-
 include build/make/package-debian.mk
+
+.PHONY: update-makefiles
+update-makefiles:
+	@echo Updating makefiles...
+	@curl -L --silent https://github.com/cloudogu/makefiles/archive/v$(MAKEFILES_VERSION).tar.gz > $(TMPDIR)/makefiles-v$(MAKEFILES_VERSION).tar.gz
+
+	@tar -xzf $(TMPDIR)/makefiles-v$(MAKEFILES_VERSION).tar.gz -C $(TMPDIR)
+	@cp -r $(TMPDIR)/makefiles-$(MAKEFILES_VERSION)/build/make $(BUILDDIR)
