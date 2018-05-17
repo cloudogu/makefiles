@@ -1,7 +1,7 @@
 GODEP=$(GOPATH)/bin/dep
 
 $(GODEP):
-	@go get -u github.com/golang/dep/cmd/dep
+	@curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 vendor:  $(GODEP)
 	@echo "Installing dependencies using go dep..."
