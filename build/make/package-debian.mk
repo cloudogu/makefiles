@@ -60,17 +60,17 @@ undeploy: deploy-check
 	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X DELETE -H 'Content-Type: application/json' --data "{\"PackageRefs\": $${PREF}}" ${APT_API_BASE_URL}/repos/xenial/packages
 	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X PUT -H "Content-Type: application/json" --data '{"Signing": { "Batch": true, "Passphrase": "${APT_API_SIGNPHRASE}"}}' ${APT_API_BASE_URL}/publish/xenial/xenial
 
-upload-info:
+upload-info: deploy-check
 	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/files" |jq
 	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/files/xenial" |jq
 
-repo-info:
+repo-info: deploy-check
 	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/repos" |jq
 	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/repos/xenial" |jq
 	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/repos/xenial/packages" |jq
 
-pub-info:
+pub-info: deploy-check
 	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/publish" |jq
 
-create-repos:
+create-repos: deploy-check
 	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X POST -H 'Content-Type: application/json' --data '{"Name": "xenial", "DefaultDistribution": "xenial", "DefaultComponent": "main"}' "${APT_API_BASE_URL}/repos" |jq
