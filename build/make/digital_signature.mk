@@ -1,6 +1,9 @@
 .PHONY: digital_signature
 
-digital_signature: creating_checksum generating_signature
+digital_signature: preparartion creating_checksum generating_signature
+
+preparartion:
+	rm -f $(TARGET_DIR)/Checksums.asc $(TARGET_DIR)/Checksums.sha256sum
 
 creating_checksum:
 	echo "Generating Checksums"
