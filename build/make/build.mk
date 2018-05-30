@@ -13,7 +13,7 @@ HOMEDIR=$(TMPDIR)/home
 PASSWD=$(TMPDIR)/passwd
 
 .PHONY: compile
-compile: $(TARGET_DIR)/$(ARTIFACT_ID) $(TARGET_DIR)/$(ARTIFACT_ID).sha256sum
+compile: $(TARGET_DIR)/$(ARTIFACT_ID)
 
 $(TMPDIR): $(BUILDDIR)
 	@mkdir $(TMPDIR)
@@ -55,9 +55,6 @@ else
   $(TARGET_DIR)/$(ARTIFACT_ID): compile-local
 endif
 
-
-$(TARGET_DIR)/$(ARTIFACT_ID).sha256sum:
-	@cd $(TARGET_DIR); shasum -a 256 $(ARTIFACT_ID) > $(ARTIFACT_ID).sha256sum
 
 #$(TARGET_DIR)/$(ARTIFACT_ID).asc:
 #	gpg --detach-sign -o $(TARGET_DIR)/$(ARTIFACT_ID).asc $(TARGET_DIR)/$(ARTIFACT_ID)
