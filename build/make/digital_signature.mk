@@ -15,5 +15,9 @@ creating_checksum:
 
 generating_signature:
 	@echo "Generating Signature"
+ifneq (,$(wildcard $(CHECKSUM_FILE)))
 	@gpg --detach-sign -o $(SIGNATURE_FILE) $(CHECKSUM_FILE)
+else
+	@echo "cannot generate signature since no checksum file exists"
+endif
 
