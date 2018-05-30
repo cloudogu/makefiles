@@ -22,6 +22,8 @@ include build/make/clean.mk
 
 include build/make/package-debian.mk
 
+include build/make/digital_signature.mk
+
 .PHONY: update-makefiles
 update-makefiles:
 	@echo Updating makefiles...
