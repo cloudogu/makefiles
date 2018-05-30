@@ -11,13 +11,9 @@ preparartion:
 
 creating_checksum:
 	@echo "Generating Checksums"
-	@$(foreach file,$(wildcard $(TARGET_DIR)/*), shasum -a 256 $(file) >> $(CHECKSUM_FILE);)
+	@shasum -a 256 $(TARGET_DIR)/* >> $(CHECKSUM_FILE)
 
 generating_signature:
 	@echo "Generating Signature"
-ifneq (,$(wildcard $(CHECKSUM_FILE)))
 	@gpg --detach-sign -o $(SIGNATURE_FILE) $(CHECKSUM_FILE)
-else
-	@echo "cannot generate signature since no checksum file exists"
-endif
 
