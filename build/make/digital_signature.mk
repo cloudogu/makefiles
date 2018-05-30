@@ -1,6 +1,6 @@
 CHECKSUMS=checksums
-CHECKSUM_FILE=$(TARGET_DIR)/$(CHECKSUMS).sha256sum
-SIGNATURE_FILE=$(TARGET_DIR)/$(CHECKSUMS).asc
+CHECKSUM_FILE=$(CHECKSUMS).sha256sum
+SIGNATURE_FILE=$(CHECKSUM_FILE).asc
 
 .PHONY: signature
 
@@ -11,9 +11,9 @@ preparartion:
 
 creating_checksum:
 	@echo "Generating Checksums"
-	@shasum -a 256 $(TARGET_DIR)/* >> $(CHECKSUM_FILE)
+	@cd $(TARGET_DIR); shasum -a 256 * >> $(CHECKSUM_FILE)
 
 generating_signature:
 	@echo "Generating Signature"
-	@gpg --detach-sign -o $(SIGNATURE_FILE) $(CHECKSUM_FILE)
+	@cd $(TARGET_DIR); gpg --detach-sign -o $(SIGNATURE_FILE) $(CHECKSUM_FILE)
 
