@@ -1,15 +1,19 @@
-.PHONY: digital_signature
+CHECKSUMS=checksums
+CHECKSUM_FILE=$(TARGET_DIR)/$(CHECKSUMS).sha256sum
+SIGNATURE_FILE=$(TARGET_DIR)/$(CHECKSUMS).asc
 
-digital_signature: preparartion creating_checksum generating_signature
+.PHONY: signature
+
+signature: preparartion creating_checksum generating_signature
 
 preparartion:
-	@rm -f $(TARGET_DIR)/Checksums.asc $(TARGET_DIR)/Checksums.sha256sum
+	@rm -f $(SIGNATURE_FILE) $(CHECKSUM_FILE)
 
 creating_checksum:
 	@echo "Generating Checksums"
-	@$(foreach file,$(wildcard $(TARGET_DIR)/*), shasum -a 256 $(file) >> $(TARGET_DIR)/Checksums.sha256sum;)
+	@$(foreach file,$(wildcard $(TARGET_DIR)/*), shasum -a 256 $(file) >> $(CHECKSUM_FILE);)
 
 generating_signature:
 	@echo "Generating Signature"
-	@gpg --detach-sign -o $(TARGET_DIR)/Checksums.asc $(TARGET_DIR)/Checksums.sha256sum
+	@gpg --detach-sign -o $(SIGNATURE_FILE) $(CHECKSUM_FILE)
 
