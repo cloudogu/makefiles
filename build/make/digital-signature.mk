@@ -1,5 +1,4 @@
-CHECKSUMS=checksums
-CHECKSUM_FILE=$(CHECKSUMS).sha256sum
+CHECKSUM_FILE=checksums.sha256sum
 SIGNATURE_FILE=$(CHECKSUM_FILE).asc
 
 .PHONY: signature
