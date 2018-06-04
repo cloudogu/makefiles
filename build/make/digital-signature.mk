@@ -4,9 +4,9 @@ SIGNATURE_FILE=$(CHECKSUM_FILE).asc
 
 .PHONY: signature
 
-signature: preparartion creating_checksum generating_signature
+signature: preparation creating_checksum generating_signature
 
-preparartion:
+preparation:
 	@rm -f $(SIGNATURE_FILE) $(CHECKSUM_FILE)
 
 creating_checksum:
