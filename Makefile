@@ -10,7 +10,7 @@ include build/make/variables.mk
 
 include build/make/info.mk
 
-include build/make/dependencies_glide.mk
+include build/make/dependencies-glide.mk
 
 include build/make/build.mk
 
@@ -22,7 +22,7 @@ include build/make/clean.mk
 
 include build/make/package-debian.mk
 
-include build/make/digital_signature.mk
+include build/make/digital-signature.mk
 
 .PHONY: update-makefiles
 update-makefiles:
