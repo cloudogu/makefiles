@@ -6,7 +6,7 @@ LINTFLAGS+=--deadline=2m
 
 
 .PHONY: static-analysis
-static-analysis: $(GOPATH)/bin/reviewdog static-analysis-$(ENVIRONMENT)
+static-analysis: $(GOPATH)/bin/reviewdog $(GOPATH)/bin/errcheck static-analysis-$(ENVIRONMENT)
 
 .PHONY: static-analysis-ci
 static-analysis-ci: target/static-analysis-cs.log
@@ -35,3 +35,6 @@ target/static-analysis-cs.log:
 
 $(GOPATH)/bin/reviewdog:
 	@go get -u github.com/haya14busa/reviewdog/cmd/reviewdog
+
+$(GOPATH)/bin/errcheck:
+	@go get -u github.com/kisielk/errcheck
