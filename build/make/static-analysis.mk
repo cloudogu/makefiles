@@ -1,12 +1,10 @@
 TARGETDIR=target
-LINT=$(GOPATH)/bin/gometalinter
-LINTFLAGS=--vendor --exclude="vendor" --exclude="_test.go"
-LINTFLAGS+=--disable-all --enable=errcheck --enable=vet --enable=golint
-LINTFLAGS+=--deadline=2m
-
+LINT=$(GOPATH)/bin/golangci-lint
+# ignore tests and mocks
+LINTFLAGS=--tests=false --skip-files="^.*_mock.go$$" --skip-files="^.*/mock.*.go$$"
 
 .PHONY: static-analysis
-static-analysis: $(GOPATH)/bin/reviewdog $(GOPATH)/bin/errcheck static-analysis-$(ENVIRONMENT)
+static-analysis: $(GOPATH)/bin/reviewdog static-analysis-$(ENVIRONMENT)
 
 .PHONY: static-analysis-ci
 static-analysis-ci: target/static-analysis-cs.log
@@ -17,24 +15,21 @@ static-analysis-local: target/static-analysis-cs.log target/static-analysis.log
 	@echo ""
 	@echo "differences to develop branch:"
 	@echo ""
-	@cat $< | reviewdog -f checkstyle -diff "git diff develop"
+	@cat $< | $(GOPATH)/bin/reviewdog -f checkstyle -diff "git diff develop"
 
 $(LINT): 
-	go get -u gopkg.in/alecthomas/gometalinter.v2
+	@go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 
-target/static-analysis.log: 
+target/static-analysis.log: $(LINT)
 	@mkdir -p $(TARGETDIR)
 	@echo ""
 	@echo "complete static analysis:"
 	@echo ""
-	@$(LINT) $(LINTFLAGS) ./... | tee $@
+	@$(LINT) $(LINTFLAGS) run ./... | tee $@
 
-target/static-analysis-cs.log:
+target/static-analysis-cs.log: $(LINT)
 	@mkdir -p $(TARGETDIR)
-	@$(LINT) $(LINTFLAGS) --checkstyle ./... > $@ | true
+	@$(LINT) $(LINTFLAGS) run --out-format=checkstyle ./... > $@ | true
 
 $(GOPATH)/bin/reviewdog:
 	@go get -u github.com/haya14busa/reviewdog/cmd/reviewdog
-
-$(GOPATH)/bin/errcheck:
-	@go get -u github.com/kisielk/errcheck
