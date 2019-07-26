@@ -2,7 +2,6 @@
 clean:
 	rm -rf ${TARGET_DIR}
 	rm -rf ${TMPDIR}
-	rm -rf ${DEBIAN_TARGET}
 
 .PHONY: dist-clean
 dist-clean: clean

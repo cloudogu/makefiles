@@ -1,19 +1,17 @@
-DEBIAN_TARGET_DIR=$(DEBIAN_TARGET)/deb/content
-DEBIAN_PACKAGE=$(TARGET_DIR)/$(ARTIFACT_ID)_$(VERSION).deb
+DEBIAN_TARGET_DIR=$(TARGET_DIR)/deb/content
+DEBIAN_PACKAGE=$(TARGET_DIR)/deb/$(ARTIFACT_ID)_$(VERSION).deb
+PREPARE_PACKAGE?=prepare-package
 
-package: $(DEBIAN_TARGET) $(DEBIAN_PACKAGE)
+package: $(DEBIAN_PACKAGE) checksum-package
 
 .PHONY: prepare-package
 prepare-package:
-	@echo "Default prepare-package, to write your own, simply define a prepare-package goal in the base Makefile (AFTER importing package-debian.mk)"
+	@echo "Default prepare-package, to write your own, define a your own target and specify it in the PREPARE_PACKAGE variable, before the package-debian.mk import"
 
-$(DEBIAN_TARGET):
-	mkdir $(DEBIAN_TARGET)
-
-$(DEBIAN_TARGET)/debian-binary:
+$(TARGET_DIR)/debian-binary:
 	@echo "2.0" > $@
 
-$(DEBIAN_PACKAGE): compile $(DEBIAN_TARGET)/debian-binary prepare-package
+$(DEBIAN_PACKAGE): compile $(TARGET_DIR)/debian-binary ${PREPARE_PACKAGE}
 	@echo "Creating .deb package..."
 
 	@install -p -m 0755 -d $(DEBIAN_TARGET_DIR)/control
@@ -21,7 +19,7 @@ $(DEBIAN_PACKAGE): compile $(DEBIAN_TARGET)/debian-binary prepare-package
 	@install -p -m 0644 $(DEBIAN_TARGET_DIR)/_control $(DEBIAN_TARGET_DIR)/control/control
 
 # creating control.tar.gz
-	@tar cvf $(DEBIAN_TARGET_DIR)/control.tar -C $(DEBIAN_TARGET_DIR)/control --owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name  .
+	@tar cvf $(DEBIAN_TARGET_DIR)/control.tar -C $(DEBIAN_TARGET_DIR)/control --owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name .
 	@gzip -fcn $(DEBIAN_TARGET_DIR)/control.tar > $(DEBIAN_TARGET_DIR)/control.tar.gz
 
 # populating data directory
@@ -29,20 +27,22 @@ $(DEBIAN_PACKAGE): compile $(DEBIAN_TARGET)/debian-binary prepare-package
 	@for file in $$(find deb -mindepth 1 -type f | grep -v "DEBIAN") ; do install -m 0644 $${file} $(DEBIAN_TARGET_DIR)/data/$${file#deb/}; done
 
 # Copy binary to /usr/sbin, if it exists
-	@if [ -f $(DEBIAN_TARGET)/$(ARTIFACT_ID) ]; then \
+	@if [ -f $(TARGET_DIR)/$(ARTIFACT_ID) ]; then \
 		echo "Copying binary to /usr/sbin"; \
 		install -p -m 0755 -d $(DEBIAN_TARGET_DIR)/data/usr/sbin; \
-		install -p -m 0755 $(DEBIAN_TARGET)/$(ARTIFACT_ID) $(DEBIAN_TARGET_DIR)/data/usr/sbin/; \
+		install -p -m 0755 $(TARGET_DIR)/$(ARTIFACT_ID) $(DEBIAN_TARGET_DIR)/data/usr/sbin/; \
 	fi
 
 # creating data.tar.gz
-	@tar cvf $(DEBIAN_TARGET_DIR)/data.tar -C $(DEBIAN_TARGET_DIR)/data --owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name  .
+	@tar cvf $(DEBIAN_TARGET_DIR)/data.tar -C $(DEBIAN_TARGET_DIR)/data --owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name .
 	@gzip -fcn $(DEBIAN_TARGET_DIR)/data.tar > $(DEBIAN_TARGET_DIR)/data.tar.gz
 # creating package
-	@ar roc $@ $(DEBIAN_TARGET)/debian-binary $(DEBIAN_TARGET_DIR)/control.tar.gz $(DEBIAN_TARGET_DIR)/data.tar.gz
+	@ar roc $@ $(TARGET_DIR)/debian-binary $(DEBIAN_TARGET_DIR)/control.tar.gz $(DEBIAN_TARGET_DIR)/data.tar.gz
 	@echo "... deb package can be found at $@"
-# removing tmp folder
-	@rm -rf ${DEBIAN_TARGET}/tmp
+
+checksum-package: $(DEBIAN_PACKAGE)
+	@echo "Calculating checksum of .deb package"
+	@cd $(TARGET_DIR)/deb/; shasum -a 256 $(ARTIFACT_ID)_$(VERSION).deb > $(ARTIFACT_ID)_$(VERSION).deb.sha256sum
 
 # deployment
 deploy-check:
@@ -75,4 +75,3 @@ pub-info: deploy-check
 
 create-repos: deploy-check
 	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X POST -H 'Content-Type: application/json' --data '{"Name": "xenial", "DefaultDistribution": "xenial", "DefaultComponent": "main"}' "${APT_API_BASE_URL}/repos" |jq
-

@@ -1,5 +1,4 @@
 TARGET_DIR=target
-DEBIAN_TARGET = target_deb
 
 COMMIT_ID:=$(shell git rev-parse HEAD)
 LAST_COMMIT_DATE=$(shell git rev-list --format=format:'%ci' --max-count=1 `git rev-parse HEAD` | tail -1)
