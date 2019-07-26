@@ -11,6 +11,8 @@ BUILDDIR=$(WORKDIR)/build
 TMPDIR=$(BUILDDIR)/tmp
 HOMEDIR=$(TMPDIR)/home
 PASSWD=$(TMPDIR)/passwd
+GOIMAGE?=cloudogu/golang
+GOTAG?=1.10.2-2
 
 .PHONY: compile
 compile: $(TARGET_DIR)/$(ARTIFACT_ID)
@@ -44,7 +46,7 @@ compile-local: dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR)
 	 -v $(HOMEDIR):/home/$(USER) \
 	 -v $(WORKDIR):/go/src/github.com/cloudogu/$(ARTIFACT_ID) \
 	 -w /go/src/github.com/cloudogu/$(ARTIFACT_ID) \
-	 cloudogu/golang:1.10.2 \
+	 $(GOIMAGE):$(GOTAG) \
   make compile-generic
 
 
