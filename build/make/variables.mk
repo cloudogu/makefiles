@@ -16,3 +16,24 @@ ENVIRONMENT=ci
 else
 ENVIRONMENT=local
 endif
+
+UID_NR:=$(shell id -u)
+GID_NR:=$(shell id -g)
+BUILDDIR=$(WORKDIR)/build
+TMPDIR=$(BUILDDIR)/tmp
+HOMEDIR=$(TMPDIR)/home
+PASSWD=$(TMPDIR)/passwd
+
+$(TMPDIR): $(BUILDDIR)
+	@mkdir $(TMPDIR)
+
+$(TARGET_DIR):
+	@mkdir $(TARGET_DIR)
+
+$(HOMEDIR): $(TMPDIR)
+	@mkdir $(HOMEDIR)
+
+$(PASSWD): $(TMPDIR)
+	@echo "$(USER):x:$(UID_NR):$(GID_NR):$(USER):/home/$(USER):/bin/bash" > $(PASSWD)
+
+PRE_COMPILE?=
