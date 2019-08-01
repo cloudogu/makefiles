@@ -30,6 +30,8 @@ else
 ENVIRONMENT=local
 endif
 
+YARN_TARGET=$(WORKDIR)/node_modules
+BOWER_TARGET?=$(WORKDIR)/public/vendor
 
 UID_NR:=$(shell id -u)
 GID_NR:=$(shell id -g)

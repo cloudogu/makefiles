@@ -63,7 +63,7 @@ upload-package: deploy-check $(DEBIAN_PACKAGE)
 .PHONY: add-package-to-repo
 add-package-to-repo: upload-package
 	@echo "... add package to repositories"
-#$(APTLY) -X POST "${APT_API_BASE_URL}/repos/ces/file/$$(basename ${DEBIAN_PACKAGE})?noRemove=1"
+#$(APTLY) -X POST "${APT_API_BASE_URL}/repos/xenial/file/$$(basename ${DEBIAN_PACKAGE})?noRemove=1"
 	@$(APTLY) -X POST "${APT_API_BASE_URL}/repos/ces/file/$$(basename ${DEBIAN_PACKAGE})"
 
 define aptly_publish
