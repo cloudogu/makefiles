@@ -8,35 +8,37 @@ UID_NR:=$(shell id -u)
 GID_NR:=$(shell id -g)
 LDFLAGS=-ldflags "-extldflags -static -X main.Version=$(VERSION) -X main.CommitID=$(COMMIT_ID)"
 BUILDDIR=$(WORKDIR)/build
-TMPDIR=$(BUILDDIR)/tmp
-HOMEDIR=$(TMPDIR)/home
-PASSWD=$(TMPDIR)/passwd
+HOMEDIR=$(TMP_DIR)/home
+PASSWD=$(TMP_DIR)/passwd
 GOIMAGE?=cloudogu/golang
 GOTAG?=1.10.2-2
 
 .PHONY: compile
-compile: $(TARGET_DIR)/$(ARTIFACT_ID)
+compile: $(BINARY)
 
-$(TMPDIR): $(BUILDDIR)
-	@mkdir $(TMPDIR)
+$(TMP_DIR):
+	@mkdir $(TMP_DIR)
 
-$(TARGET_DIR):
-	@mkdir $(TARGET_DIR)
-
-$(HOMEDIR): $(TMPDIR)
+$(HOMEDIR): $(TMP_DIR)
 	@mkdir $(HOMEDIR)
 
-$(PASSWD): $(TMPDIR)
+$(PASSWD): $(TMP_DIR)
 	@echo "$(USER):x:$(UID_NR):$(GID_NR):$(USER):/home/$(USER):/bin/bash" > $(PASSWD)
 
 compile-generic:
 	@echo "Compiling..."
-	@go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(TARGET_DIR)/$(ARTIFACT_ID)
+	@go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(BINARY)
 
-compile-ci: dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR) compile-generic
+
+ifeq ($(ENVIRONMENT), ci)
+
+$(BINARY): $(SRC) vendor
 	@echo "Built on CI server"
+	@make compile-generic
 
-compile-local: dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR)
+else
+
+$(BINARY): $(SRC) vendor $(PASSWD) $(HOMEDIR)
 	@echo "Building locally (in Docker)"
 	@docker run --rm \
 	 -e GOOS=linux \
