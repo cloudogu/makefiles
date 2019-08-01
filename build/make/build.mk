@@ -12,6 +12,8 @@ HOMEDIR=$(TMP_DIR)/home
 PASSWD=$(TMP_DIR)/passwd
 GOIMAGE?=cloudogu/golang
 GOTAG?=1.10.2-2
+GOOS?=linux
+GOARCH?=amd64
 
 .PHONY: compile
 compile: $(BINARY)
@@ -41,8 +43,8 @@ else
 $(BINARY): $(SRC) vendor $(PASSWD) $(HOMEDIR)
 	@echo "Building locally (in Docker)"
 	@docker run --rm \
-	 -e GOOS=linux \
-	 -e GOARCH=amd64 \
+	 -e GOOS=$(GOOS) \
+	 -e GOARCH=$(GOARCH) \
 	 -u "$(UID_NR):$(GID_NR)" \
 	 -v $(PASSWD):/etc/passwd:ro \
 	 -v $(HOMEDIR):/home/$(USER) \
@@ -51,10 +53,4 @@ $(BINARY): $(SRC) vendor $(PASSWD) $(HOMEDIR)
 	 $(GOIMAGE):$(GOTAG) \
   make compile-generic
 
-
-$(TARGET_DIR)/$(ARTIFACT_ID): dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR)
-ifeq ($(ENVIRONMENT), ci)
-  $(TARGET_DIR)/$(ARTIFACT_ID): compile-ci
-else
-  $(TARGET_DIR)/$(ARTIFACT_ID): compile-local
 endif
