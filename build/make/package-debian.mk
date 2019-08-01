@@ -45,6 +45,8 @@ $(DEBIAN_PACKAGE): $(BINARY) $(DEBIAN_BUILD_DIR)/debian-binary ${PREPARE_PACKAGE
 	@ar roc $@ $(DEBIAN_BUILD_DIR)/debian-binary $(DEBIAN_CONTENT_DIR)/control.tar.gz $(DEBIAN_CONTENT_DIR)/data.tar.gz
 	@echo "... deb package can be found at $@"
 
+APTLY:=curl --silent --show-error --fail -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}"
+
 # deployment
 .PHONY: deploy-check
 deploy-check:
@@ -56,51 +58,37 @@ deploy-check:
 .PHONY: upload-package
 upload-package: deploy-check $(DEBIAN_PACKAGE)
 	@echo "... uploading package"
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -F file=@"${DEBIAN_PACKAGE}" "${APT_API_BASE_URL}/files/${DEBIAN_PACKAGE}"
+	@$(APTLY) -F file=@"${DEBIAN_PACKAGE}" "${APT_API_BASE_URL}/files/$$(basename ${DEBIAN_PACKAGE})"
 
 .PHONY: add-package-to-repo
 add-package-to-repo: upload-package
 	@echo "... add package to repositories"
-	# @curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X POST "${APT_API_BASE_URL}/repos/xenial/file/${DEBIAN_PACKAGE}"
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X POST "${APT_API_BASE_URL}/repos/ces/file/${DEBIAN_PACKAGE}"
+#$(APTLY) -X POST "${APT_API_BASE_URL}/repos/ces/file/$$(basename ${DEBIAN_PACKAGE})?noRemove=1"
+	@$(APTLY) -X POST "${APT_API_BASE_URL}/repos/ces/file/$$(basename ${DEBIAN_PACKAGE})"
 
 define aptly_publish
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X PUT -H "Content-Type: application/json" --data '{"Signing": { "Batch": true, "Passphrase": "${APT_API_SIGNPHRASE}"}}' ${APT_API_BASE_URL}/publish/$(1)/$(2)
+	$(APTLY) -X PUT -H "Content-Type: application/json" --data '{"Signing": { "Batch": true, "Passphrase": "${APT_API_SIGNPHRASE}"}}' ${APT_API_BASE_URL}/publish/$(1)/$(2)
 endef
 
 .PHONY: publish
-publish: add-package-to-repo
+publish:
 	@echo "... publish packages"
-	# @curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X PUT -H "Content-Type: application/json" --data '{"Signing": { "Batch": true, "Passphrase": "${APT_API_SIGNPHRASE}"}}' ${APT_API_BASE_URL}/publish/xenial/xenial
-	# @curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X PUT -H "Content-Type: application/json" --data '{"Signing": { "Batch": true, "Passphrase": "${APT_API_SIGNPHRASE}"}}' ${APT_API_BASE_URL}/publish/ces/xenial
-	# @curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X PUT -H "Content-Type: application/json" --data '{"Signing": { "Batch": true, "Passphrase": "${APT_API_SIGNPHRASE}"}}' ${APT_API_BASE_URL}/publish/ces/bionic
-	$(aptly_publish "ces", "xenial")
-	$(aptly_publish "ces", "bionic")
+#@$(call aptly_publish,xenial,xenial)
+	@$(call aptly_publish,ces,xenial)
+	@$(call aptly_publish,ces,bionic)
 
 .PHONY: deploy
-deploy: publish
+deploy: add-package-to-repo publish
+
+define aptly_undeploy
+	PREF=$$(${APTLY} "${APT_API_BASE_URL}/repos/ces/packages?q=${ARTIFACT_ID}%20(${VERSION})"); \
+	${APTLY} -X DELETE -H 'Content-Type: application/json' --data "{\"PackageRefs\": $${PREF}}" ${APT_API_BASE_URL}/repos/$(1)/packages
+endef
+
+.PHONY: remove-package-from-repo
+remove-package-from-repo:
+# @$(call aptly_undeploy,xenial)
+	@$(call aptly_undeploy,ces)
 
 .PHONY: undeploy
-undeploy: deploy-check
-	PREF=$$(curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/repos/ces/packages?q=${ARTIFACT_ID}%20(${VERSION})"); \
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X DELETE -H 'Content-Type: application/json' --data "{\"PackageRefs\": $${PREF}}" ${APT_API_BASE_URL}/repos/ces/packages
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X PUT -H "Content-Type: application/json" --data '{"Signing": { "Batch": true, "Passphrase": "${APT_API_SIGNPHRASE}"}}' ${APT_API_BASE_URL}/publish/ces
-  #PREF=$$(curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/repos/xenial/packages?q=${ARTIFACT_ID}%20(${VERSION})"); \
-	#curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X DELETE -H 'Content-Type: application/json' --data "{\"PackageRefs\": $${PREF}}" ${APT_API_BASE_URL}/repos/xenial/packages
-	#curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X PUT -H "Content-Type: application/json" --data '{"Signing": { "Batch": true, "Passphrase": "${APT_API_SIGNPHRASE}"}}' ${APT_API_BASE_URL}/publish/xenial/xenial
-
-
-upload-info: deploy-check
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/files" |jq
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/files/xenial" |jq
-
-repo-info: deploy-check
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/repos" |jq
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/repos/xenial" |jq
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/repos/xenial/packages" |jq
-
-pub-info: deploy-check
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" "${APT_API_BASE_URL}/publish" |jq
-
-create-repos: deploy-check
-	curl --silent -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}" -X POST -H 'Content-Type: application/json' --data '{"Name": "xenial", "DefaultDistribution": "xenial", "DefaultComponent": "main"}' "${APT_API_BASE_URL}/repos" |jq
+undeploy: deploy-check remove-package-from-repo publish
