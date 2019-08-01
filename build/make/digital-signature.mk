@@ -1,18 +1,17 @@
-CHECKSUM_FILE=checksums.sha256sum
-SIGNATURE_FILE=$(CHECKSUM_FILE).asc
+CHECKSUM=$(TARGET_DIR)/$(ARTIFACT_ID).sha256sum
+
+.PHONY: checksum
+checksum: $(CHECKSUM)
+# we have to depend on target dir, because we want to rebuild the checksum
+# if one of the artifact gets changed
+$(CHECKSUM): $(TARGET_DIR)
+	@echo "Generating Checksums"
+	@cd $(TARGET_DIR); ls | egrep -v ".(sha256sum|asc)$$" | xargs shasum -a 256 > $$(basename $@)
+
+SIGNATURE=$(CHECKSUM).asc
 
 .PHONY: signature
-
-signature: preparation creating_checksum generating_signature
-
-preparation:
-	@rm -f $(SIGNATURE_FILE) $(CHECKSUM_FILE)
-
-creating_checksum:
-	@echo "Generating Checksums"
-	@cd $(TARGET_DIR); shasum -a 256 * >> $(CHECKSUM_FILE)
-
-generating_signature:
+signature: $(SIGNATURE)
+$(SIGNATURE): $(TARGET_DIR)/$(ARTIFACT_ID).sha256sum
 	@echo "Generating Signature"
-	@cd $(TARGET_DIR); gpg --detach-sign -o $(SIGNATURE_FILE) $(CHECKSUM_FILE)
-
+	@gpg --batch --yes --detach-sign --armor -o $@ $<
