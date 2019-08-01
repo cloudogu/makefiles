@@ -6,6 +6,9 @@ MAKEFILES_VERSION= # Set this once we have a stable release
 
 .DEFAULT_GOAL:=compile
 
+# set PRE_COMPILE to define steps that shall be executed before the go build
+# PRE_COMPILE=
+
 include build/make/variables.mk
 
 include build/make/info.mk
@@ -23,6 +26,13 @@ include build/make/clean.mk
 include build/make/package-debian.mk
 
 include build/make/digital-signature.mk
+
+include build/make/yarn.mk
+
+include build/make/bower.mk
+
+
+
 
 .PHONY: update-makefiles
 update-makefiles:

@@ -4,28 +4,16 @@
 # As a consequence make build will always trigger a full build, even if targets already exist.
 #
 
-UID_NR:=$(shell id -u)
-GID_NR:=$(shell id -g)
+
 LDFLAGS=-ldflags "-extldflags -static -X main.Version=$(VERSION) -X main.CommitID=$(COMMIT_ID)"
-BUILDDIR=$(WORKDIR)/build
-HOMEDIR=$(TMP_DIR)/home
-PASSWD=$(TMP_DIR)/passwd
 GOIMAGE?=cloudogu/golang
 GOTAG?=1.10.2-2
 GOOS?=linux
 GOARCH?=amd64
+PRE_COMPILE?=
 
 .PHONY: compile
 compile: $(BINARY)
-
-$(TMP_DIR):
-	@mkdir $(TMP_DIR)
-
-$(HOMEDIR): $(TMP_DIR)
-	@mkdir $(HOMEDIR)
-
-$(PASSWD): $(TMP_DIR)
-	@echo "$(USER):x:$(UID_NR):$(GID_NR):$(USER):/home/$(USER):/bin/bash" > $(PASSWD)
 
 compile-generic:
 	@echo "Compiling..."
@@ -34,20 +22,20 @@ compile-generic:
 
 ifeq ($(ENVIRONMENT), ci)
 
-$(BINARY): $(SRC) vendor
+$(BINARY): $(SRC) vendor $(PRE_COMPILE)
 	@echo "Built on CI server"
 	@make compile-generic
 
 else
 
-$(BINARY): $(SRC) vendor $(PASSWD) $(HOMEDIR)
+$(BINARY): $(SRC) vendor $(PASSWD) $(HOME_DIR) $(PRE_COMPILE)
 	@echo "Building locally (in Docker)"
 	@docker run --rm \
 	 -e GOOS=$(GOOS) \
 	 -e GOARCH=$(GOARCH) \
 	 -u "$(UID_NR):$(GID_NR)" \
 	 -v $(PASSWD):/etc/passwd:ro \
-	 -v $(HOMEDIR):/home/$(USER) \
+	 -v $(HOME_DIR):/home/$(USER) \
 	 -v $(WORKDIR):/go/src/github.com/cloudogu/$(ARTIFACT_ID) \
 	 -w /go/src/github.com/cloudogu/$(ARTIFACT_ID) \
 	 $(GOIMAGE):$(GOTAG) \
