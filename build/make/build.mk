@@ -4,8 +4,8 @@
 # As a consequence make build will always trigger a full build, even if targets already exist.
 #
 
-
-LDFLAGS=-ldflags "-extldflags -static -X main.Version=$(VERSION) -X main.CommitID=$(COMMIT_ID)"
+ADDITIONAL_LDFLAGS?=-extldflags -static
+LDFLAGS?=-ldflags "$(ADDITIONAL_LDFLAGS) -X main.Version=$(VERSION) -X main.CommitID=$(COMMIT_ID)"
 GOIMAGE?=cloudogu/golang
 GOTAG?=1.10.2-2
 GOOS?=linux
