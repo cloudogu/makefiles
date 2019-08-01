@@ -6,7 +6,7 @@ checksum: $(CHECKSUM)
 # if one of the artifact gets changed
 $(CHECKSUM): $(TARGET_DIR)
 	@echo "Generating Checksums"
-	@cd $(TARGET_DIR); ls | egrep -v ".(sha256sum|asc)$$" | xargs shasum -a 256 > $$(basename $@)
+	@cd $(TARGET_DIR); find . -maxdepth 1 -not -type d | egrep -v ".(sha256sum|asc)$$" | xargs shasum -a 256 > $$(basename $@)
 
 SIGNATURE=$(CHECKSUM).asc
 
