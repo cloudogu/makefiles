@@ -5,7 +5,7 @@ start-docker-compose:
 		docker-compose up -d; \
 	fi;
 
-POST_UNITTESTS?=start-docker-compose
+POST_UNITTESTS?=stop-docker-compose
 .PHONY: stop-docker-compose
 stop-docker-compose:
 	@if [ X"${ENVIRONMENT}" = X"local" ] ; then \

@@ -1,9 +1,3 @@
-# build steps: dependencies, compile, package
-#
-# XXX dependencies- target can not be associated to a file.
-# As a consequence make build will always trigger a full build, even if targets already exist.
-#
-
 ADDITIONAL_LDFLAGS?=-extldflags -static
 LDFLAGS?=-ldflags "$(ADDITIONAL_LDFLAGS) -X main.Version=$(VERSION) -X main.CommitID=$(COMMIT_ID)"
 GOIMAGE?=cloudogu/golang
