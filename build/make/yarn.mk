@@ -3,6 +3,14 @@ YARN_LOCK=$(WORKDIR)/yarn.lock
 .PHONY: yarn-install
 yarn-install: $(YARN_TARGET)
 
+ifeq ($(ENVIRONMENT), ci)
+
+$(YARN_TARGET): $(YARN_LOCK)
+	@echo "Yarn install on CI server"
+	@yarn install
+
+else
+
 $(YARN_TARGET): $(YARN_LOCK) $(PASSWD)
 	@echo "Executing yarn..."
 	@docker run --rm \
@@ -13,3 +21,5 @@ $(YARN_TARGET): $(YARN_LOCK) $(PASSWD)
 	  node:8 \
 	  yarn install
 	@touch $@
+
+endif
