@@ -24,8 +24,7 @@ $(DEBIAN_PACKAGE): $(BINARY) $(DEBIAN_BUILD_DIR)/debian-binary ${PREPARE_PACKAGE
 	@install -p -m 0644 $(DEBIAN_CONTENT_DIR)/_control $(DEBIAN_CONTENT_DIR)/control/control
 
 # creating control.tar.gz
-	@tar cvf $(DEBIAN_CONTENT_DIR)/control.tar -C $(DEBIAN_CONTENT_DIR)/control --owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name .
-	@gzip -fcn $(DEBIAN_CONTENT_DIR)/control.tar > $(DEBIAN_CONTENT_DIR)/control.tar.gz
+	@tar cvfz $(DEBIAN_CONTENT_DIR)/control.tar.gz -C $(DEBIAN_CONTENT_DIR)/control $(TAR_ARGS) .
 
 # populating data directory
 	@for dir in $$(find deb -mindepth 1 -not -name "DEBIAN" -a -type d |sed s@"^deb/"@"$(DEBIAN_CONTENT_DIR)/data/"@) ; do install -m 0755 -d $${dir} ; done
@@ -39,8 +38,7 @@ $(DEBIAN_PACKAGE): $(BINARY) $(DEBIAN_BUILD_DIR)/debian-binary ${PREPARE_PACKAGE
 	fi
 
 # creating data.tar.gz
-	@tar cvf $(DEBIAN_CONTENT_DIR)/data.tar -C $(DEBIAN_CONTENT_DIR)/data --owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name .
-	@gzip -fcn $(DEBIAN_CONTENT_DIR)/data.tar > $(DEBIAN_CONTENT_DIR)/data.tar.gz
+	@tar cvfz $(DEBIAN_CONTENT_DIR)/data.tar.gz -C $(DEBIAN_CONTENT_DIR)/data $(TAR_ARGS) .
 # creating package
 	@ar roc $@ $(DEBIAN_BUILD_DIR)/debian-binary $(DEBIAN_CONTENT_DIR)/control.tar.gz $(DEBIAN_CONTENT_DIR)/data.tar.gz
 	@echo "... deb package can be found at $@"
@@ -63,7 +61,6 @@ upload-package: deploy-check $(DEBIAN_PACKAGE)
 .PHONY: add-package-to-repo
 add-package-to-repo: upload-package
 	@echo "... add package to repositories"
-#$(APTLY) -X POST "${APT_API_BASE_URL}/repos/xenial/file/$$(basename ${DEBIAN_PACKAGE})?noRemove=1"
 	@$(APTLY) -X POST "${APT_API_BASE_URL}/repos/ces/file/$$(basename ${DEBIAN_PACKAGE})"
 
 define aptly_publish
@@ -73,7 +70,6 @@ endef
 .PHONY: publish
 publish:
 	@echo "... publish packages"
-#@$(call aptly_publish,xenial,xenial)
 	@$(call aptly_publish,ces,xenial)
 	@$(call aptly_publish,ces,bionic)
 
@@ -87,7 +83,6 @@ endef
 
 .PHONY: remove-package-from-repo
 remove-package-from-repo:
-# @$(call aptly_undeploy,xenial)
 	@$(call aptly_undeploy,ces)
 
 .PHONY: undeploy
