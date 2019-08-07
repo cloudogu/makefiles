@@ -70,6 +70,7 @@ endef
 .PHONY: publish
 publish:
 	@echo "... publish packages"
+	@$(call aptly_publish,xenial,xenial)
 	@$(call aptly_publish,ces,xenial)
 	@$(call aptly_publish,ces,bionic)
 
@@ -83,6 +84,7 @@ endef
 
 .PHONY: remove-package-from-repo
 remove-package-from-repo:
+	@$(call aptly_undeploy,xenial)
 	@$(call aptly_undeploy,ces)
 
 .PHONY: undeploy
