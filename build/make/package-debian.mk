@@ -61,7 +61,10 @@ upload-package: deploy-check $(DEBIAN_PACKAGE)
 .PHONY: add-package-to-repo
 add-package-to-repo: upload-package
 	@echo "... add package to repositories"
-	@$(APTLY) -X POST "${APT_API_BASE_URL}/repos/ces/file/$$(basename ${DEBIAN_PACKAGE})"
+	# heads up: For migration to a new repo structure we use two repos, new (ces) and old (xenial)
+	# '?noRemove=1': aptly removes the file on success. This leads to an error on the second package add. Keep it this round
+	@$(APTLY) -X POST "${APT_API_BASE_URL}/repos/ces/file/$$(basename ${DEBIAN_PACKAGE})?noRemove=1"
+	@$(APTLY) -X POST "${APT_API_BASE_URL}/repos/xenial/file/$$(basename ${DEBIAN_PACKAGE})"
 
 define aptly_publish
 	$(APTLY) -X PUT -H "Content-Type: application/json" --data '{"Signing": { "Batch": true, "Passphrase": "${APT_API_SIGNPHRASE}"}}' ${APT_API_BASE_URL}/publish/$(1)/$(2)
@@ -78,7 +81,7 @@ publish:
 deploy: add-package-to-repo publish
 
 define aptly_undeploy
-	PREF=$$(${APTLY} "${APT_API_BASE_URL}/repos/ces/packages?q=${ARTIFACT_ID}%20(${VERSION})"); \
+	PREF=$$(${APTLY} "${APT_API_BASE_URL}/repos/$(1)/packages?q=${ARTIFACT_ID}%20(${VERSION})"); \
 	${APTLY} -X DELETE -H 'Content-Type: application/json' --data "{\"PackageRefs\": $${PREF}}" ${APT_API_BASE_URL}/repos/$(1)/packages
 endef
 
