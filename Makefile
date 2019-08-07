@@ -37,7 +37,7 @@ include build/make/bower.mk
 .PHONY: update-makefiles
 update-makefiles:
 	@echo Updating makefiles...
-	@curl -L --silent https://github.com/cloudogu/makefiles/archive/v$(MAKEFILES_VERSION).tar.gz > $(TMPDIR)/makefiles-v$(MAKEFILES_VERSION).tar.gz
+	@curl -L --silent https://github.com/cloudogu/makefiles/archive/v$(MAKEFILES_VERSION).tar.gz > $(TMP_DIR)/makefiles-v$(MAKEFILES_VERSION).tar.gz
 
-	@tar -xzf $(TMPDIR)/makefiles-v$(MAKEFILES_VERSION).tar.gz -C $(TMPDIR)
-	@cp -r $(TMPDIR)/makefiles-$(MAKEFILES_VERSION)/build/make $(BUILDDIR)
+	@tar -xzf $(TMP_DIR)/makefiles-v$(MAKEFILES_VERSION).tar.gz -C $(TMP_DIR)
+	@cp -r $(TMP_DIR)/makefiles-$(MAKEFILES_VERSION)/build/make $(BUILD_DIR)
