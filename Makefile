@@ -11,27 +11,18 @@ MAKEFILES_VERSION= # Set this once we have a stable release
 
 include build/make/variables.mk
 
+# You may want to overwrite existing variables for pre/post target actions to fit into your project.
+
 include build/make/info.mk
-
 include build/make/dependencies-glide.mk
-
 include build/make/build.mk
-
 include build/make/unit-test.mk
-
 include build/make/static-analysis.mk
-
 include build/make/clean.mk
-
 include build/make/package-debian.mk
-
 include build/make/digital-signature.mk
-
 include build/make/yarn.mk
-
 include build/make/bower.mk
-
-
 
 
 .PHONY: update-makefiles
