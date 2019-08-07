@@ -2,7 +2,7 @@
 ARTIFACT_ID=
 VERSION=
 
-MAKEFILES_VERSION= # Set this once we have a stable release
+MAKEFILES_VERSION=0.1.0
 
 .DEFAULT_GOAL:=compile
 
