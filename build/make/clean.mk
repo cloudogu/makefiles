@@ -1,8 +1,8 @@
 .PHONY: clean
 clean:
 	rm -rf ${TARGET_DIR}
-	rm -rf ${TMPDIR}
-	rm -rf ${DEBIAN_TARGET}
+	rm -rf ${TMP_DIR}
+	rm -rf ${DEBIAN_BUILD_DIR}
 
 .PHONY: dist-clean
 dist-clean: clean

@@ -1,39 +1,38 @@
-# build steps: dependencies, compile, package
-#
-# XXX dependencies- target can not be associated to a file.
-# As a consequence make build will always trigger a full build, even if targets already exist.
-#
-
-
-LDFLAGS=-ldflags "-extldflags -static -X main.Version=$(VERSION) -X main.CommitID=$(COMMIT_ID)"
+ADDITIONAL_LDFLAGS?=-extldflags -static
+LDFLAGS?=-ldflags "$(ADDITIONAL_LDFLAGS) -X main.Version=$(VERSION) -X main.CommitID=$(COMMIT_ID)"
+GOIMAGE?=cloudogu/golang
+GOTAG?=1.10.2-2
+GOOS?=linux
+GOARCH?=amd64
+PRE_COMPILE?=
 
 .PHONY: compile
-compile: $(TARGET_DIR)/$(ARTIFACT_ID)
+compile: $(BINARY)
 
 compile-generic:
 	@echo "Compiling..."
-	@go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(TARGET_DIR)/$(ARTIFACT_ID)
+	@go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(BINARY)
 
-compile-ci: dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR) compile-generic
+
+ifeq ($(ENVIRONMENT), ci)
+
+$(BINARY): $(SRC) vendor $(PRE_COMPILE)
 	@echo "Built on CI server"
+	@make compile-generic
 
-compile-local: dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR) $(PRE_COMPILE)
+else
+
+$(BINARY): $(SRC) vendor $(PASSWD) $(HOME_DIR) $(PRE_COMPILE)
 	@echo "Building locally (in Docker)"
 	@docker run --rm \
-	 -e GOOS=linux \
-	 -e GOARCH=amd64 \
+	 -e GOOS=$(GOOS) \
+	 -e GOARCH=$(GOARCH) \
 	 -u "$(UID_NR):$(GID_NR)" \
 	 -v $(PASSWD):/etc/passwd:ro \
-	 -v $(HOMEDIR):/home/$(USER) \
+	 -v $(HOME_DIR):/home/$(USER) \
 	 -v $(WORKDIR):/go/src/github.com/cloudogu/$(ARTIFACT_ID) \
 	 -w /go/src/github.com/cloudogu/$(ARTIFACT_ID) \
-	 cloudogu/golang:1.10.2 \
+	 $(GOIMAGE):$(GOTAG) \
   make compile-generic
 
-
-$(TARGET_DIR)/$(ARTIFACT_ID): dependencies $(PASSWD) $(HOMEDIR) $(TARGET_DIR)
-ifeq ($(ENVIRONMENT), ci)
-  $(TARGET_DIR)/$(ARTIFACT_ID): compile-ci
-else
-  $(TARGET_DIR)/$(ARTIFACT_ID): compile-local
 endif

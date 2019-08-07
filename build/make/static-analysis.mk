@@ -1,40 +1,36 @@
-TARGETDIR=target
-LINT=$(GOPATH)/bin/gometalinter
-LINTFLAGS=--vendor --exclude="vendor" --exclude="_test.go"
-LINTFLAGS+=--disable-all --enable=errcheck --enable=vet --enable=golint
-LINTFLAGS+=--deadline=2m
+STATIC_ANALYSIS_DIR=$(TARGET_DIR)/static-analysis
 
+LINT=$(GOPATH)/bin/golangci-lint
+# ignore tests and mocks
+LINTFLAGS=--tests=false --skip-files="^.*_mock.go$$" --skip-files="^.*/mock.*.go$$"
 
 .PHONY: static-analysis
-static-analysis: $(GOPATH)/bin/reviewdog $(GOPATH)/bin/errcheck static-analysis-$(ENVIRONMENT)
+static-analysis: $(GOPATH)/bin/reviewdog static-analysis-$(ENVIRONMENT)
 
 .PHONY: static-analysis-ci
-static-analysis-ci: target/static-analysis-cs.log
+static-analysis-ci: $(STATIC_ANALYSIS_DIR)/static-analysis-cs.log
 	@if [ X"$$(CI_PULL_REQUEST)" != X"" -a X"$$(CI_PULL_REQUEST)" != X"null" ] ; then cat $< | CI_COMMIT=$(COMMIT_ID) reviewdog -f=checkstyle -ci="common" ; fi
 
 .PHONY: static-analysis-local
-static-analysis-local: target/static-analysis-cs.log target/static-analysis.log
+static-analysis-local: $(STATIC_ANALYSIS_DIR)/static-analysis-cs.log $(STATIC_ANALYSIS_DIR)/static-analysis.log
 	@echo ""
 	@echo "differences to develop branch:"
 	@echo ""
-	@cat $< | reviewdog -f checkstyle -diff "git diff develop"
+	@cat $< | $(GOPATH)/bin/reviewdog -f checkstyle -diff "git diff develop"
 
 $(LINT): 
-	go get -u gopkg.in/alecthomas/gometalinter.v2
+	@go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 
-target/static-analysis.log: 
-	@mkdir -p $(TARGETDIR)
+$(STATIC_ANALYSIS_DIR)/static-analysis.log: $(LINT)
+	@mkdir -p $(STATIC_ANALYSIS_DIR)
 	@echo ""
 	@echo "complete static analysis:"
 	@echo ""
-	@$(LINT) $(LINTFLAGS) ./... | tee $@
+	@$(LINT) $(LINTFLAGS) run ./... | tee $@
 
-target/static-analysis-cs.log:
-	@mkdir -p $(TARGETDIR)
-	@$(LINT) $(LINTFLAGS) --checkstyle ./... > $@ | true
+$(STATIC_ANALYSIS_DIR)/static-analysis-cs.log: $(LINT)
+	@mkdir -p $(STATIC_ANALYSIS_DIR)
+	@$(LINT) $(LINTFLAGS) run --out-format=checkstyle ./... > $@ | true
 
 $(GOPATH)/bin/reviewdog:
 	@go get -u github.com/haya14busa/reviewdog/cmd/reviewdog
-
-$(GOPATH)/bin/errcheck:
-	@go get -u github.com/kisielk/errcheck

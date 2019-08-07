@@ -1,14 +1,27 @@
 TARGET_DIR=target
-DEBIAN_TARGET = target_deb
+
+WORKDIR:=$(shell pwd)
+BUILD_DIR=$(WORKDIR)/build
+TMP_DIR:=$(BUILD_DIR)/tmp
+
+BINARY:=$(TARGET_DIR)/$(ARTIFACT_ID)
 
 COMMIT_ID:=$(shell git rev-parse HEAD)
 LAST_COMMIT_DATE=$(shell git rev-list --format=format:'%ci' --max-count=1 `git rev-parse HEAD` | tail -1)
+TAR_ARGS:=--owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name
 BRANCH=$(shell git branch | grep \* | sed 's/ /\n/g' | head -2 | tail -1)
 
-# collect packages and dependencies for later usage
 PACKAGES=$(shell go list ./... | grep -v /vendor/)
 
-WORKDIR=$(shell pwd)
+
+SRC:=$(shell find "${WORKDIR}" -type f -name "*.go" -not -path "./vendor/*")
+DEBSRC:=$(shell find "${WORKDIR}/deb" -type f)
+
+# debian stuff
+DEBIAN_BUILD_DIR=$(BUILD_DIR)/deb
+DEBIAN_CONTENT_DIR=$(DEBIAN_BUILD_DIR)/content
+DEBIAN_PACKAGE=$(TARGET_DIR)/$(ARTIFACT_ID)_$(VERSION).deb
+APT_API_BASE_URL=https://apt-api.cloudogu.com/api
 
 # choose the environment, if BUILD_URL environment variable is available then we are on ci (jenkins)
 ifdef BUILD_URL
@@ -17,23 +30,19 @@ else
 ENVIRONMENT=local
 endif
 
+YARN_TARGET=$(WORKDIR)/node_modules
+BOWER_TARGET?=$(WORKDIR)/public/vendor
+
 UID_NR:=$(shell id -u)
 GID_NR:=$(shell id -g)
-BUILDDIR=$(WORKDIR)/build
-TMPDIR=$(BUILDDIR)/tmp
-HOMEDIR=$(TMPDIR)/home
-PASSWD=$(TMPDIR)/passwd
+HOME_DIR=$(TMP_DIR)/home
+PASSWD=$(TMP_DIR)/passwd
 
-$(TMPDIR): $(BUILDDIR)
-	@mkdir $(TMPDIR)
+$(TMP_DIR):
+	@mkdir -p $(TMP_DIR)
 
-$(TARGET_DIR):
-	@mkdir $(TARGET_DIR)
+$(HOME_DIR): $(TMP_DIR)
+	@mkdir -p $(HOME_DIR)
 
-$(HOMEDIR): $(TMPDIR)
-	@mkdir $(HOMEDIR)
-
-$(PASSWD): $(TMPDIR)
+$(PASSWD): $(TMP_DIR)
 	@echo "$(USER):x:$(UID_NR):$(GID_NR):$(USER):/home/$(USER):/bin/bash" > $(PASSWD)
-
-PRE_COMPILE?=

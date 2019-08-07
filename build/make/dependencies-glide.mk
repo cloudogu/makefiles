@@ -14,10 +14,11 @@ update-dependencies: $(GLIDE)
 .PHONY: dependencies
 dependencies: vendor
 
-vendor: $(GLIDE)
+vendor: $(GLIDE) glide.yaml glide.lock
 	@echo "Installing dependencies using Glide..."
 	$(GLIDE) $(GLIDEFLAGS) install -v
 
-$(GLIDE): 
+$(GLIDE):
+	@echo "installing glide"
 	@curl https://glide.sh/get | sh
 
