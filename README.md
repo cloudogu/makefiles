@@ -8,7 +8,7 @@ Wird ein neues Projekt angelegt, so müssen einmalig das base-`Makefile` sowie d
 Gibt es zu einem späteren Zeitpunkt ein neues Release der Makefiles, so kann auf diese Version geupdatet werden, in dem die Variable `MAKEFILES_VERSION` im Makefile gestetzt, und anschließend das Goal `update-makefiles` ausgeführt wird:
 
 ```
-make upate-makefiles
+make update-makefiles
 ```
 
 Die Module des Makefiles liegen in `build/make` und müssen den Anforderungen entsprechend eingebunden werden.
