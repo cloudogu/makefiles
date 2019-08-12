@@ -2,12 +2,16 @@
 ARTIFACT_ID=
 VERSION=
 
-MAKEFILES_VERSION=0.1.0
+MAKEFILES_VERSION=1.0.0
 
 .DEFAULT_GOAL:=compile
 
 # set PRE_COMPILE to define steps that shall be executed before the go build
 # PRE_COMPILE=
+
+# set PRE_UNITTESTS and POST_UNITTESTS to define steps that shall be executed before or after the unit tests
+# PRE_UNITTESTS?=
+# POST_UNITTESTS?=
 
 include build/make/variables.mk
 

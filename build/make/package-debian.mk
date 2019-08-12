@@ -1,10 +1,13 @@
 PREPARE_PACKAGE?=prepare-package
 
 .PHONY: package
-package: $(DEBIAN_PACKAGE)
+package: debian-with-binary
 
 .PHONY: debian
 debian: $(DEBIAN_PACKAGE)
+
+.PHONY: debian-with-binary
+debian-with-binary: $(BINARY) $(DEBIAN_PACKAGE)
 
 .PHONY: prepare-package
 prepare-package:
@@ -16,7 +19,7 @@ $(DEBIAN_BUILD_DIR):
 $(DEBIAN_BUILD_DIR)/debian-binary: $(DEBIAN_BUILD_DIR)
 	@echo "2.0" > $@
 
-$(DEBIAN_PACKAGE): $(BINARY) $(DEBIAN_BUILD_DIR)/debian-binary ${PREPARE_PACKAGE} $(DEBSRC)
+$(DEBIAN_PACKAGE): $(TARGET_DIR) $(DEBIAN_BUILD_DIR)/debian-binary ${PREPARE_PACKAGE} $(DEBSRC)
 	@echo "Creating .deb package..."
 
 	@install -p -m 0755 -d $(DEBIAN_CONTENT_DIR)/control

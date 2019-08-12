@@ -1,19 +1,19 @@
 # makefiles
-Makefiles für Cloudogu Projekte
+Makefiles for Cloudogu projects
 
-Für Go-Builds gibt es ein modulares, generisches Makefile, welches [hier](https://github.com/cloudogu/makefiles) zu finden ist. Das Repo dient zur Vereinheitlichung unserer Builds, deshalb müssen alle neuen Go-Projekte dieses Makefile verwenden.
+This repository holds makefiles for building Cloudogu tools, especially those written in Go. They were created to standardize the build and release process. You should use them for every new tool you are developing in the Cloudogu environment.
 
-## Neues Projekt
-Wird ein neues Projekt angelegt, so müssen einmalig das base-`Makefile` sowie das Verzeichnis `build/make` kopiert werden, ohne die relativen Pfade zu verändern; i.e. `build` **muss** neben `Makefile` im Projekt-Root liegen und das `make`-Verzeichnis enthalten.
-Gibt es zu einem späteren Zeitpunkt ein neues Release der Makefiles, so kann auf diese Version geupdatet werden, in dem die Variable `MAKEFILES_VERSION` im Makefile gestetzt, und anschließend das Goal `update-makefiles` ausgeführt wird:
+## New Project
+When creating a new project you have to import the `Makefile` and the `build` directory (with all its contents). While doing so you need to keep the directory structure, i.e. the `Makefile` and `build` folder need to be in the project's root folder.
+When there is a new release of the Makefiles in the future, you can easily upgrade your Makefiles via setting the `MAKEFILES_VERSION` variable in the `Makefile` and executing the `update-makefiles` make target:
 
 ```
-make upate-makefiles
+make update-makefiles
 ```
 
-Die Module des Makefiles liegen in `build/make` und müssen den Anforderungen entsprechend eingebunden werden.
+The `build/make` folder holds all Makefiles referenced by the `Makefile` in the root folder. This main `Makefile` can be adjusted to your needs. For example, if you want to build a Go project with glide and pack it into a .deb package you can adjust your `Makefile` in the following way:
 
-### Beispiel: Go Build mit Glide und Debian-Package
+### Example: Go Build with Glide and Debian-Package
 ```
 ARTIFACT_ID=app
 VERSION=0.1.2
@@ -33,10 +33,10 @@ include build/make/package-debian.mk
 
 ```
 
-Wird in diesem Falle z.B. das `package`-Goal ausgeführt, wird automatisch Glide zum Herunterladen der Abhängigkeiten verwendet, sowie ein Debian-Package mit dem Binary angelegt.
+If you use the `package` make target, your `Makefile` will automatically use glide for downloading dependencies, compiles and creates a .deb package including the binary afterwards.
 
-### Go Build mit Go Dep und tar.gz-Package
-Verwendet man stattdessen dieses Makefile:
+### Go Build with Go Dep and tar.gz-Package
+If you use this kind of `Makefile`, `go dep` will be used to fetch dependencies:
 
 ```
 ARTIFACT_ID=app
@@ -56,65 +56,75 @@ include build/make/clean.mk
 include build/make/package-tar.mk
 ```
 
-wird zum Herunterladen der Dependencies go dep verwendet. Außerdem wird statt eines Debian-Pakets ein tar.gz-Archiv mit dem Binary angelegt.
+Also, a tar.gz-package will be created instead of a debian package.
 
-## Module
+## Modules
 
 ### variables.mk
 
-Dieses Modult enthält einige generische Definitionen und sollte immer eingebunden werden.
+This module holds generic definitions needed for all builds and should be always included.
 
 ### info.mk
 
-Enthält das Goal `info`, welches allgemeine Informationen zum Build (z.B. Name des Branches, Commit-ID) ausgibt.
+This module holds the `info` target which prints general information about the build (e.g. name of the branch, commit ID).
 
-### dependencies_godep.mk
+### dependencies-godep.mk
 
-Enthält das Goal `dependencies` (welches aus dem `build`-Goal aufgerufen wird) und nutzt go dep zur Dependencyverwaltung
+This module holds the `dependencies` target, which is utilized by the `build` target. It uses `go dep` for fetching dependencies.
 
-### dependencies_glide.mk
+Include only one of the files: dependencies-godep.mk OR dependencies-glide.mk
 
-Das Gleiche wie `dependencies_godep.mk` jedoch wird Glide statt dep verwendet.
+### dependencies-glide.mk
+
+This module holds the `dependencies` target, which is utilized by the `build` target. It uses `glide` for fetching dependencies.
+
+Include only one of the files: dependencies-godep.mk OR dependencies-glide.mk
 
 ### build.mk
 
-Enthält das `build`-Goal welches den Build in einem Docker-Container startet (Reproducible Build) und eine Checksumme des erstellten Binaries erzeugt.
+This module holds the `build` target, which starts the build inside a Docker container (to ensure reproducible builds). It also creates a checksum of the binary.
 
 ### unit-test.mk
 
-Startet generisch die unit tests. Das entsprechende Goal heißt `unit-test`.
+This module ensures that you can start unit tests via the `unit-test` target.
+
+Include only one of the files: unit-test.mk OR unit-test-docker-compose.mk
 
 ### unit-test-docker-compose.mk
 
-Das gleiche wie `unit-test.mk`; startet (und stoppt) jedoch eine docker-compose-Umgebung.
+This module ensures that you can start unit tests via the `unit-test` target, including an additional environment which is started and stopped using docker-compose.
+
+Include only one of the files: unit-test.mk OR unit-test-docker-compose.mk
 
 ### static-analysis.mk
 
-Führt die statische Code-Analyse abhängig von der Umgebung (CI-Server oder lokal) aus. Goal: `static-analysis`
+This module holds the `static-analysis` target for static code analysis. It automatically determines the working environment (local or CI).
 
 ### clean.mk
 
-Enthält das `clean`-Goal.
+This module holds the `clean` target to clean your workspace.
 
 ### package-debian.mk
 
-Das package-debian-Modul erstellt aus den Daten im `deb`-Verzeichnis sowie dem kompilierten Binary (sofern es eines gibt, eine Ausnahme bildet z.B. ces-commons) ein Debian-Paket und legt dieses in `target/deb` ab. Außerdem wird die Checksumme des Debian-Pakets berechnet.
+This module enables you to build a debian package from the local contents. The `package` target will compile the binary and create a .deb file which holds the contents in the `deb` folder and the binary.
+The module also enables you to build a debian package without compiling, using the `debian` target.
+
+Include only one of the files: package-debian.mk OR package-tar.mk
+
+### package-tar.mk
+
+This module lets you use the `package` target to pack a .tar archive.
+
+Include only one of the files: package-debian.mk OR package-tar.mk
 
 ### digital-signature.mk
 
-Berechnet von allen im `target`-Verzeichnis liegenden Dateien die Checksumme, schreibt diese in eine Datei und signiert diese Datei anschließend.
+This module makes sure that a checksum is calculated for every file in the `target` folder and signs the checksum files.
 
-#### prepare-package
-Das package-debian Modul ermöglicht das Kopieren weiterer Dateien in das zu erstellende Debian-Paket. Dafür muss lediglich **nach dem Import von package-debian.mk** das Goal `prepare-package` angelegt bzw. überschrieben werden. Ein Beispiel aus der cesapp:
+### yarn.mk
 
+This module enables you to use yarn via the `yarn-install` target.
 
-```
-[...]
-include build/make/package-debian.mk
+### bower.mk
 
-prepare-package:
-	@echo "Copying additional files to be added to deb package"	
-	@install -m 0755 -d $(DEBIAN_TARGET_DIR)/data/etc/bash_completion.d/
-	cp ${GOPATH}/src/github.com/cloudogu/cesapp/vendor/github.com/codegangsta/cli/autocomplete/bash_autocomplete ${DEBIAN_TARGET_DIR}/data/etc/bash_completion.d/cesapp
-```
-
+This module enables you to use bower via the `bower-install` target.
