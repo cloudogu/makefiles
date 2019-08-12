@@ -19,9 +19,9 @@ $(DEBIAN_BUILD_DIR):
 $(DEBIAN_BUILD_DIR)/debian-binary: $(DEBIAN_BUILD_DIR)
 	@echo "2.0" > $@
 
-$(DEBIAN_PACKAGE): $(DEBIAN_BUILD_DIR)/debian-binary ${PREPARE_PACKAGE} $(DEBSRC)
+$(DEBIAN_PACKAGE): $(TARGET_DIR) $(DEBIAN_BUILD_DIR)/debian-binary ${PREPARE_PACKAGE} $(DEBSRC)
 	@echo "Creating .deb package..."
-	@mkdir -p $(TARGET_DIR);
+
 	@install -p -m 0755 -d $(DEBIAN_CONTENT_DIR)/control
 	@sed -e "s/^Version:.*/Version: $(VERSION)/g" deb/DEBIAN/control > $(DEBIAN_CONTENT_DIR)/_control
 	@install -p -m 0644 $(DEBIAN_CONTENT_DIR)/_control $(DEBIAN_CONTENT_DIR)/control/control
