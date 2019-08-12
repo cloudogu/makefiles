@@ -72,9 +72,13 @@ This module holds the `info` target which prints general information about the b
 
 This module holds the `dependencies` target, which is utilized by the `build` target. It uses `go dep` for fetching dependencies.
 
+Include only one of the files: dependencies-godep.mk OR dependencies-glide.mk
+
 ### dependencies-glide.mk
 
 This module holds the `dependencies` target, which is utilized by the `build` target. It uses `glide` for fetching dependencies.
+
+Include only one of the files: dependencies-godep.mk OR dependencies-glide.mk
 
 ### build.mk
 
@@ -84,9 +88,13 @@ This module holds the `build` target, which starts the build inside a Docker con
 
 This module ensures that you can start unit tests via the `unit-test` target.
 
+Include only one of the files: unit-test.mk OR unit-test-docker-compose.mk
+
 ### unit-test-docker-compose.mk
 
 This module ensures that you can start unit tests via the `unit-test` target, including an additional environment which is started and stopped using docker-compose.
+
+Include only one of the files: unit-test.mk OR unit-test-docker-compose.mk
 
 ### static-analysis.mk
 
@@ -100,6 +108,14 @@ This module holds the `clean` target to clean your workspace.
 
 This module enables you to build a debian package from the local contents. The `package` target will compile the binary and create a .deb file which holds the contents in the `deb` folder and the binary.
 The module also enables you to build a debian package without compiling, using the `debian` target.
+
+Include only one of the files: package-debian.mk OR package-tar.mk
+
+### package-tar.mk
+
+This module lets you use the `package` target to pack a .tar archive.
+
+Include only one of the files: package-debian.mk OR package-tar.mk
 
 ### digital-signature.mk
 

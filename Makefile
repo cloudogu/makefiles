@@ -9,6 +9,10 @@ MAKEFILES_VERSION=0.1.0
 # set PRE_COMPILE to define steps that shall be executed before the go build
 # PRE_COMPILE=
 
+# set PRE_UNITTESTS and POST_UNITTESTS to define steps that shall be executed before or after the unit tests
+# PRE_UNITTESTS?=
+# POST_UNITTESTS?=
+
 include build/make/variables.mk
 
 # You may want to overwrite existing variables for pre/post target actions to fit into your project.
