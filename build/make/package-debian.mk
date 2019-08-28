@@ -4,10 +4,13 @@ CONFFILES_FILE="$(DEBIAN_CONTENT_DIR)/control/conffiles"
 CONFFILES_FILE_TMP="$(DEBIAN_CONTENT_DIR)/conffiles_"
 
 .PHONY: package
-package: $(DEBIAN_PACKAGE)
+package: debian-with-binary
 
 .PHONY: debian
 debian: $(DEBIAN_PACKAGE)
+
+.PHONY: debian-with-binary
+debian-with-binary: $(BINARY) $(DEBIAN_PACKAGE)
 
 .PHONY: prepare-package
 prepare-package:
@@ -19,7 +22,7 @@ $(DEBIAN_BUILD_DIR):
 $(DEBIAN_BUILD_DIR)/debian-binary: $(DEBIAN_BUILD_DIR)
 	@echo $(DEBIAN_PACKAGE_FORMAT_VERSION) > $@
 
-$(DEBIAN_PACKAGE): $(BINARY) $(DEBIAN_BUILD_DIR)/debian-binary $(PREPARE_PACKAGE) $(DEBSRC)
+$(DEBIAN_PACKAGE): $(TARGET_DIR) $(DEBIAN_BUILD_DIR)/debian-binary $(PREPARE_PACKAGE) $(DEBSRC)
 	@echo "Creating .deb package..."
 
 # populate control directory
