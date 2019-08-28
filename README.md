@@ -107,9 +107,32 @@ This module holds the `clean` target to clean your workspace.
 ### package-debian.mk
 
 This module enables you to build a debian package from the local contents. The `package` target will compile the binary and create a .deb file which holds the contents in the `deb` folder and the binary.
-The module also enables you to build a debian package without compiling, using the `debian` target.
+The module also enables you to build a debian package *without compiling a binary*, using the `debian` target. This makes sense for example if the debian file should consist only of configuration files.
+The target `lint-deb-package` will show any errors or warnings for your built debian package.
 
 Include only one of the files: package-debian.mk OR package-tar.mk
+
+#### Package requirements
+
+You need a `deb` directory in order to successfully create a debian package. This directory is used to incorporate existing files and directories into the debian package. The minimum requirement for a valid debian package is a `control` file which you must place in `deb/DEBIAN/control`.
+
+As an extended example, a proper directory could look like this:
+
+```
+deb/
+ L DEBIAN/
+ |  L control
+ |  L postinst
+ L etc/ 
+    L config.file
+```
+
+Files which reside in `DEBIAN` will be subject to be stored in the `control` part of the debian package.
+In turn, all other files and directories will be stored in the `data` part of the debian package. 
+
+Please note when you are building a debian package that all files unter `/deb/etc` will be named in a automatically generated file `conffiles`. Those files will be subject to debian's conflict management instead of overwriting crucial configuration files when said configuration files already exist (f. i. when a package is upgraded).
+
+ 
 
 ### package-tar.mk
 
