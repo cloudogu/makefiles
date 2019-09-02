@@ -2,7 +2,7 @@
 ARTIFACT_ID=
 VERSION=
 
-MAKEFILES_VERSION=1.0.1
+MAKEFILES_VERSION=1.0.2
 
 .DEFAULT_GOAL:=compile
 
@@ -30,7 +30,7 @@ include build/make/bower.mk
 
 
 .PHONY: update-makefiles
-update-makefiles:
+update-makefiles: $(TMP_DIR)
 	@echo Updating makefiles...
 	@curl -L --silent https://github.com/cloudogu/makefiles/archive/v$(MAKEFILES_VERSION).tar.gz > $(TMP_DIR)/makefiles-v$(MAKEFILES_VERSION).tar.gz
 
