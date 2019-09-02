@@ -13,6 +13,9 @@ MAKEFILES_VERSION=1.0.2
 # PRE_UNITTESTS?=
 # POST_UNITTESTS?=
 
+# set PREPARE_PACKAGE to define a target that should be executed before the package build
+# PREPARE_PACKAGE=
+
 include build/make/variables.mk
 
 # You may want to overwrite existing variables for pre/post target actions to fit into your project.
