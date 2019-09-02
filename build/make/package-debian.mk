@@ -14,7 +14,7 @@ debian-with-binary: $(BINARY) $(DEBIAN_PACKAGE)
 
 .PHONY: prepare-package
 prepare-package:
-	@echo "Default prepare-package, to write your own, define a your own target and specify it in the PREPARE_PACKAGE variable, before the package-debian.mk import"
+	@echo "Using default prepare-package target. To write your own, define a target and specify it in the PREPARE_PACKAGE variable, before the package-debian.mk import"
 
 $(DEBIAN_BUILD_DIR):
 	@mkdir $@
@@ -22,11 +22,13 @@ $(DEBIAN_BUILD_DIR):
 $(DEBIAN_BUILD_DIR)/debian-binary: $(DEBIAN_BUILD_DIR)
 	@echo $(DEBIAN_PACKAGE_FORMAT_VERSION) > $@
 
-$(DEBIAN_PACKAGE): $(TARGET_DIR) $(DEBIAN_BUILD_DIR)/debian-binary $(PREPARE_PACKAGE) $(DEBSRC)
+$(DEBIAN_CONTENT_DIR)/control:
+	@install -p -m 0755 -d $@
+
+$(DEBIAN_PACKAGE): $(TARGET_DIR) $(DEBIAN_CONTENT_DIR)/control $(DEBIAN_BUILD_DIR)/debian-binary $(PREPARE_PACKAGE) $(DEBSRC)
 	@echo "Creating .deb package..."
 
 # populate control directory
-	@install -p -m 0755 -d $(DEBIAN_CONTENT_DIR)/control
 	@sed -e "s/^Version:.*/Version: $(VERSION)/g" deb/DEBIAN/control > $(DEBIAN_CONTENT_DIR)/_control
 	@install -p -m 0644 $(DEBIAN_CONTENT_DIR)/_control $(DEBIAN_CONTENT_DIR)/control/control
 
