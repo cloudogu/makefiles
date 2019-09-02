@@ -2,7 +2,7 @@
 ARTIFACT_ID=
 VERSION=
 
-MAKEFILES_VERSION=1.0.2
+MAKEFILES_VERSION=1.0.3
 
 .DEFAULT_GOAL:=compile
 
@@ -12,6 +12,9 @@ MAKEFILES_VERSION=1.0.2
 # set PRE_UNITTESTS and POST_UNITTESTS to define steps that shall be executed before or after the unit tests
 # PRE_UNITTESTS?=
 # POST_UNITTESTS?=
+
+# set PREPARE_PACKAGE to define a target that should be executed before the package build
+# PREPARE_PACKAGE=
 
 include build/make/variables.mk
 
