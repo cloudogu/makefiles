@@ -130,7 +130,7 @@ deb/
 Files which reside in `DEBIAN` will be subject to be stored in the `control` part of the debian package.
 In turn, all other files and directories will be stored in the `data` part of the debian package. 
 
-Please note when you are building a debian package that all files unter `/deb/etc` will be named in a automatically generated file `conffiles`. Those files will be subject to debian's conflict management instead of overwriting crucial configuration files when said configuration files already exist (f. i. when a package is upgraded).
+Please note when you are building a debian package that all files under `/deb/etc` will be named in a automatically generated file `conffiles`. Those files will be subject to debian's conflict management instead of overwriting crucial configuration files when said configuration files already exist (f. i. when a package is upgraded).
 
  
 
