@@ -8,7 +8,7 @@ BINARY:=$(TARGET_DIR)/$(ARTIFACT_ID)
 
 COMMIT_ID:=$(shell git rev-parse HEAD)
 LAST_COMMIT_DATE=$(shell git rev-list --format=format:'%ci' --max-count=1 `git rev-parse HEAD` | tail -1)
-TAR_ARGS:=--owner=cloudogu:1000 --group=cloudogu:1000 --mtime="$(LAST_COMMIT_DATE)" --sort=name
+TAR_ARGS:=--owner=0:0 --group=0:0 --mtime="$(LAST_COMMIT_DATE)" --sort=name
 BRANCH=$(shell git branch | grep \* | sed 's/ /\n/g' | head -2 | tail -1)
 
 PACKAGES=$(shell go list ./... | grep -v /vendor/)
