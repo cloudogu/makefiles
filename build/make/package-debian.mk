@@ -58,6 +58,7 @@ $(DEBIAN_PACKAGE): $(TARGET_DIR) $(DEBIAN_CONTENT_DIR)/control $(DEBIAN_CONTENT_
 		echo $$file | sed s@'.*\(/etc/\)@\1'@ >> $(CONFFILES_FILE_TMP) ; \
 	done
 	@install -p -m 0644 $(CONFFILES_FILE_TMP) $(CONFFILES_FILE)
+	@rm $(CONFFILES_FILE_TMP)
 
 # create control.tar.gz
 	@tar cvfz $(DEBIAN_CONTENT_DIR)/control.tar.gz -C $(DEBIAN_CONTENT_DIR)/control $(TAR_ARGS) .
