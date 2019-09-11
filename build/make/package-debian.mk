@@ -25,7 +25,10 @@ $(DEBIAN_BUILD_DIR)/debian-binary: $(DEBIAN_BUILD_DIR)
 $(DEBIAN_CONTENT_DIR)/control:
 	@install -p -m 0755 -d $@
 
-$(DEBIAN_PACKAGE): $(TARGET_DIR) $(DEBIAN_CONTENT_DIR)/control $(DEBIAN_BUILD_DIR)/debian-binary $(PREPARE_PACKAGE) $(DEBSRC)
+$(DEBIAN_CONTENT_DIR)/data:
+	@install -p -m 0755 -d $@
+
+$(DEBIAN_PACKAGE): $(TARGET_DIR) $(DEBIAN_CONTENT_DIR)/control $(DEBIAN_CONTENT_DIR)/data $(DEBIAN_BUILD_DIR)/debian-binary $(PREPARE_PACKAGE) $(DEBSRC)
 	@echo "Creating .deb package..."
 
 # populate control directory
@@ -38,7 +41,7 @@ $(DEBIAN_PACKAGE): $(TARGET_DIR) $(DEBIAN_CONTENT_DIR)/control $(DEBIAN_BUILD_DI
 	done
 
 	@for file in $$(find deb -mindepth 1 -type f | grep -v "DEBIAN") ; do \
-		install -m 0644 $${file} $(DEBIAN_CONTENT_DIR)/data/$${file#deb/} ; \
+		cp $${file} $(DEBIAN_CONTENT_DIR)/data/$${file#deb/} ; \
 	done
 
 # Copy binary to data/usr/sbin, if it exists
