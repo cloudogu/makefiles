@@ -1,5 +1,5 @@
 .PHONY: clean
-clean:
+clean: $(ADDITIONAL_CLEAN)
 	rm -rf ${TARGET_DIR}
 	rm -rf ${TMP_DIR}
 

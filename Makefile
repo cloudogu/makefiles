@@ -16,6 +16,11 @@ MAKEFILES_VERSION=1.0.6
 # set PREPARE_PACKAGE to define a target that should be executed before the package build
 # PREPARE_PACKAGE=
 
+# set ADDITIONAL_CLEAN to define a target that should be executed before the clean target, e.g.
+# ADDITIONAL_CLEAN=clean_deb
+# clean_deb:
+#     rm -rf ${DEBIAN_BUILD_DIR}
+
 include build/make/variables.mk
 
 # You may want to overwrite existing variables for pre/post target actions to fit into your project.
