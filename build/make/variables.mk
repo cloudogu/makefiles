@@ -12,7 +12,8 @@ TAR_ARGS:=--owner=0:0 --group=0:0 --mtime="$(LAST_COMMIT_DATE)" --sort=name
 BRANCH=$(shell git branch | grep \* | sed 's/ /\n/g' | head -2 | tail -1)
 
 PACKAGES=$(shell go list ./... | grep -v /vendor/)
-
+PACKAGES_FOR_INTEGRATION_TEST=${PACKAGES}
+GO_BUILD_TAG_INTEGRATION_TEST=integration
 
 SRC:=$(shell find "${WORKDIR}" -type f -name "*.go" -not -path "./vendor/*")
 DEBSRC:=$(shell find "${WORKDIR}/deb" -type f)
