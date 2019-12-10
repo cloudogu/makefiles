@@ -2,6 +2,7 @@ PREPARE_PACKAGE?=prepare-package
 DEBIAN_PACKAGE_FORMAT_VERSION="2.0"
 CONFFILES_FILE="$(DEBIAN_CONTENT_DIR)/control/conffiles"
 CONFFILES_FILE_TMP="$(DEBIAN_CONTENT_DIR)/conffiles_"
+DEBSRC:=$(shell find "${WORKDIR}/deb" -type f)
 
 .PHONY: package
 package: debian-with-binary

@@ -15,7 +15,6 @@ PACKAGES=$(shell go list ./... | grep -v /vendor/)
 
 
 SRC:=$(shell find "${WORKDIR}" -type f -name "*.go" -not -path "./vendor/*")
-DEBSRC:=$(shell find "${WORKDIR}/deb" -type f)
 
 # debian stuff
 DEBIAN_BUILD_DIR=$(BUILD_DIR)/deb
