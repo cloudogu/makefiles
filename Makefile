@@ -2,7 +2,7 @@
 ARTIFACT_ID=
 VERSION=
 
-MAKEFILES_VERSION=2.0.0
+MAKEFILES_VERSION=2.1.0
 
 .DEFAULT_GOAL:=compile
 
@@ -31,6 +31,8 @@ include build/make/info.mk
 include build/make/dependencies-glide.mk
 # or dependencies-godep.mk
 include build/make/dependencies-godep.mk
+# or dependencies-gomod.mk
+include build/make/dependencies-gomod.mk
 include build/make/build.mk
 include build/make/test-common.mk
 include build/make/test-integration.mk

@@ -14,7 +14,7 @@ ${XUNIT_XML}: ${GOPATH}/bin/go-junit-report
 	@echo 'mode: set' > ${COVERAGE_REPORT}
 	@rm -f $(UNIT_TEST_LOG) || true
 	@for PKG in $(PACKAGES) ; do \
-    go test -v $$PKG -coverprofile=${COVERAGE_REPORT}.tmp 2>&1 | tee $(UNIT_TEST_LOG).tmp ; \
+    ${GO_CALL} test -v $$PKG -coverprofile=${COVERAGE_REPORT}.tmp 2>&1 | tee $(UNIT_TEST_LOG).tmp ; \
 		cat ${COVERAGE_REPORT}.tmp | tail +2 >> ${COVERAGE_REPORT} ; \
 		rm -f ${COVERAGE_REPORT}.tmp ; \
 		cat $(UNIT_TEST_LOG).tmp >> $(UNIT_TEST_LOG) ; \
