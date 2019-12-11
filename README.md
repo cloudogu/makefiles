@@ -3,13 +3,23 @@ Makefiles for Cloudogu projects
 
 This repository holds makefiles for building Cloudogu tools, especially those written in Go. They were created to standardize the build and release process. You should use them for every new tool you are developing in the Cloudogu environment.
 
-## New Project
+## Create a New Project or update it
+
 When creating a new project you have to import the `Makefile` and the `build` directory (with all its contents). While doing so you need to keep the directory structure, i.e. the `Makefile` and `build` folder need to be in the project's root folder.
+
 When there is a new release of the Makefiles in the future, you can easily upgrade your Makefiles via setting the `MAKEFILES_VERSION` variable in the `Makefile` and executing the `update-makefiles` make target:
 
 ```
 make update-makefiles
 ```
+
+Please note that there MUST NOT be done any changes within the `${BUILD_DIR}/make/` directory. Content within this directory may be removed and added during the update of the makefiles. Usually the way how the makefiles work can be modified by these to things:
+
+1. overwriting Makefile variables
+   - usually pre- or post-target variables like `POST_UNITTESTS`
+   - often these can be overwritten with project specific make targets 
+1. include only one of filial makefiles that provide the an exclusive build target defined in several files
+   - f. i. `dependencies-godep` vs `dependencies-glide`
 
 The `build/make` folder holds all Makefiles referenced by the `Makefile` in the root folder. This main `Makefile` can be adjusted to your needs. For example, if you want to build a Go project with glide and pack it into a .deb package you can adjust your `Makefile` in the following way:
 
