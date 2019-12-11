@@ -11,9 +11,12 @@ LAST_COMMIT_DATE=$(shell git rev-list --format=format:'%ci' --max-count=1 `git r
 TAR_ARGS:=--owner=0:0 --group=0:0 --mtime="$(LAST_COMMIT_DATE)" --sort=name
 BRANCH=$(shell git branch | grep \* | sed 's/ /\n/g' | head -2 | tail -1)
 
-PACKAGES=$(shell go list ./... | grep -v /vendor/)
-PACKAGES_FOR_INTEGRATION_TEST=${PACKAGES}
-GO_BUILD_TAG_INTEGRATION_TEST=integration
+GO_ENVIRONMENT?=
+# GO_CALL accomodates the go CLI command as well as necessary environment variables which are optional.
+GO_CALL=${GO_ENVIRONMENT} go
+PACKAGES=$(shell ${GO_CALL} list ./... | grep -v /vendor/)
+PACKAGES_FOR_INTEGRATION_TEST?=${PACKAGES}
+GO_BUILD_TAG_INTEGRATION_TEST?=integration
 
 SRC:=$(shell find "${WORKDIR}" -type f -name "*.go" -not -path "./vendor/*")
 

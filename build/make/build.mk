@@ -9,9 +9,15 @@ PRE_COMPILE?=
 .PHONY: compile
 compile: $(BINARY)
 
+compile-ci:
+	@echo "Compiling (CI)..."
+	make compile-generic
+
 compile-generic:
 	@echo "Compiling..."
-	@go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(BINARY)
+# here is go called without mod capabilities because of error "go: error loading module requirements"
+# see https://github.com/golang/go/issues/30868#issuecomment-474199640
+	@CGO_ENABLED=0 go build -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(BINARY)
 
 
 ifeq ($(ENVIRONMENT), ci)
