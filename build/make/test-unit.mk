@@ -24,6 +24,3 @@ ${XUNIT_XML}: ${GOPATH}/bin/go-junit-report
 	@if grep '^FAIL' $(UNIT_TEST_LOG); then \
 		exit 1; \
 	fi
-
-${GOPATH}/bin/go-junit-report:
-	@go get -u github.com/jstemmer/go-junit-report
