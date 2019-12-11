@@ -32,7 +32,7 @@ ${XUNIT_INTEGRATION_XML}: ${GOPATH}/bin/go-junit-report
 	@echo 'mode: set' > ${INTEGRATION_TEST_REPORT}
 	@rm -f $(INTEGRATION_TEST_LOG) || true
 	@for PKG in $(PACKAGES_FOR_INTEGRATION_TEST) ; do \
-    go test -tags=${GO_BUILD_TAG_INTEGRATION_TEST} -v $$PKG -coverprofile=${INTEGRATION_TEST_REPORT}.tmp 2>&1 | tee $(INTEGRATION_TEST_LOG).tmp ; \
+    ${GO_CALL} test -tags=${GO_BUILD_TAG_INTEGRATION_TEST} -v $$PKG -coverprofile=${INTEGRATION_TEST_REPORT}.tmp 2>&1 | tee $(INTEGRATION_TEST_LOG).tmp ; \
 		cat ${INTEGRATION_TEST_REPORT}.tmp | tail +2 >> ${INTEGRATION_TEST_REPORT} ; \
 		rm -f ${INTEGRATION_TEST_REPORT}.tmp ; \
 		cat $(INTEGRATION_TEST_LOG).tmp >> $(INTEGRATION_TEST_LOG) ; \

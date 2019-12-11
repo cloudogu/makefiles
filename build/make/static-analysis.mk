@@ -19,7 +19,7 @@ static-analysis-local: $(STATIC_ANALYSIS_DIR)/static-analysis-cs.log $(STATIC_AN
 	@cat $< | $(GOPATH)/bin/reviewdog -f checkstyle -diff "git diff develop"
 
 $(LINT): 
-	@go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+	@${GO_CALL} get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 
 $(STATIC_ANALYSIS_DIR)/static-analysis.log: $(LINT)
 	@mkdir -p $(STATIC_ANALYSIS_DIR)
@@ -33,4 +33,4 @@ $(STATIC_ANALYSIS_DIR)/static-analysis-cs.log: $(LINT)
 	@$(LINT) $(LINTFLAGS) run --out-format=checkstyle ./... > $@ | true
 
 $(GOPATH)/bin/reviewdog:
-	@go get -u github.com/haya14busa/reviewdog/cmd/reviewdog
+	@${GO_CALL} get -u github.com/haya14busa/reviewdog/cmd/reviewdog
