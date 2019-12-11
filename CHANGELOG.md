@@ -32,25 +32,15 @@ After updating to this version you SHOULD remove the `update-makefiles` from the
 
 Also, if the update-makefiles target is called, all filial makefiles under `build/make/` are deleted.
 
-- Changed files
+- Changes in test makefiles to support proper integration tests
 
 Please include these files for your tests. It is possible to include neither, only one, or both files for unit and integration tests. Both need `test-common.mk` included beforehand.
 
 - `test-common.mk`
+   - this should be included first becaus both depend on it
 - `test-unit.mk`
 - `test-integration`
 
 ### Removed
 
-The test-related filial makefiles are *deleted* in favour of new makefiles which orient better in the file system:
-
-- `integration-test.mk`
-- `unit-test-docker-compose.mk`
-
-Please include instead these files:
-
-- `test-common.mk`
-- `test-unit.mk`
-- `test-integration`
-
-Please note that `test-common.mk` must be included before the other two.
+The test-related filial makefiles `integration-test.mk` and `unit-test-docker-compose.mk` are *deleted* in favour of new makefiles which orient better in the file system (see section 'added')
