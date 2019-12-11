@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## UNRELEASED
+
+### Added
+
+- Add Go modules support  (#31)
+   - Go module is activated by setting GO_ENVIRONMENT=GO111MODULE=on before including variables.mk
+   - When working with go modules `dependencies-gomod.mk` has to be included.
+
+### Fixed
+
+- Furthermore this commit fixes a weird unit-test behaviour when the go-junit tool is older than the tests.
+
+
 ## [v2.0.0](https://github.com/cloudogu/makefiles/releases/tag/v2.0.0)
 
 Please note: Breaking change ahead. 
