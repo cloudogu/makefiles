@@ -43,6 +43,8 @@ include build/make/clean.mk
 include build/make/package-tar.mk
 # or package-debian.mk
 include build/make/package-debian.mk
+# deploy-debian.mk depends on package-debian.mk
+include build/make/deploy-debian.mk
 include build/make/digital-signature.mk
 include build/make/yarn.mk
 include build/make/bower.mk
