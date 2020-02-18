@@ -1,3 +1,6 @@
+# This Makefile holds all targets for building a debian package
+# For deployment of the deb package include the deploy-debian.mk!
+
 PREPARE_PACKAGE?=prepare-package
 DEBIAN_PACKAGE_FORMAT_VERSION="2.0"
 CONFFILES_FILE="$(DEBIAN_CONTENT_DIR)/control/conffiles"
