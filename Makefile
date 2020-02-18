@@ -2,7 +2,7 @@
 ARTIFACT_ID=
 VERSION=
 
-MAKEFILES_VERSION=2.1.1
+MAKEFILES_VERSION=3.0.0
 
 .DEFAULT_GOAL:=compile
 
@@ -43,6 +43,8 @@ include build/make/clean.mk
 include build/make/package-tar.mk
 # or package-debian.mk
 include build/make/package-debian.mk
+# deploy-debian.mk depends on package-debian.mk
+include build/make/deploy-debian.mk
 include build/make/digital-signature.mk
 include build/make/yarn.mk
 include build/make/bower.mk

@@ -122,6 +122,12 @@ The target `lint-deb-package` will show any errors or warnings for your built de
 
 Include only one of the files: package-debian.mk OR package-tar.mk
 
+### deploy-debian.mk
+
+This module enables you to deploy or undeploy the built deb package to/from the apt repository via the `deploy` respectively `undeploy` targets.
+
+If you want to use this module, you also have to include the `package-debian.mk` module!
+
 #### Package requirements
 
 You need a `deb` directory in order to successfully create a debian package. This directory is used to incorporate existing files and directories into the debian package. The minimum requirement for a valid debian package is a `control` file which you must place in `deb/DEBIAN/control`.

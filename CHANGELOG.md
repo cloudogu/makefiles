@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v3.0.0](https://github.com/cloudogu/makefiles/releases/tag/v3.0.0)
+
+Please note: Breaking change ahead.
+
+### Added
+- Update vendor target to check for new gomod dependencies
+
+### Changed
+- Separate the debian package building and deploying targets
+   - `package-debian.mk` only holds deb package building targets now
+   - `deploy-debian.mk` holds the deb package deployment targets now
+
+When you are upgrading to this version and want to deploy deb packages, you have to
+include the `deploy-debian.mk` into your Makefile, below the `package-debian.mk`.
+For example, see the [Makefile in this repository](https://github.com/cloudogu/makefiles/blob/develop/Makefile).
+
 ## [v2.1.1](https://github.com/cloudogu/makefiles/releases/tag/v2.1.1)
 
 ### Changed
