@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v3.0.0](https://github.com/cloudogu/makefiles/releases/tag/v3.0.0)
+
 Please note: Breaking change ahead.
 
 ### Added
