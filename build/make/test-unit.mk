@@ -7,10 +7,12 @@ PRE_UNITTESTS?=
 POST_UNITTESTS?=
 
 .PHONY: unit-test
-unit-test:  ${XUNIT_XML}
+unit-test: $(XUNIT_XML)
 
-${XUNIT_XML}: ${SRC} ${GOPATH}/bin/go-junit-report
+$(XUNIT_XML): $(SRC) $(GOPATH)/bin/go-junit-report
+ifneq ($(strip $(PRE_UNITTESTS)),)
 	@make $(PRE_UNITTESTS)
+endif
 
 	@mkdir -p $(UNIT_TEST_DIR)
 	@echo 'mode: set' > ${COVERAGE_REPORT}
@@ -27,4 +29,6 @@ ${XUNIT_XML}: ${SRC} ${GOPATH}/bin/go-junit-report
 		exit 1; \
 	fi
 
+ifneq ($(strip $(POST_UNITTESTS)),)
 	@make $(POST_UNITTESTS)
+endif
