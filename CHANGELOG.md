@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v3.0.1](https://github.com/cloudogu/makefiles/releases/tag/v3.0.1)
+
+### Fixed
+
+- Issue [34](https://github.com/cloudogu/makefiles/issues/34)
+  `make unit-test` and `make integration-test` depend on the go sources
+  and won't download go-junit-report each time they run
+
 ## [v3.0.0](https://github.com/cloudogu/makefiles/releases/tag/v3.0.0)
 
 Please note: Breaking change ahead.
@@ -44,7 +52,7 @@ For example, see the [Makefile in this repository](https://github.com/cloudogu/m
 
 ## [v2.0.0](https://github.com/cloudogu/makefiles/releases/tag/v2.0.0)
 
-Please note: Breaking change ahead. 
+Please note: Breaking change ahead.
 
 ### Added
 
@@ -62,7 +70,7 @@ PACKAGES_FOR_INTEGRATION_TEST=$(shell go list ./... | grep 'tasks\|registry')
 
 - Added customizable `clean` target
    - This comes handy if more files and directory should be removed during `clean` than the common stuff
-   - Appending one's own clean target is easily done by defining the variable `ADDITIONAL_CLEAN` with a custom target name 
+   - Appending one's own clean target is easily done by defining the variable `ADDITIONAL_CLEAN` with a custom target name
 
 ### Changed
 
