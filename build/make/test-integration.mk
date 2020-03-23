@@ -6,7 +6,7 @@ PRE_INTEGRATIONTESTS?=start-local-docker-compose
 POST_INTEGRATIONTESTS?=stop-local-docker-compose
 
 .PHONY: integration-test
-integration-test: $(PRE_INTEGRATIONTESTS) ${XUNIT_INTEGRATION_XML} $(POST_INTEGRATIONTESTS)
+integration-test: $(XUNIT_INTEGRATION_XML)
 
 .PHONY: start-local-docker-compose
 start-local-docker-compose:
@@ -27,7 +27,11 @@ else
 		echo "Found CI environment. Nothing to be done"
 endif
 
-${XUNIT_INTEGRATION_XML}: ${GOPATH}/bin/go-junit-report
+$(XUNIT_INTEGRATION_XML): $(SRC) $(GOPATH)/bin/go-junit-report
+ifneq ($(strip $(PRE_INTEGRATIONTESTS)),)
+	@make $(PRE_INTEGRATIONTESTS)
+endif
+
 	@mkdir -p $(INTEGRATION_TEST_DIR)
 	@echo 'mode: set' > ${INTEGRATION_TEST_REPORT}
 	@rm -f $(INTEGRATION_TEST_LOG) || true
@@ -42,3 +46,7 @@ ${XUNIT_INTEGRATION_XML}: ${GOPATH}/bin/go-junit-report
 	@if grep '^FAIL' $(INTEGRATION_TEST_LOG); then \
 		exit 1; \
 	fi
+
+ifneq ($(strip $(POST_INTEGRATIONTESTS)),)
+	@make $(POST_INTEGRATIONTESTS)
+endif

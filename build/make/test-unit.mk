@@ -7,9 +7,13 @@ PRE_UNITTESTS?=
 POST_UNITTESTS?=
 
 .PHONY: unit-test
-unit-test: $(PRE_UNITTESTS) ${XUNIT_XML} $(POST_UNITTESTS)
+unit-test: $(XUNIT_XML)
 
-${XUNIT_XML}: ${GOPATH}/bin/go-junit-report
+$(XUNIT_XML): $(SRC) $(GOPATH)/bin/go-junit-report
+ifneq ($(strip $(PRE_UNITTESTS)),)
+	@make $(PRE_UNITTESTS)
+endif
+
 	@mkdir -p $(UNIT_TEST_DIR)
 	@echo 'mode: set' > ${COVERAGE_REPORT}
 	@rm -f $(UNIT_TEST_LOG) || true
@@ -24,3 +28,7 @@ ${XUNIT_XML}: ${GOPATH}/bin/go-junit-report
 	@if grep '^FAIL' $(UNIT_TEST_LOG); then \
 		exit 1; \
 	fi
+
+ifneq ($(strip $(POST_UNITTESTS)),)
+	@make $(POST_UNITTESTS)
+endif
