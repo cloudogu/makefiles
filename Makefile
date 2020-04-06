@@ -9,6 +9,9 @@ MAKEFILES_VERSION=3.0.0
 # set PRE_COMPILE to define steps that shall be executed before the go build
 # PRE_COMPILE=
 
+# set GO_ENV_VARS to define go environment variables for the go build
+# GO_ENV_VARS = CGO_ENABLED=0
+
 # set PRE_UNITTESTS and POST_UNITTESTS to define steps that shall be executed before or after the unit tests
 # PRE_UNITTESTS?=
 # POST_UNITTESTS?=
