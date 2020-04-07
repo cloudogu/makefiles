@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v4.0.0](https://github.com/cloudogu/makefiles/releases/tag/v4.0.0)
+
 Please note: Default behaviour changed!
 The "CGO_ENABLED=0" variable is not set per default any more!
 You have to set it via the Makefile, if needed.
