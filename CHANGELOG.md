@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Please note: Default behaviour changed!
+The "CGO_ENABLED=0" variable is not set per default any more!
+You have to set it via the Makefile, if needed.
+
+### Added
+- Introduce GO_ENV_VARS for go environment variables
+
 ## [v3.0.1](https://github.com/cloudogu/makefiles/releases/tag/v3.0.1)
 
 ### Fixed
