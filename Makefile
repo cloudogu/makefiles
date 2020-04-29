@@ -2,7 +2,7 @@
 ARTIFACT_ID=
 VERSION=
 
-MAKEFILES_VERSION=4.0.0
+MAKEFILES_VERSION=4.1.0
 
 .DEFAULT_GOAL:=compile
 
@@ -24,7 +24,7 @@ MAKEFILES_VERSION=4.0.0
 # clean_deb:
 #     rm -rf ${DEBIAN_BUILD_DIR}
 
-# controls the target apt repository for deploy-debian.mk
+# APT_REPO controls the target apt repository for deploy-debian.mk
 # -> APT_REPO=ces-premium results in a deploy to the premium apt repository
 # -> Everything else results in a deploy to the public repositories
 APT_REPO?=ces
