@@ -1,4 +1,7 @@
 # This Makefile holds all targets for deploying and undeploying
+# Uses the variable APT_REPO to determine which apt repos should be used to deploy
+# -> APT_REPO=ces-premium results in a deploy to the premium apt repository
+# -> Everything else results in a deploy to the public repositories
 
 # Attention: This Makefile depends on package-debian.mk!
 
@@ -19,8 +22,12 @@ add-package-to-repo: upload-package
 	@echo "... add package to repositories"
 	# heads up: For migration to a new repo structure we use two repos, new (ces) and old (xenial)
 	# '?noRemove=1': aptly removes the file on success. This leads to an error on the second package add. Keep it this round
+ifeq ($(APT_REPO), ces-premium)
+	@$(APTLY) -X POST "${APT_API_BASE_URL}/repos/ces-premium/file/$$(basename ${DEBIAN_PACKAGE})"
+else
 	@$(APTLY) -X POST "${APT_API_BASE_URL}/repos/ces/file/$$(basename ${DEBIAN_PACKAGE})?noRemove=1"
 	@$(APTLY) -X POST "${APT_API_BASE_URL}/repos/xenial/file/$$(basename ${DEBIAN_PACKAGE})"
+endif
 
 define aptly_publish
 	$(APTLY) -X PUT -H "Content-Type: application/json" --data '{"Signing": { "Batch": true, "Passphrase": "${APT_API_SIGNPHRASE}"}}' ${APT_API_BASE_URL}/publish/$(1)/$(2)
@@ -29,9 +36,13 @@ endef
 .PHONY: publish
 publish:
 	@echo "... publish packages"
+ifeq ($(APT_REPO), ces-premium)
+	@$(call aptly_publish,ces-premium,bionic)
+else
 	@$(call aptly_publish,xenial,xenial)
 	@$(call aptly_publish,ces,xenial)
 	@$(call aptly_publish,ces,bionic)
+endif
 
 .PHONY: deploy
 deploy: add-package-to-repo publish
@@ -43,8 +54,12 @@ endef
 
 .PHONY: remove-package-from-repo
 remove-package-from-repo:
+ifeq ($(APT_REPO), ces-premium)
+	@$(call aptly_undeploy,ces-premium)
+else
 	@$(call aptly_undeploy,xenial)
 	@$(call aptly_undeploy,ces)
+endif
 
 .PHONY: undeploy
 undeploy: deploy-check remove-package-from-repo publish
