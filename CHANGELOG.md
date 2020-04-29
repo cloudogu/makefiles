@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Include a new variable `APT_REPO` which controls which apt repository should be used as a deploy target. `ces-premium` deploys into the premium repository while any other value deploys into the public repositories. ([Issue 45](https://github.com/cloudogu/makefiles/issues/45))
 
+## [v4.0.0](https://github.com/cloudogu/makefiles/releases/tag/v4.0.0)
+
+Please note: Default behaviour changed!
+The "CGO_ENABLED=0" variable is not set per default any more!
+You have to set it via the Makefile, if needed.
+
+### Added
+- Introduce GO_ENV_VARS for go environment variables
+
 ## [v3.0.1](https://github.com/cloudogu/makefiles/releases/tag/v3.0.1)
 
 ### Fixed
