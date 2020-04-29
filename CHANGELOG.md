@@ -9,8 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
-- Issue [35](https://github.com/cloudogu/makefiles/issues/45)
-  Include a new variable `APT_REPO` which controles which apt repository should be used as a deploy target. `ces-premium` deploys into the premium repository while any other value deploys into the public repositories.
+- Include a new variable `APT_REPO` which controls which apt repository should be used as a deploy target. `ces-premium` deploys into the premium repository while any other value deploys into the public repositories. ([Issue 45](https://github.com/cloudogu/makefiles/issues/45))
 
 ## [v3.0.1](https://github.com/cloudogu/makefiles/releases/tag/v3.0.1)
 

@@ -21,6 +21,11 @@ MAKEFILES_VERSION=3.0.0
 # clean_deb:
 #     rm -rf ${DEBIAN_BUILD_DIR}
 
+# controls the target apt repository for deploy-debian.mk
+# -> APT_REPO=ces-premium results in a deploy to the premium apt repository
+# -> Everything else results in a deploy to the public repositories
+APT_REPO?=ces
+
 include build/make/variables.mk
 
 # You may want to overwrite existing variables for target actions to fit into your project.

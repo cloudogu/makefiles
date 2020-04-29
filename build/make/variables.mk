@@ -36,8 +36,6 @@ endif
 YARN_TARGET=$(WORKDIR)/node_modules
 BOWER_TARGET?=$(WORKDIR)/public/vendor
 
-APT_REPO?=ces
-
 UID_NR:=$(shell id -u)
 GID_NR:=$(shell id -g)
 HOME_DIR=$(TMP_DIR)/home

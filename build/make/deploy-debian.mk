@@ -1,7 +1,5 @@
 # This Makefile holds all targets for deploying and undeploying
 # Uses the variable APT_REPO to determine which apt repos should be used to deploy
-# -> APT_REPO=ces-premium results in a deploy to the premium apt repository
-# -> Everything else results in a deploy to the public repositories
 
 # Attention: This Makefile depends on package-debian.mk!
 
