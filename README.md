@@ -126,6 +126,10 @@ Include only one of the files: package-debian.mk OR package-tar.mk
 
 This module enables you to deploy or undeploy the built deb package to/from the apt repository via the `deploy` respectively `undeploy` targets.
 
+The variable `APT_REPO` determines, which repository should be used as a target. Currently, it supports the following values:
+- `ces-premium`: The secured repositories are used
+- any other value: The public repositories are used
+
 If you want to use this module, you also have to include the `package-debian.mk` module!
 
 #### Package requirements
