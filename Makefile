@@ -56,4 +56,6 @@ include build/make/deploy-debian.mk
 include build/make/digital-signature.mk
 include build/make/yarn.mk
 include build/make/bower.mk
+# only include this in dogu repositories
+include build/make/release.mk
 
