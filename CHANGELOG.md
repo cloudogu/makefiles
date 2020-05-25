@@ -7,9 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v4.1.0](https://github.com/cloudogu/makefiles/releases/tag/v4.1.0) 2020-05-25
+### Fixed
+- Set repo-specific user output in deploy-debian.mk
+
+### Added
+- dogu-release target to start an automated dogu release
+
 ## [v4.1.0](https://github.com/cloudogu/makefiles/releases/tag/v4.1.0)
-## Added
+### Added
 - Include a new variable `APT_REPO` which controls which apt repository should be used as a deploy target. `ces-premium` deploys into the premium repository while any other value deploys into the public repositories. ([Issue 45](https://github.com/cloudogu/makefiles/issues/45))
+- dogu-release target to start an automated dogu release
 
 ## [v4.0.0](https://github.com/cloudogu/makefiles/releases/tag/v4.0.0)
 

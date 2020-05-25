@@ -171,3 +171,9 @@ This module enables you to use yarn via the `yarn-install` target.
 ### bower.mk
 
 This module enables you to use bower via the `bower-install` target.
+
+### release.mk
+
+This module holds the `dogu-release` target for starting automated dogu releases.
+
+Only include this module in dogu repositories!
