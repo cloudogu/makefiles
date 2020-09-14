@@ -44,7 +44,7 @@ $(DEBIAN_PACKAGE): $(TARGET_DIR) $(DEBIAN_CONTENT_DIR)/control $(DEBIAN_CONTENT_
 # create data.tar.gz
 	@tar cvfz $(DEBIAN_CONTENT_DIR)/data.tar.gz -C $(DEBIAN_CONTENT_DIR)/data $(TAR_ARGS) .
 
-# create package
+# create final debian package
 	@ar roc $@ $(DEBIAN_BUILD_DIR)/debian-binary $(DEBIAN_CONTENT_DIR)/control.tar.gz $(DEBIAN_CONTENT_DIR)/data.tar.gz
 	@echo "... deb package can be found at $@"
 
@@ -60,6 +60,8 @@ debian-copy-files:
 		install -m 0755 -d $${dir} ; \
 	done
 
+# This is a shell loop, not a makefile loop, that's why bash variables need to be escaped with $$.
+# ${file#deb/} trims the prefix "deb/" from the file path. See https://tldp.org/LDP/abs/html/string-manipulation.html
 	@for file in $$(find deb -mindepth 1 -type f | grep -v "DEBIAN") ; do \
 		cp $${file} $(DEBIAN_CONTENT_DIR)/data/$${file#deb/} ; \
 	done
