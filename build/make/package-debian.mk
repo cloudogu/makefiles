@@ -86,5 +86,3 @@ set-permissions:
 	@for file in $$(find $(DEBIAN_CONTENT_DIR)/data/etc -mindepth 1 -type f | grep -v "DEBIAN") ; do \
 		chmod 0644 $$file ; \
 	done
-
-APTLY:=curl --silent --show-error --fail -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}"
