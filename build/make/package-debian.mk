@@ -25,6 +25,10 @@ prepare-package:
 pre-create-package:
 	@echo "Using default pre-create-package target. To write your own, define a target and specify it in the PRE_CREATE_PACKAGE variable, before the package-debian.mk import"
 
+.PHONY: clean-deb
+clean-deb:
+	rm -rf ${DEBIAN_BUILD_DIR}
+
 $(DEBIAN_BUILD_DIR):
 	@mkdir $@
 
