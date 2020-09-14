@@ -82,7 +82,10 @@ debian-copy-files:
 
 .PHONY: set-permissions
 set-permissions:
-	@echo "Setting default permissions"
+	@echo "Setting default permissions..."
 	@for file in $$(find $(DEBIAN_CONTENT_DIR)/data/etc -mindepth 1 -type f | grep -v "DEBIAN") ; do \
 		chmod 0644 $$file ; \
 	done
+	@for file in $$(find $(DEBIAN_CONTENT_DIR)/data/usr/share/doc -mindepth 1 -type f | grep -v "DEBIAN") ; do \
+    	chmod 0644 $$file ; \
+    done
