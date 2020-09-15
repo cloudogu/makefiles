@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Add custom target before packaging files into debian package (#47)
+   - own targets can be hooked by overwriting the variable `PRE_CREATE_PACKAGE=your-custom-target`
+   - this allows for a wide range of extension (f. i. coping with additional files that were not designed by the packaging mechanism)
+- Add separate phony clean target `clean-deb` for cleaning the debian build directory (#48)
+   - this target can be combined with the general `clean` target by overwriting the variable `ADDITIONAL_CLEAN=clean-deb`
+   
+### Changed
+- the debian packaging target `$(DEBIAN_PACKAGE)` was split (#47)
+   - This allows for more extensibility during the packaging and includes the new `${PRE_CREATE_PACKAGE}` target
+- change default permissions for files under `/usr/share/doc/`
+   - any files found under `/usr/share/doc/` receive now a file permission setting of `0644` according the Debian packaging rules 
 
 ## [v4.1.0](https://github.com/cloudogu/makefiles/releases/tag/v4.1.0) 2020-05-25
 ### Fixed
