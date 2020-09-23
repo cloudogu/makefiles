@@ -94,4 +94,4 @@ set-permissions:
 	done
 	@for file in $$(find $(DEBIAN_CONTENT_DIR)/data/usr/share/doc -mindepth 1 -type f | grep -v "DEBIAN") ; do \
     	chmod 0644 $$file ; \
-    done
+	done
