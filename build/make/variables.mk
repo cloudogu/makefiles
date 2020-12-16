@@ -40,6 +40,7 @@ UID_NR:=$(shell id -u)
 GID_NR:=$(shell id -g)
 HOME_DIR=$(TMP_DIR)/home
 PASSWD=$(TMP_DIR)/passwd
+ETCGROUP=$(TMP_DIR)/group
 
 $(TMP_DIR):
 	@mkdir -p $(TMP_DIR)
@@ -52,3 +53,7 @@ $(TARGET_DIR):
 
 $(PASSWD): $(TMP_DIR)
 	@echo "$(USER):x:$(UID_NR):$(GID_NR):$(USER):/home/$(USER):/bin/bash" > $(PASSWD)
+
+$(ETCGROUP): $(TMP_DIR)
+	@echo "root:x:0:" > $(ETCGROUP)
+	@echo "$(USER):x:$(GID_NR):" >> $(ETCGROUP)
