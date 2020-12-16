@@ -94,6 +94,27 @@ Include only one of the files: dependencies-godep.mk OR dependencies-glide.mk
 
 This module holds the `build` target, which starts the build inside a Docker container (to ensure reproducible builds). It also creates a checksum of the binary.
 
+The exact golang container that is going to be used to compile Go code can be configured by overwriting the makefile variables `GOIMAGE` and `GOTAG` in the main `Makefile`. A different Go compiler version could be achieved with a line like this:
+
+```
+GOTAG=1.15.6-buster
+```
+
+This module also supports one optional Docker volume mount to the Golang container. The sureshot default mounts the host's `/tmp` to the container `/tmp`. A custom volume mount can be expressed by overwriting the makefile variable `CUSTOM_GO_MOUNT` in your main `Makefile` with the usual Docker volume syntax:
+
+```makefile
+CUSTOM_GO_MOUNT=-v /host/path/:/container/path
+``` 
+
+When building on Jenkins CI, make sure to mount a `/etc/passwd` file according to the Jenkins user (this file can be easily generated). This mounting is even easier with the help of the [ces-build-lib](https://github.com/cloudogu/ces-build-lib) `mountJenkinsUser()` step, like so:
+
+```
+new Docker(this)
+ .image('golang:1.14.13')
+ .mountJenkinsUser()
+ .inside
+``` 
+
 ### unit-test.mk
 
 This module ensures that you can start unit tests via the `unit-test` target.
@@ -109,6 +130,10 @@ Include only one of the files: unit-test.mk OR unit-test-docker-compose.mk
 ### static-analysis.mk
 
 This module holds the `static-analysis` target for static code analysis. It automatically determines the working environment (local or CI).
+
+Static analysis is now powered by the official Golang containers in the very same ways as it is done in `build.mk`. Any container customizations can be applied in the same way to local static-analysis.
+
+When running on Jenkins CI and to avoid configuration overhead it is possible to re-use  the same Golang container (that was used to compile the code) and embedd a static analysis stage there.
 
 ### clean.mk
 

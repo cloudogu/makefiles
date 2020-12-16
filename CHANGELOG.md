@@ -6,28 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+**Breaking Change ahead!**, see below
+
 ### Changed
-:warn: **Breaking Change ahead!** :warn:
 - Replace custom `cloudogu/golang` container with official golang container (#51)
    - the affected targets are:
       - `build`
       - `static-analysis-ci`
       - `static-analysis-local`
    - the targets `static-analysis`/`static-analysis-ci` may no longer work on your CI because of changed container references  
-      - mounting a custom `/etc/passwd` into the golang container is advised, either manually or with help of the [ces-build-lib](https://github.com/cloudogu/ces-build-lib) `mountJenkinsUser()` step:
-      ```
-        new Docker(this)
-         .image('golang:1.14.13')
-         .mountJenkinsUser()
-         .inside
-     ```
-   - Golang containers default to `GOIMAGE=golang` and `GOTAG=1.14.13` now
-      - customized make variables `GOIMAGE`/`GOTAG` should be replaced accordingly
+      - mounting a custom `/etc/passwd` into the golang container is advised
+   - Golang containers default to version 1.14.13` now
+      - the Go compiler version is adjustable via the `GOTAG` variable
+      - customized make variables `GOIMAGE` and `GOTAG` should be replaced in your main `Makefile`accordingly
+      - see also the [README.md](README.md) for more information
 
 ### Added
 - add customizable make variable for Golang container volume mount (#51)
    - f. e.: `CUSTOM_GO_MOUNT=-v /host/path:/container/path`
-   - if unused, the host's temp directory will be mounted `-v /tmp:/tmp`
+   - see also the [README.md](README.md) for more information
 - add make variable `ETCGROUP` for generated `/etc/group` file 
 
 ## [v4.2.0](https://github.com/cloudogu/makefiles/releases/tag/v4.2.0) 2020-05-25
