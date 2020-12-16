@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       - `static-analysis-local`
    - the targets `static-analysis`/`static-analysis-ci` may no longer work on your CI because of changed container references  
       - mounting a custom `/etc/passwd` into the golang container is advised
-   - Golang containers default to version 1.14.13` now
+   - Golang containers default to version 1.14.13 now
       - the Go compiler version is adjustable via the `GOTAG` variable
       - customized make variables `GOIMAGE` and `GOTAG` should be replaced in your main `Makefile`accordingly
       - see also the [README.md](README.md) for more information
