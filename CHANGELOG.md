@@ -7,7 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v4.1.0](https://github.com/cloudogu/makefiles/releases/tag/v4.1.0) 2020-05-25
+## [v4.3.0](https://github.com/cloudogu/makefiles/releases/tag/v4.3.0) 2020-12-17
+**Breaking Change ahead!**, see below
+
+### Changed
+- Replace custom `cloudogu/golang` container with official golang container (#51)
+   - The affected targets are:
+      - `build`
+      - `static-analysis-ci`
+      - `static-analysis-local`
+   - The targets `static-analysis`/`static-analysis-ci` may no longer work on your CI because of changed container references
+      - mounting a custom `/etc/passwd` into the golang container is advised
+   - Golang containers default to version 1.14.13 now
+      - the Go compiler version is adjustable via the `GOTAG` variable
+      - customized make variables `GOIMAGE` and `GOTAG` should be replaced in your main `Makefile` accordingly
+      - see also the [README.md](README.md) for more information
+
+### Added
+- Add customizable make variable for Golang container volume mount (#51)
+   - f. e.: `CUSTOM_GO_MOUNT=-v /host/path:/container/path`
+   - see also the [README.md](README.md) for more information
+- Add make variable `ETCGROUP` for generated `/etc/group` file
+
+## [v4.2.0](https://github.com/cloudogu/makefiles/releases/tag/v4.2.0) 2020-05-25
 ### Fixed
 - Set repo-specific user output in deploy-debian.mk
 
