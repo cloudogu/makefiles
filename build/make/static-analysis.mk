@@ -15,7 +15,7 @@ static-analysis: static-analysis-$(ENVIRONMENT)
 static-analysis-ci:
 	@make $(STATIC_ANALYSIS_DIR)/static-analysis-cs.log $(STATIC_ANALYSIS_DIR)/static-analysis.log static-analysis-ci-report-pr
 
-static-analysis-ci-report-pr:
+static-analysis-ci-report-pr: $(REVIEW_DOG)
 	@if [ X"$(CI_PULL_REQUEST)" != X"" -a X"$(CI_PULL_REQUEST)" != X"null" ] ; then \
   		cat $(STATIC_ANALYSIS_DIR)/static-analysis-cs.log | CI_COMMIT=$(COMMIT_ID) $(REVIEW_DOG) -f=checkstyle -reporter="github-pr-review"; \
   	fi
@@ -48,7 +48,7 @@ $(STATIC_ANALYSIS_DIR)/static-analysis-cs.log: $(STATIC_ANALYSIS_DIR)
 $(STATIC_ANALYSIS_DIR): $(LINT)
 	@mkdir -p $(STATIC_ANALYSIS_DIR)
 
-static-analysis-ci-report-local: $(STATIC_ANALYSIS_DIR)/static-analysis-cs.log
+static-analysis-ci-report-local: $(STATIC_ANALYSIS_DIR)/static-analysis-cs.log $(REVIEW_DOG)
 	@echo ""
 	@echo "differences to develop branch:"
 	@echo ""
