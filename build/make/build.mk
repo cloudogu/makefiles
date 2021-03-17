@@ -7,6 +7,7 @@ GOARCH?=amd64
 PRE_COMPILE?=
 GO_ENV_VARS?=
 CUSTOM_GO_MOUNT?=-v /tmp:/tmp
+GO_BUILD_FLAGS?=-mod=vendor -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(BINARY)
 
 .PHONY: compile
 compile: $(BINARY)
@@ -19,7 +20,7 @@ compile-generic:
 	@echo "Compiling..."
 # here is go called without mod capabilities because of error "go: error loading module requirements"
 # see https://github.com/golang/go/issues/30868#issuecomment-474199640
-	@$(GO_ENV_VARS) go build -mod=vendor -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(BINARY)
+	@$(GO_ENV_VARS) go build $(GO_BUILD_FLAGS)
 
 
 ifeq ($(ENVIRONMENT), ci)
