@@ -6,13 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Debian package (un)deployment for focal (Ubuntu 20.04); #56
+
+### Removed
+- Debian package (un)deployment for xenial (Ubuntu 16.04); #56
 
 ## [v4.3.1](https://github.com/cloudogu/makefiles/releases/tag/v4.3.1) 2021-1-25
-
 ### Changed
 - Calls an additional `go mod vendor` after installing `j-unit-report` to prevent inconsistencies between `go.mod` and `vendor/modules.txt` [#53]. 
 
 ## [v4.3.0](https://github.com/cloudogu/makefiles/releases/tag/v4.3.0) 2020-12-17
+
 **Breaking Change ahead!**, see below
 
 ### Changed
@@ -56,9 +61,7 @@ You have to set it via the Makefile, if needed.
 - Introduce GO_ENV_VARS for go environment variables
 
 ## [v3.0.1](https://github.com/cloudogu/makefiles/releases/tag/v3.0.1)
-
 ### Fixed
-
 - Issue [34](https://github.com/cloudogu/makefiles/issues/34)
   `make unit-test` and `make integration-test` depend on the go sources
   and won't download go-junit-report each time they run
@@ -80,23 +83,18 @@ include the `deploy-debian.mk` into your Makefile, below the `package-debian.mk`
 For example, see the [Makefile in this repository](https://github.com/cloudogu/makefiles/blob/develop/Makefile).
 
 ## [v2.1.1](https://github.com/cloudogu/makefiles/releases/tag/v2.1.1)
-
 ### Changed
 - Changed reviewdog -ci flag to -reporter flag in jenkins build
 - static-analysis-ci now also executes the goal to create static-analysis.log
 
 ## [v2.1.0](https://github.com/cloudogu/makefiles/releases/tag/v2.1.0)
-
 ### Added
-
 - Add Go modules support  (#31)
    - Go module is activated by setting GO_ENVIRONMENT=GO111MODULE=on before including variables.mk
    - When working with go modules `dependencies-gomod.mk` has to be included.
 
 ### Fixed
-
 - Furthermore this commit fixes a weird unit-test behaviour when the go-junit tool is older than the tests.
-
 
 ## [v2.0.0](https://github.com/cloudogu/makefiles/releases/tag/v2.0.0)
 
