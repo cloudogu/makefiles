@@ -39,9 +39,20 @@ if [[ ${NEW_RELEASE_VERSION} = v* ]]; then
 fi;
 
 # Do gitflow
-git flow init -df
-git checkout master
-git pull origin master
+git flow init --defaults --force
+
+mainBranchExists="$(git show-ref refs/remotes/origin/main)"
+if [ -n "$mainBranchExists" ]; then
+    echo 'Using "main" branch for production releases'
+    git flow config set master main
+    git checkout main
+    git pull origin main
+else
+    echo 'Using "master" branch for production releases'
+    git checkout master
+    git pull origin master
+fi
+
 git checkout develop
 git pull origin develop
 git flow release start v"${NEW_RELEASE_VERSION}"
