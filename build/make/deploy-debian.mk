@@ -3,6 +3,8 @@
 
 # Attention: This Makefile depends on package-debian.mk!
 
+APTLY:=curl --silent --show-error --fail -u "${APT_API_USERNAME}":"${APT_API_PASSWORD}"
+
 .PHONY: deploy-check
 deploy-check:
 	@case X"${VERSION}" in *-SNAPSHOT) echo "i will not upload a snaphot version for you" ; exit 1; esac;
