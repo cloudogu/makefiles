@@ -3,23 +3,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-wait_for_ok(){
-  printf "\n"
-  OK=false
-  while [[ ${OK} != "ok" ]] ; do
-    read -r -p "${1} (type 'ok'): " OK
-  done
-}
-
-ask_yes_or_no(){
-  local ANSWER=""
-
-  while [ "${ANSWER}" != "y" ] && [ "${ANSWER}" != "n" ]; do
-    read -r -p "${1} (type 'y/n'): " ANSWER
-  done
-
-  echo "${ANSWER}"
-}
+source "$(pwd)/build/make/release_util.sh"
 
 # dogu.json will always exist. So get current dogu version from dogu.json.
 CURRENT_DOGU_VERSION=$(jq ".Version" --raw-output dogu.json)
