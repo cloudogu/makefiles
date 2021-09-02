@@ -190,4 +190,3 @@ finish_release_and_push(){
   git checkout develop
   git branch -D release/v"${NEW_RELEASE_VERSION}"
 }
-}
