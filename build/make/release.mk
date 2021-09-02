@@ -2,8 +2,8 @@
 
 .PHONY: dogu-release
 dogu-release:
-	build/make/dogu_release.sh
+	build/make/release.sh dogu
 
 .PHONY: go-release
 go-release:
-	build/make/go_release.sh
+	build/make/release.sh go-tool

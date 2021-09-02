@@ -21,6 +21,20 @@ ask_yes_or_no(){
   echo "${ANSWER}"
 }
 
+get_current_version_by_makefile(){
+  grep '^VERSION=[0-9a-Z.]*$' Makefile | sed s/VERSION=//g
+}
+
+get_current_version_by_dogu_json(){
+  jq ".Version" --raw-output dogu.json
+}
+
+read_new_version(){
+  local NEW_RELEASE_VERSION
+  read -r -p "Current Version is v${CURRENT_TOOL_VERSION}. Please provide the new version: v" NEW_RELEASE_VERSION
+  echo "${NEW_RELEASE_VERSION}"
+}
+
 validate_new_version(){
   local NEW_RELEASE_VERSION="${1}"
   # Validate that release version does not start with vv
@@ -40,7 +54,7 @@ start_git_flow_release(){
   # Do gitflow
   git flow init --defaults --force
 
-  mainBranchExists="$(git show-ref refs/remotes/origin/main)"
+  mainBranchExists="$(git show-ref refs/remotes/origin/main || echo "")"
   if [ -n "$mainBranchExists" ]; then
       echo 'Using "main" branch for production releases'
       git flow config set master main
@@ -60,37 +74,56 @@ start_git_flow_release(){
 update_versions(){
   local NEW_RELEASE_VERSION="${1}"
 
-  # Update version in dogu.json
-  jq ".Version = \"${NEW_RELEASE_VERSION}\"" dogu.json > dogu2.json && mv dogu2.json dogu.json
-  # Update version in Dockerfile
-  sed -i "s/\(^[ ]*VERSION=\"\)\([^\"]*\)\(.*$\)/\1${NEW_RELEASE_VERSION}\3/" Dockerfile
+  if [ -f "dogu.json" ]; then
+    # Update version in dogu.json
+    jq ".Version = \"${NEW_RELEASE_VERSION}\"" dogu.json > dogu2.json && mv dogu2.json dogu.json
+  fi
+
+  if [ -f "Dockerfile" ]; then
+    # Update version in Dockerfile
+    sed -i "s/\(^[ ]*VERSION=\"\)\([^\"]*\)\(.*$\)/\1${NEW_RELEASE_VERSION}\3/" Dockerfile
+  fi
+
   # Update version in Makefile
   if [ -f "Makefile" ]; then
     sed -i "s/\(^VERSION=\)\(.*\)$/\1${NEW_RELEASE_VERSION}/" Makefile
   fi
+
   # Update version in package.json
   if [ -f "package.json" ]; then
     jq ".version = \"${NEW_RELEASE_VERSION}\"" package.json > package2.json && mv package2.json package.json
   fi
+
   # Update version in pom.xml
   if [ -f "pom.xml" ]; then
     echo "Updating version in pom.xml..."
     mvn versions:set -DgenerateBackupPoms=false -DnewVersion="${NEW_RELEASE_VERSION}"
   fi
 
-  # Commit changes to version
   wait_for_ok "Please make sure that all versions have been updated correctly now (e.g. via \"git diff\")."
-  git add Dockerfile
-  git add dogu.json
+
+  ### The `git add` command has to be after the okay. Otherwise user-made changes to versions would not be added.
+
+  if [ -f "dogu.json" ]; then
+      git add dogu.json
+  fi
+
+  if [ -f "Dockerfile" ]; then
+    git add Dockerfile
+  fi
+
   if [ -f "Makefile" ]; then
     git add Makefile
   fi
+
   if [ -f "package.json" ]; then
     git add package.json
   fi
+
   if [ -f "pom.xml" ]; then
     git add pom.xml
   fi
+
   git commit -m "Bump version"
 }
 
@@ -150,10 +183,11 @@ finish_release_and_push(){
   local NEW_RELEASE_VERSION="${2}"
 
   # Push changes and delete release branch
-  wait_for_ok "Tool upgrade from version v${CURRENT_VERSION} to version v${NEW_RELEASE_VERSION} finished. Should the changes be pushed?"
+  wait_for_ok "Upgrade from version v${CURRENT_VERSION} to version v${NEW_RELEASE_VERSION} finished. Should the changes be pushed?"
   git push origin release/v"${NEW_RELEASE_VERSION}"
 
   echo "Switching back to develop and deleting branch release/v${NEW_RELEASE_VERSION}..."
   git checkout develop
   git branch -D release/v"${NEW_RELEASE_VERSION}"
+}
 }
