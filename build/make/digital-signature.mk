@@ -17,7 +17,6 @@ $(SIGNATURE): $(CHECKSUM)
 	@gpg --batch --yes --detach-sign --armor -o $@ $<
 
 .PHONY: signature-ci
-signature-ci: $(SIGNATURE)
-$(SIGNATURE): $(CHECKSUM)
+signature-ci: $(CHECKSUM)
 	@echo "Generating Signature"
-	@gpg2 --batch --pinentry-mode loopback --passphrase="${passphrase}" --yes --detach-sign --armor -o $@ $<
+	@gpg2 --batch --pinentry-mode loopback --passphrase="${passphrase}" --yes --detach-sign --armor -o ${SIGNATURE} $<
