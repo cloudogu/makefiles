@@ -74,23 +74,27 @@ start_git_flow_release(){
 update_versions(){
   local NEW_RELEASE_VERSION="${1}"
 
+  # Update version in dogu.json
   if [ -f "dogu.json" ]; then
-    # Update version in dogu.json
+    echo "Updating version in dogu.json..."
     jq ".Version = \"${NEW_RELEASE_VERSION}\"" dogu.json > dogu2.json && mv dogu2.json dogu.json
   fi
 
+  # Update version in Dockerfile
   if [ -f "Dockerfile" ]; then
-    # Update version in Dockerfile
+    echo "Updating version in Dockerfile..."
     sed -i "s/\(^[ ]*VERSION=\"\)\([^\"]*\)\(.*$\)/\1${NEW_RELEASE_VERSION}\3/" Dockerfile
   fi
 
   # Update version in Makefile
   if [ -f "Makefile" ]; then
+    echo "Updating version in Makefile..."
     sed -i "s/\(^VERSION=\)\(.*\)$/\1${NEW_RELEASE_VERSION}/" Makefile
   fi
 
   # Update version in package.json
   if [ -f "package.json" ]; then
+    echo "Updating version in package.json..."
     jq ".version = \"${NEW_RELEASE_VERSION}\"" package.json > package2.json && mv package2.json package.json
   fi
 
