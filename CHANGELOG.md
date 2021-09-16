@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v4.6.0](https://github.com/cloudogu/makefiles/releases/tag/v4.6.0) 2021-9-16
+## Changed 
+- Reworked Release-script. It is new also able to handle releases of non-dogus (#62)
+
+## Added
+- Added command to release go-tools (#62)
+
 ## [v4.5.0](https://github.com/cloudogu/makefiles/releases/tag/v4.5.0) 2021-4-06
 ### Changed
 - The testing dependency `go-junit-reporting` is retrieved with `GO111MODULE=off go get...` to support all kinds of dependency managers (`gomod`, `dep`, `glide`)

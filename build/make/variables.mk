@@ -17,6 +17,7 @@ GO_CALL=${GO_ENVIRONMENT} go
 PACKAGES=$(shell ${GO_CALL} list ./... | grep -v /vendor/)
 PACKAGES_FOR_INTEGRATION_TEST?=${PACKAGES}
 GO_BUILD_TAG_INTEGRATION_TEST?=integration
+GOMODULES=on
 
 SRC:=$(shell find "${WORKDIR}" -type f -name "*.go" -not -path "./vendor/*")
 
