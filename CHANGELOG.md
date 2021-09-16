@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v4.6.0](https://github.com/cloudogu/makefiles/releases/tag/v4.6.0) 2021-9-16
 ## Changed 
 - Reworked Release-script. It is new also able to handle releases of non-dogus (#62)
 
