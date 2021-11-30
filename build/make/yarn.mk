@@ -18,7 +18,7 @@ $(YARN_TARGET): $(YARN_LOCK) $(PASSWD)
 	  -v $(PASSWD):/etc/passwd:ro \
 	  -v $(WORKDIR):$(WORKDIR) \
 	  -w $(WORKDIR) \
-	  node:8 \
+	  node:$(NODE_VERSION) \
 	  yarn install
 	@touch $@
 

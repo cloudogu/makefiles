@@ -7,19 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v4.6.0](https://github.com/cloudogu/makefiles/releases/tag/v4.6.0) 2021-9-16
+## [v4.7.0](https://github.com/cloudogu/makefiles/releases/tag/v4.7.0) 2021-11-30
+### Changed
+- Make the nodejs version adjustable via NODE_VERSION variable; #64
+
+## [v4.6.0](https://github.com/cloudogu/makefiles/releases/tag/v4.6.0) 2021-09-16
 ## Changed 
 - Reworked Release-script. It is new also able to handle releases of non-dogus (#62)
 
 ## Added
 - Added command to release go-tools (#62)
 
-## [v4.5.0](https://github.com/cloudogu/makefiles/releases/tag/v4.5.0) 2021-4-06
+## [v4.5.0](https://github.com/cloudogu/makefiles/releases/tag/v4.5.0) 2021-04-06
 ### Changed
 - The testing dependency `go-junit-reporting` is retrieved with `GO111MODULE=off go get...` to support all kinds of dependency managers (`gomod`, `dep`, `glide`)
 - Use main as production releases branch if existent; #60
 
-## [v4.4.0](https://github.com/cloudogu/makefiles/releases/tag/v4.3.1) 2021-3-18
+## [v4.4.0](https://github.com/cloudogu/makefiles/releases/tag/v4.3.1) 2021-03-18
 ### Changed
 - make go build args configurable
 
@@ -29,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Debian package (un)deployment for xenial (Ubuntu 16.04); #56
 
-## [v4.3.1](https://github.com/cloudogu/makefiles/releases/tag/v4.3.1) 2021-1-25
+## [v4.3.1](https://github.com/cloudogu/makefiles/releases/tag/v4.3.1) 2021-01-25
 ### Changed
 - Calls an additional `go mod vendor` after installing `j-unit-report` to prevent inconsistencies between `go.mod` and `vendor/modules.txt` [#53]. 
 
