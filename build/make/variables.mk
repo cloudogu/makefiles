@@ -58,3 +58,5 @@ $(PASSWD): $(TMP_DIR)
 $(ETCGROUP): $(TMP_DIR)
 	@echo "root:x:0:" > $(ETCGROUP)
 	@echo "$(USER):x:$(GID_NR):" >> $(ETCGROUP)
+
+NODE_VERSION?=8

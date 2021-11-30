@@ -19,7 +19,7 @@ $(BOWER_TARGET): $(BOWER_JSON) $(PASSWD) $(YARN_TARGET)
 	  -v $(PASSWD):/etc/passwd:ro \
 	  -v $(WORKDIR):$(WORKDIR) \
 	  -w $(WORKDIR) \
-	  node:8 \
+	  node:$(NODE_VERSION) \
 	  yarn run bower
 	@touch $@
 
