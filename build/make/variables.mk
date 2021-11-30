@@ -36,6 +36,7 @@ endif
 
 YARN_TARGET=$(WORKDIR)/node_modules
 BOWER_TARGET?=$(WORKDIR)/public/vendor
+NODE_VERSION?=8
 
 UID_NR:=$(shell id -u)
 GID_NR:=$(shell id -g)
