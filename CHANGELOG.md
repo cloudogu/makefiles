@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v4.7.1](https://github.com/cloudogu/makefiles/releases/tag/v4.7.1) 2021-12-01
+### Fixed
+- Make grep regex work with grep v3.7; #66
+
 ## [v4.7.0](https://github.com/cloudogu/makefiles/releases/tag/v4.7.0) 2021-11-30
 ### Changed
 - Make the nodejs version adjustable via NODE_VERSION variable; #64
