@@ -22,7 +22,7 @@ ask_yes_or_no(){
 }
 
 get_current_version_by_makefile(){
-  grep '^VERSION=[0-9a-Z.-]*$' Makefile | sed s/VERSION=//g
+  grep '^VERSION=[0-9[:alpha:].-]*$' Makefile | sed s/VERSION=//g
 }
 
 get_current_version_by_dogu_json(){
