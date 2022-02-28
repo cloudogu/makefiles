@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v4.8.0](https://github.com/cloudogu/makefiles/releases/tag/v4.8.0) 2022-02-28
+### Added
+- create extensibility to change version of files not tracked by the makefiles; #68
+
 ## [v4.7.1](https://github.com/cloudogu/makefiles/releases/tag/v4.7.1) 2021-12-01
 ### Fixed
 - Make grep regex work with grep v3.7; #66
