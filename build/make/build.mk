@@ -9,10 +9,12 @@ GO_ENV_VARS?=
 CUSTOM_GO_MOUNT?=-v /tmp:/tmp
 GO_BUILD_FLAGS?=-mod=vendor -a -tags netgo $(LDFLAGS) -installsuffix cgo -o $(BINARY)
 
-.PHONY: compile
-compile: $(BINARY)
+##@ Build go software
 
-compile-ci:
+.PHONY: compile
+compile: $(BINARY) ## Compile the go program locally via Docker
+
+compile-ci: ## Compile the go program locally without Docker
 	@echo "Compiling (CI)..."
 	make compile-generic
 

@@ -7,11 +7,13 @@ CONFFILES_FILE="$(DEBIAN_CONTENT_DIR)/control/conffiles"
 CONFFILES_FILE_TMP="$(DEBIAN_CONTENT_DIR)/conffiles_"
 DEBSRC:=$(shell find "${WORKDIR}/deb" -type f)
 
+##@ Debian packaging
+
 .PHONY: package
-package: debian-with-binary
+package: debian-with-binary ## Build binary and package into .deb file
 
 .PHONY: debian
-debian: $(DEBIAN_PACKAGE)
+debian: $(DEBIAN_PACKAGE) ## Package files into .deb file
 
 .PHONY: debian-with-binary
 debian-with-binary: $(BINARY) $(DEBIAN_PACKAGE)
