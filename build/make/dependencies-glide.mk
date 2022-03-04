@@ -1,3 +1,5 @@
+##@ Glide
+
 GLIDE=$(GOPATH)/bin/glide
 GLIDEFLAGS=
 GLIDEHOME=$(GLIDE_HOME)
@@ -9,10 +11,10 @@ ifeq ($(ENVIRONMENT), ci)
 endif
 
 .PHONY: update-dependencies
-update-dependencies: $(GLIDE)
+update-dependencies: $(GLIDE) ## Install glide
 
 .PHONY: dependencies
-dependencies: vendor
+dependencies: vendor ## Install dependencies using glide
 
 vendor: $(GLIDE) glide.yaml glide.lock
 	@echo "Installing dependencies using Glide..."

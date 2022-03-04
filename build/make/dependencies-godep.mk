@@ -1,3 +1,5 @@
+##@ Go dep
+
 GODEP=$(GOPATH)/bin/dep
 
 $(GODEP):
@@ -7,4 +9,4 @@ vendor: $(GODEP) Gopkg.toml Gopkg.lock
 	@echo "Installing dependencies using go dep..."
 	@dep ensure
 
-dependencies: vendor
+dependencies: vendor ## Install dependencies using go dep
