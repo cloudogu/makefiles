@@ -1,6 +1,6 @@
-BOWER_JSON=$(WORKDIR)/bower.json
+##@ Bower dependency management
 
-##@ Bower
+BOWER_JSON=$(WORKDIR)/bower.json
 
 .PHONY: bower-install
 bower-install: $(BOWER_TARGET) ## Execute yarn run bower (in Docker)

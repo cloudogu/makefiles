@@ -1,4 +1,4 @@
-##@ Go dep
+##@ Go dep dependency management
 
 GODEP=$(GOPATH)/bin/dep
 

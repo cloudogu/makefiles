@@ -1,3 +1,5 @@
+##@ General
+
 TARGET_DIR=target
 
 WORKDIR:=$(shell pwd)
@@ -59,8 +61,6 @@ $(PASSWD): $(TMP_DIR)
 $(ETCGROUP): $(TMP_DIR)
 	@echo "root:x:0:" > $(ETCGROUP)
 	@echo "$(USER):x:$(GID_NR):" >> $(ETCGROUP)
-
-##@ General
 
 .PHONY: help
 help: ## Display this help.

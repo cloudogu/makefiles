@@ -1,4 +1,4 @@
-##@ Glide
+##@ Glide dependency management
 
 GLIDE=$(GOPATH)/bin/glide
 GLIDEFLAGS=

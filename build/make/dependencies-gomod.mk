@@ -1,4 +1,4 @@
-##@ Go mod
+##@ Go mod dependency management
 
 .PHONY: dependencies
 dependencies: vendor ## Install dependencies using go mod

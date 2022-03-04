@@ -1,6 +1,6 @@
-# This makefile holds the dogu-release target for starting a new dogu release
-
 ##@ Dogu releases
+
+# This makefile holds the dogu-release target for starting a new dogu release
 
 .PHONY: dogu-release
 dogu-release: ## Start a dogu release

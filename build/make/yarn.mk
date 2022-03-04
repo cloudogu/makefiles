@@ -1,6 +1,6 @@
-YARN_LOCK=$(WORKDIR)/yarn.lock
+##@ Yarn dependency management
 
-##@ Yarn
+YARN_LOCK=$(WORKDIR)/yarn.lock
 
 .PHONY: yarn-install
 yarn-install: $(YARN_TARGET) ## Execute yarn install

@@ -1,3 +1,5 @@
+##@ Debian packaging
+
 # This Makefile holds all targets for building a debian package
 # For deployment of the deb package include the deploy-debian.mk!
 
@@ -6,8 +8,6 @@ DEBIAN_PACKAGE_FORMAT_VERSION="2.0"
 CONFFILES_FILE="$(DEBIAN_CONTENT_DIR)/control/conffiles"
 CONFFILES_FILE_TMP="$(DEBIAN_CONTENT_DIR)/conffiles_"
 DEBSRC:=$(shell find "${WORKDIR}/deb" -type f)
-
-##@ Debian packaging
 
 .PHONY: package
 package: debian-with-binary ## Build binary and package into .deb file

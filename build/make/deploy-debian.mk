@@ -1,9 +1,9 @@
+##@ Debian package deployment
+
 # This Makefile holds all targets for deploying and undeploying
 # Uses the variable APT_REPO to determine which apt repos should be used to deploy
 
 # Attention: This Makefile depends on package-debian.mk!
-
-##@ Debian package deployment
 
 .PHONY: deploy-check
 deploy-check:

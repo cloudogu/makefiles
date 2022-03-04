@@ -1,4 +1,4 @@
-##@ Clean
+##@ Cleaning
 
 .PHONY: clean
 clean: $(ADDITIONAL_CLEAN) ## Remove target and tmp directories
