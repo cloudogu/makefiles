@@ -3,6 +3,8 @@
 
 # Attention: This Makefile depends on package-debian.mk!
 
+##@ Debian package deployment
+
 .PHONY: deploy-check
 deploy-check:
 	@case X"${VERSION}" in *-SNAPSHOT) echo "i will not upload a snaphot version for you" ; exit 1; esac;
@@ -40,7 +42,7 @@ else
 endif
 
 .PHONY: deploy
-deploy: add-package-to-repo publish
+deploy: add-package-to-repo publish ## Deploy package to apt repository
 
 define aptly_undeploy
 	PREF=$$(${APTLY} "${APT_API_BASE_URL}/repos/$(1)/packages?q=${ARTIFACT_ID}%20(${VERSION})"); \
@@ -56,8 +58,8 @@ else
 endif
 
 .PHONY: undeploy
-undeploy: deploy-check remove-package-from-repo publish
+undeploy: deploy-check remove-package-from-repo publish ## Undeploy package from apt repository
 
 .PHONE: lint-deb-package
-lint-deb-package: debian
+lint-deb-package: debian ## Build and lint debian package
 	@lintian -i $(DEBIAN_PACKAGE)
