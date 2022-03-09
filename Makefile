@@ -33,7 +33,6 @@ include build/make/variables.mk
 
 # You may want to overwrite existing variables for target actions to fit into your project.
 
-include build/make/info.mk
 include build/make/self-update.mk
 # either dependencies-glide.mk
 include build/make/dependencies-glide.mk

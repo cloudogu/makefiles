@@ -61,5 +61,5 @@ endif
 undeploy: deploy-check remove-package-from-repo publish ## Undeploy package from apt repository
 
 .PHONE: lint-deb-package
-lint-deb-package: debian ## Build and lint debian package
+lint-deb-package: debian ## Lint debian package
 	@lintian -i $(DEBIAN_PACKAGE)

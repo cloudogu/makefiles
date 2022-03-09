@@ -13,7 +13,7 @@ DEBSRC:=$(shell find "${WORKDIR}/deb" -type f)
 package: debian-with-binary ## Build binary and package into .deb file
 
 .PHONY: debian
-debian: $(DEBIAN_PACKAGE) ## Package files into .deb file
+debian: $(DEBIAN_PACKAGE) ## Create .deb package without building the binary before
 
 .PHONY: debian-with-binary
 debian-with-binary: $(BINARY) $(DEBIAN_PACKAGE)
