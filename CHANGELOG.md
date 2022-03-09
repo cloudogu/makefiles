@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Default help target to print all available make targets; #71
 
+### Removed
+- Remove glide and go dep makefiles
+
 ## [v4.8.0](https://github.com/cloudogu/makefiles/releases/tag/v4.8.0) 2022-02-28
 ### Added
 - create extensibility to change version of files not tracked by the makefiles; #68
