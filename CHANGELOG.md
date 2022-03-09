@@ -9,9 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Default help target to print all available make targets; #71
 - new method `go-get-tool` to conveniently download go tools without affecting the module of the current project; #73
+  - call it like so: `$(call go-get-tool,$(YOUR_BINARY_TARGET),YOURGOTOOLURL)`
+    - find an example call in `build/make/test-common.mk`
+  - this feature introduces a project relative directory `.bin` which will contain your downloaded go tools
+  - you may add a matching line to your `.gitignore` file to avoid adding it to your repository
 
 ### Changed
 - go-junit-reporter is now being downloaded without affecting the project module; #73
+- the removal routine in `make clean` expands to the new `.bin` go tool directory
 
 ### Removed
 - Remove glide and go dep makefiles
