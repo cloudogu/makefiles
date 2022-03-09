@@ -3,7 +3,52 @@ Makefiles for Cloudogu projects
 
 This repository holds makefiles for building Cloudogu tools, especially those written in Go. They were created to standardize the build and release process. You should use them for every new tool you are developing in the Cloudogu environment.
 
-## Create a New Project or update it
+## Overview over make targets
+
+Starting with makefiles v5.0.0 `make help` will produce an overview of make popular targets:
+
+Example output:
+```
+make help
+
+Usage:
+  make <target>
+
+General
+  help             Display this help.
+  info             Print build information
+
+Go mod dependency management
+  dependencies     Install dependencies using go mod
+
+Compiling go software
+  compile          Compile the go program via Docker
+  compile-ci       Compile the go program without Docker
+...
+```
+
+The actual output depends on the makefiles that your main `Makefile` includes.
+
+You can extend the help output to your own `Makefile` in two ways:
+- add a new help section description `A new section`:
+   - `##@ A new section`
+- add a new target description `Do something`:
+  - `do-something: ## Do something`
+
+Full example:
+```makefile
+...
+include build/make/variables.mk
+
+##@ A new section
+
+.PHONE do-something:
+do-something: $(mybinary) ## Do something
+
+...
+```
+
+## Create a new project or update it
 
 When creating a new project you have to import the `Makefile` and the `build` directory (with all its contents). While doing so you need to keep the directory structure, i.e. the `Makefile` and `build` folder need to be in the project's root folder.
 
@@ -21,9 +66,9 @@ Please note that there MUST NOT be done any changes within the `${BUILD_DIR}/mak
 1. include only one of filial makefiles that provide the an exclusive build target defined in several files
    - f. i. `dependencies-godep` vs `dependencies-glide`
 
-The `build/make` folder holds all Makefiles referenced by the `Makefile` in the root folder. This main `Makefile` can be adjusted to your needs. For example, if you want to build a Go project with glide and pack it into a .deb package you can adjust your `Makefile` in the following way:
+The `build/make` folder holds all Makefiles referenced by the `Makefile` in the root folder. This main `Makefile` can be adjusted to your needs. For example, if you want to build a Go project and pack it into a .deb package you can adjust your `Makefile` in the following way:
 
-### Example: Go Build with Glide and Debian-Package
+### Example: Go Build with .deb package
 ```
 ARTIFACT_ID=app
 VERSION=0.1.2
@@ -34,19 +79,18 @@ MAKEFILES_VERSION=
 
 include build/make/variables.mk
 include build/make/info.mk
-include build/make/dependencies_glide.mk
+include build/make/dependencies-gomod.mk
 include build/make/build.mk
 include build/make/unit-test.mk
 include build/make/static-analysis.mk
 include build/make/clean.mk
 include build/make/package-debian.mk
-
 ```
 
 If you use the `package` make target, your `Makefile` will automatically use glide for downloading dependencies, compiles and creates a .deb package including the binary afterwards.
 
-### Go Build with Go Dep and tar.gz-Package
-If you use this kind of `Makefile`, `go dep` will be used to fetch dependencies:
+### Go Build and tar.gz package
+If you use this kind of `Makefile`, `make package` a tar.gz-package will be created instead of a debian package (see above).
 
 ```
 ARTIFACT_ID=app
@@ -58,7 +102,7 @@ MAKEFILES_VERSION=
 
 include build/make/variables.mk
 include build/make/info.mk
-include build/make/dependencies_godep.mk
+include build/make/dependencies-gomod.mk
 include build/make/build.mk
 include build/make/unit-test-docker-compose.mk
 include build/make/static-analysis.mk
@@ -66,29 +110,15 @@ include build/make/clean.mk
 include build/make/package-tar.mk
 ```
 
-Also, a tar.gz-package will be created instead of a debian package.
-
 ## Modules
 
 ### variables.mk
 
 This module holds generic definitions needed for all builds and should be always included.
 
-### info.mk
+### dependencies-gomod.mk
 
-This module holds the `info` target which prints general information about the build (e.g. name of the branch, commit ID).
-
-### dependencies-godep.mk
-
-This module holds the `dependencies` target, which is utilized by the `build` target. It uses `go dep` for fetching dependencies.
-
-Include only one of the files: dependencies-godep.mk OR dependencies-glide.mk
-
-### dependencies-glide.mk
-
-This module holds the `dependencies` target, which is utilized by the `build` target. It uses `glide` for fetching dependencies.
-
-Include only one of the files: dependencies-godep.mk OR dependencies-glide.mk
+This module holds the `dependencies` target, which is utilized by the `build` target. It uses `go mod` for fetching dependencies.
 
 ### build.mk
 
@@ -177,8 +207,6 @@ In turn, all other files and directories will be stored in the `data` part of th
 
 Please note when you are building a debian package that all files under `/deb/etc` will be named in a automatically generated file `conffiles`. Those files will be subject to debian's conflict management instead of overwriting crucial configuration files when said configuration files already exist (f. i. when a package is upgraded).
 
- 
-
 ### package-tar.mk
 
 This module lets you use the `package` target to pack a .tar archive.
@@ -199,6 +227,6 @@ This module enables you to use bower via the `bower-install` target.
 
 ### release.mk
 
-This module holds the `dogu-release` target for starting automated dogu releases.
+This module holds the `dogu-release` or other binary release related targets for starting automated production releases.
 
 Only include this module in dogu repositories!

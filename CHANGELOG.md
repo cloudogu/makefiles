@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v5.0.0](https://github.com/cloudogu/makefiles/releases/tag/v5.0.0) 2022-03-09
+
+**Heads-up:** This release removes obsolete Go dependency management files. All go dependency management should be conducted
+with `go mod` by now.
+
 ### Added
 - Default help target to print all available make targets; #71
 - new method `go-get-tool` to conveniently download go tools without affecting the module of the current project; #73
