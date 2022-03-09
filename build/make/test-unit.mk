@@ -9,7 +9,7 @@ POST_UNITTESTS?=
 .PHONY: unit-test
 unit-test: $(XUNIT_XML)
 
-$(XUNIT_XML): $(SRC) $(GOPATH)/bin/go-junit-report
+$(XUNIT_XML): $(SRC) $(GO_JUNIT_REPORT)
 ifneq ($(strip $(PRE_UNITTESTS)),)
 	@make $(PRE_UNITTESTS)
 endif
@@ -24,7 +24,7 @@ endif
 		cat $(UNIT_TEST_LOG).tmp >> $(UNIT_TEST_LOG) ; \
 		rm -f $(UNIT_TEST_LOG).tmp ; \
 	done
-	@cat $(UNIT_TEST_LOG) | go-junit-report > $@
+	@cat $(UNIT_TEST_LOG) | $(GO_JUNIT_REPORT) > $@
 	@if grep '^FAIL' $(UNIT_TEST_LOG); then \
 		exit 1; \
 	fi

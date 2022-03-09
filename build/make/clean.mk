@@ -2,6 +2,7 @@
 clean: $(ADDITIONAL_CLEAN)
 	rm -rf ${TARGET_DIR}
 	rm -rf ${TMP_DIR}
+	rm -rf ${UTILITY_BIN_PATH}
 
 .PHONY: dist-clean
 dist-clean: clean
