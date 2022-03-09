@@ -2,9 +2,9 @@
 ARTIFACT_ID=
 VERSION=
 
-MAKEFILES_VERSION=4.8.0
+MAKEFILES_VERSION=5.0.0
 
-.DEFAULT_GOAL:=compile
+.DEFAULT_GOAL:=help
 
 # set PRE_COMPILE to define steps that shall be executed before the go build
 # PRE_COMPILE=
@@ -34,12 +34,6 @@ include build/make/variables.mk
 # You may want to overwrite existing variables for target actions to fit into your project.
 
 include build/make/self-update.mk
-include build/make/info.mk
-# either dependencies-glide.mk
-include build/make/dependencies-glide.mk
-# or dependencies-godep.mk
-include build/make/dependencies-godep.mk
-# or dependencies-gomod.mk
 include build/make/dependencies-gomod.mk
 include build/make/build.mk
 include build/make/test-common.mk
