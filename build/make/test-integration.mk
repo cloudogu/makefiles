@@ -1,3 +1,5 @@
+##@ Integration testing
+
 INTEGRATION_TEST_DIR=$(TARGET_DIR)/integration-tests
 XUNIT_INTEGRATION_XML=$(INTEGRATION_TEST_DIR)/integration-tests.xml
 INTEGRATION_TEST_LOG=$(INTEGRATION_TEST_DIR)/integration-tests.log
@@ -6,7 +8,7 @@ PRE_INTEGRATIONTESTS?=start-local-docker-compose
 POST_INTEGRATIONTESTS?=stop-local-docker-compose
 
 .PHONY: integration-test
-integration-test: $(XUNIT_INTEGRATION_XML)
+integration-test: $(XUNIT_INTEGRATION_XML) ## Start integration tests
 
 .PHONY: start-local-docker-compose
 start-local-docker-compose:

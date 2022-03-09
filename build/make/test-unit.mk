@@ -1,3 +1,5 @@
+##@ Unit testing
+
 UNIT_TEST_DIR=$(TARGET_DIR)/unit-tests
 XUNIT_XML=$(UNIT_TEST_DIR)/unit-tests.xml
 UNIT_TEST_LOG=$(UNIT_TEST_DIR)/unit-tests.log
@@ -7,7 +9,7 @@ PRE_UNITTESTS?=
 POST_UNITTESTS?=
 
 .PHONY: unit-test
-unit-test: $(XUNIT_XML)
+unit-test: $(XUNIT_XML) ## Start unit tests
 
 $(XUNIT_XML): $(SRC) $(GO_JUNIT_REPORT)
 ifneq ($(strip $(PRE_UNITTESTS)),)

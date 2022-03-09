@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Default help target to print all available make targets; #71
 - new method `go-get-tool` to conveniently download go tools without affecting the module of the current project; #73
 
 ### Changed
 - go-junit-reporter is now being downloaded without affecting the project module; #73
+
+### Removed
+- Remove glide and go dep makefiles
 
 ## [v4.8.0](https://github.com/cloudogu/makefiles/releases/tag/v4.8.0) 2022-02-28
 ### Added
