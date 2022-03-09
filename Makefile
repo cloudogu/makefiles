@@ -34,11 +34,6 @@ include build/make/variables.mk
 # You may want to overwrite existing variables for target actions to fit into your project.
 
 include build/make/self-update.mk
-# either dependencies-glide.mk
-include build/make/dependencies-glide.mk
-# or dependencies-godep.mk
-include build/make/dependencies-godep.mk
-# or dependencies-gomod.mk
 include build/make/dependencies-gomod.mk
 include build/make/build.mk
 include build/make/test-common.mk

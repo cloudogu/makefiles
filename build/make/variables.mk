@@ -1,5 +1,3 @@
-##@ General
-
 TARGET_DIR=target
 
 WORKDIR:=$(shell pwd)
@@ -20,6 +18,7 @@ PACKAGES=$(shell ${GO_CALL} list ./... | grep -v /vendor/)
 PACKAGES_FOR_INTEGRATION_TEST?=${PACKAGES}
 GO_BUILD_TAG_INTEGRATION_TEST?=integration
 GOMODULES=on
+UTILITY_BIN_PATH?=${WORKDIR}/.bin
 
 SRC:=$(shell find "${WORKDIR}" -type f -name "*.go" -not -path "./vendor/*")
 
@@ -61,6 +60,11 @@ $(PASSWD): $(TMP_DIR)
 $(ETCGROUP): $(TMP_DIR)
 	@echo "root:x:0:" > $(ETCGROUP)
 	@echo "$(USER):x:$(GID_NR):" >> $(ETCGROUP)
+
+$(UTILITY_BIN_PATH):
+	@mkdir -p $@
+
+##@ General
 
 .PHONY: help
 help: ## Display this help.
