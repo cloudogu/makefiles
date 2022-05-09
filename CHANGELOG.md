@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v5.2.0](https://github.com/cloudogu/makefiles/releases/tag/v5.2.0) 2022-05-09
 ### Changed
 - Added variable `LINT_VERION` to `static-analysis.mk` to define the `golangci-lint` version used for the analysis; #77
 
