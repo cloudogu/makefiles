@@ -26,7 +26,7 @@ K8S_CURRENT_NAMESPACE=$(shell kubectl config view --minify -o jsonpath='{..names
 ##@ K8s - Variables
 
 .PHONY: check-all-vars
-check-all-vars: check-k8s-cluster-root-env-var check-k8s-image-env-var check-k8s-artifact-id check-etc-hosts  ## Conduct a sanity check against selected build artefacts or local environment
+check-all-vars: check-k8s-cluster-root-env-var check-k8s-image-env-var check-k8s-artifact-id check-etc-hosts check-insecure-cluster-registry ## Conduct a sanity check against selected build artefacts or local environment
 
 .PHONY: check-k8s-cluster-root-env-var
 check-k8s-cluster-root-env-var:
@@ -42,7 +42,13 @@ check-k8s-artifact-id:
 
 .PHONY: check-etc-hosts
 check-etc-hosts:
-	@grep -E "^.+\s+${K3S_CLUSTER_FQDN}\$$" /etc/hosts > /dev/null || (echo "Missing /etc/hosts entry for ${K3S_CLUSTER_FQDN}" && exit 1)
+	@grep -E "^.+\s+${K3S_CLUSTER_FQDN}\$$" /etc/hosts > /dev/null || \
+		(echo "Missing /etc/hosts entry for ${K3S_CLUSTER_FQDN}" && exit 1)
+
+.PHONY: check-insecure-cluster-registry
+check-insecure-cluster-registry:
+	@grep "${K3CES_REGISTRY_URL_PREFIX}1" /etc/docker/daemon.json > /dev/null || \
+		(echo "Missing /etc/docker/daemon.json for ${K3CES_REGISTRY_URL_PREFIX}" && exit 1)
 
 ##@ K8s - Resources
 
