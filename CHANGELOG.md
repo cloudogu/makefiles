@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v6.0.0](https://github.com/cloudogu/makefiles/releases/tag/v6.0.0) 2022-05-20
+### Changed
+- k8s.mk: Replaced docker image `.tar` rollout with `docker push`; #78
+   - Users of k8s-related (non-dogu) targets need to add two things:
+      1. Add a make variable of the local dev-image
+         - Most likely this will look like `IMAGE_DEV=${K3CES_REGISTRY_URL_PREFIX}/${ARTIFACT_ID}:${VERSION}`
+      2. They must replace `$(IMAGE)` references with `$(IMAGE_DEV)` when they are solely used inside a local dev cluster
+   - this DOES NOT apply for dogus: The respective functionality works out-of-the-box by including `k8s-dogu.mk` as before
+      - Anyhow, the referenced image inside the dogu descriptor changed under the hood 
+
+### Added
+- k8s.mk; #78
+   - Added `check-etc-hosts` target to detect errors in the DNS resolution while pushing images to a local registry
+   - Added `check-insecure-cluster-registry` target to detect errors in the local Docker configuration  while pushing images to a local registry
+
 ## [v5.2.0](https://github.com/cloudogu/makefiles/releases/tag/v5.2.0) 2022-05-09
 ### Changed
 - Added variable `LINT_VERION` to `static-analysis.mk` to define the `golangci-lint` version used for the analysis; #77
