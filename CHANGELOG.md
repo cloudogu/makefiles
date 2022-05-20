@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v6.0.0](https://github.com/cloudogu/makefiles/releases/tag/v6.0.0) 2022-05-20
 ### Changed
 - k8s.mk: Replaced docker image `.tar` rollout with `docker push`; #78
    - Users of k8s-related (non-dogu) targets need to add two things:
