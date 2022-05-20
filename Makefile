@@ -50,9 +50,10 @@ include build/make/deploy-debian.mk
 include build/make/digital-signature.mk
 include build/make/yarn.mk
 include build/make/bower.mk
-# only include this in dogu repositories
+# only include this in repositories which support the automatic release process (like dogus or golang apps)
 include build/make/release.mk
+# either k8s-dogu.mk
 include build/make/k8s-dogu.mk
-# only include this in k8s-controller repositories
+# or k8s-controller.mk; only include this in k8s-controller repositories
 include build/make/k8s-controller.mk
 

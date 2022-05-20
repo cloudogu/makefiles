@@ -81,15 +81,14 @@ k8s-apply: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Applies all generated K8
 ##@ K8s - Docker
 
 .PHONY: docker-build
-docker-build: check-k8s-image-env-var ## Builds the production docker image of the K8s app.
-	@echo "Building docker image of dogu..."
+docker-build: check-k8s-image-env-var ## Builds the docker image of the K8s app.
+	@echo "Building docker image..."
 	DOCKER_BUILDKIT=1 docker build . -t $(IMAGE)
 
 .PHONY: docker-dev-tag
 docker-dev-tag: check-k8s-image-dev-var docker-build ## Tags a Docker image for local K3ces deployment.
-	@echo "Building docker image of dogu..."
+	@echo "Tagging image with dev tag..."
 	DOCKER_BUILDKIT=1 docker tag ${IMAGE} ${IMAGE_DEV}
-
 
 .PHONY: check-k8s-image-dev-var
 check-k8s-image-dev-var:
