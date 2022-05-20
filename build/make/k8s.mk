@@ -47,7 +47,7 @@ check-etc-hosts:
 
 .PHONY: check-insecure-cluster-registry
 check-insecure-cluster-registry:
-	@grep "${K3CES_REGISTRY_URL_PREFIX}1" /etc/docker/daemon.json > /dev/null || \
+	@grep "${K3CES_REGISTRY_URL_PREFIX}" /etc/docker/daemon.json > /dev/null || \
 		(echo "Missing /etc/docker/daemon.json for ${K3CES_REGISTRY_URL_PREFIX}" && exit 1)
 
 ##@ K8s - Resources
