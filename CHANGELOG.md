@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v6.0.1](https://github.com/cloudogu/makefiles/releases/tag/v6.0.1) 2022-05-30
+### Fixed
+- Fix shell error when executing `k8s-dogu.mk` target; #82
+  - this error only occurs with GNU make 4.2 and earlier
+
 ## [v6.0.0](https://github.com/cloudogu/makefiles/releases/tag/v6.0.0) 2022-05-20
 ### Changed
 - k8s.mk: Replaced docker image `.tar` rollout with `docker push`; #78

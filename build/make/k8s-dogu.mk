@@ -12,7 +12,7 @@ ARTIFACT_NAMESPACE=$(shell yq -e ".Name" $(DOGU_JSON_FILE) | sed "s|/.*||g")
 VERSION=$(shell yq -e ".Version" $(DOGU_JSON_FILE))
 # Image of the dogu is extracted from the dogu.json
 IMAGE=$(shell yq -e ".Image" $(DOGU_JSON_FILE)):$(VERSION)
-IMAGE_DEV_WITHOUT_TAG=$(shell yq -e ".Image" $(DOGU_JSON_FILE) | sed "s#registry\.cloudogu\.com\(.\+\)#${K3CES_REGISTRY_URL_PREFIX}\1#g")
+IMAGE_DEV_WITHOUT_TAG=$(shell yq -e ".Image" $(DOGU_JSON_FILE) | sed "s|registry\.cloudogu\.com\(.\+\)|${K3CES_REGISTRY_URL_PREFIX}\1|g")
 IMAGE_DEV=${IMAGE_DEV_WITHOUT_TAG}:${VERSION}
 
 include $(WORKDIR)/build/make/k8s.mk
