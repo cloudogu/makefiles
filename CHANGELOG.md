@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v6.0.2](https://github.com/cloudogu/makefiles/releases/tag/v6.0.2) 2022-06-07
+### Changed
+- Moved function `go-get-tool` from `dependencies-gomod.mk` to `variables.mk`
+- Removed the `k8s-delete` target as requirement for the `build` target in `k8s-controller.mk` and `k8s-dogu.mk`
+
 ## [v6.0.1](https://github.com/cloudogu/makefiles/releases/tag/v6.0.1) 2022-05-30
 ### Fixed
 - Fix shell error when executing `k8s-dogu.mk` target; #82
