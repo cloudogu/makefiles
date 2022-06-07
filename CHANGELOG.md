@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Moved function `go-get-tool` from `dependencies-gomod.mk` to `variables.mk`
+- Removed the `k8s-delete` target as requirement for the `build` target in `k8s-controller.mk` and `k8s-dogu.mk`
 
 ## [v6.0.1](https://github.com/cloudogu/makefiles/releases/tag/v6.0.1) 2022-05-30
 ### Fixed
