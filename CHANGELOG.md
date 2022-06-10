@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Use consistent temporary yaml file names in k8s makefiles
+
 ## [v6.0.2](https://github.com/cloudogu/makefiles/releases/tag/v6.0.2) 2022-06-07
 ### Changed
 - Moved function `go-get-tool` from `dependencies-gomod.mk` to `variables.mk`
