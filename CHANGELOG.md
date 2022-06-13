@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v6.0.3](https://github.com/cloudogu/makefiles/releases/tag/v6.0.3) 2022-06-13
 ### Fixed
 - Use consistent temporary yaml file names in k8s makefiles: #86
 
