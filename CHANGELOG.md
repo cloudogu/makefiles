@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - You should now define a pattern for integration tests in the Variable `INTEGRATION_TEST_NAME_PATTERN`
     - Only tests which names are matching this pattern will be executed in `make integration-test`
     - Suggested Pattern: `INTEGRATION_TEST_NAME_SUFFIX=.*_inttest$$`. 
-    - With that pattern, only tests which names are ending with `_inttest.go` are executed by `make integration-test`
+    - With that pattern, only test functions which names are ending with `_inttest` are executed by `make integration-test`
 
 ### Removed
 - The variable PACKAGES_FOR_INTEGRATION_TEST
