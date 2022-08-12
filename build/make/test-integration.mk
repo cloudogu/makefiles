@@ -35,8 +35,8 @@ ifneq ($(strip $(PRE_INTEGRATIONTESTS)),)
 	@make $(PRE_INTEGRATIONTESTS)
 endif
 
-	mkdir -p $(INTEGRATION_TEST_DIR)
-	echo 'mode: set' > $(INTEGRATION_TEST_REPORT)
+	@mkdir -p $(INTEGRATION_TEST_DIR)
+	@echo 'mode: set' > $(INTEGRATION_TEST_REPORT)
 	@rm -f $(INTEGRATION_TEST_LOG) || true
 	@$(GO_CALL) test ./... -v -tags=${GO_BUILD_TAG_INTEGRATION_TEST} -coverpkg=./... -coverprofile=${INTEGRATION_TEST_REPORT} -run ${INTEGRATION_TEST_NAME_PATTERN} 2>&1 | tee $(INTEGRATION_TEST_LOG)
 	@cat $(INTEGRATION_TEST_LOG) | $(GO_JUNIT_REPORT) > $@

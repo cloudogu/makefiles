@@ -3,6 +3,8 @@ Makefiles for Cloudogu projects
 
 This repository holds makefiles for building Cloudogu tools, especially those written in Go. They were created to standardize the build and release process. You should use them for every new tool you are developing in the Cloudogu environment.
 
+Please note that `make` only accepts `Makefile`s that are **only** indented with tabs.
+
 ## Overview over make targets
 
 Starting with makefiles v5.0.0 `make help` will produce an overview of make popular targets:
@@ -147,15 +149,58 @@ new Docker(this)
 
 ### unit-test.mk
 
-This module ensures that you can start unit tests via the `unit-test` target.
+This module ensures that you can start Golang unit tests via the `unit-test` target.
 
-Include only one of the files: unit-test.mk OR unit-test-docker-compose.mk
+This target can be supplemented with pre- and post-targets by setting make targets to the corresponding variables in your `Makefile` (both are optional):
 
-### unit-test-docker-compose.mk
+```makefile
+    PRE_UNITTESTS=your-pre-target
+    POST_UNITTESTS=your-post-target
+```
 
-This module ensures that you can start unit tests via the `unit-test` target, including an additional environment which is started and stopped using docker-compose.
+### test-integration.mk
 
-Include only one of the files: unit-test.mk OR unit-test-docker-compose.mk
+This module ensures that you can start Golang tests via the `integration-test` target, including an additional environment which is started and stopped using docker-compose.
+
+Integration tests are excluded from running with the target `unit-test` by means of a build tag. Use these build tag lines to mark your test as integration test in the very first lines of the go file. 
+
+```go
+//go:build integration
+// +build integration
+
+package yourpackagegoeshere
+```
+
+The default build tag name is defined in the global variable `GO_BUILD_TAG_INTEGRATION_TEST?=integration`. While this should fit most projects it is possible to modify the name of the build tag. 
+
+#### Pre- and Post-targets
+
+This target can be supplemented with pre- and post-targets by setting make targets to the corresponding variables in your `Makefile` (both are optional):
+
+```makefile
+PRE_INTEGRATIONTESTS=start-local-docker-compose
+POST_INTEGRATIONTESTS=stop-local-docker-compose
+```
+
+Keep in mind that if your test relies on the target `start-local-docker-compose` you should add several targets in order to properly start docker-compose. For example:
+
+```makefile
+PRE_INTEGRATIONTESTS=yourcooltarget start-local-docker-compose anothertarget
+```
+
+#### Splitting unit tests from integration tests 
+
+This target allows also to filter test methods by regexp. This helps to avoid running regular unit-test during the integration tests, which may reside in the same package.
+
+```makefile
+INTEGRATION_TEST_NAME_PATTERN?=.*_inttest$$
+```
+Note the double dollar sign `$$` is Makefile escape syntax for the regexp line-end delimiter `$` (other delimiters may be escaped as well).
+
+For example, setting this variable in your `Makefile` will filter tests that end with the suffix `_inttest`, i. e. 
+- `func Test_yourStructCreate_inttest(t *testing.T)` **will be** executed
+- `func Test_yourStructCreate(t *testing.T)` will **not** be executed
+- `func Test_inttest_foobar(t *testing.T)` will also **not** be executed
 
 ### static-analysis.mk
 
@@ -229,4 +274,4 @@ This module enables you to use bower via the `bower-install` target.
 
 This module holds the `dogu-release` or other binary release related targets for starting automated production releases.
 
-Only include this module in dogu repositories!
+Only include this module in dogu or Golang repositories that support a dedicated release flow!
