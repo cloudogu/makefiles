@@ -41,7 +41,7 @@ endif
 	@$(GO_CALL) test ./... -v -tags=${GO_BUILD_TAG_INTEGRATION_TEST} -coverpkg=./... -coverprofile=${INTEGRATION_TEST_REPORT} -run ${INTEGRATION_TEST_NAME_PATTERN} 2>&1 | tee $(INTEGRATION_TEST_LOG)
 	@cat $(INTEGRATION_TEST_LOG) | $(GO_JUNIT_REPORT) > $@
 	@if grep '^FAIL' $(INTEGRATION_TEST_LOG); then \
-	exit 1; \
+		exit 1; \
 	fi
 
 ifneq ($(strip $(POST_INTEGRATIONTESTS)),)
