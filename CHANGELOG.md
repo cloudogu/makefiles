@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v6.3.0](https://github.com/cloudogu/makefiles/releases/tag/v6.3.0) 2022-08-24
+### Added
+- Add makefile `bats.mk` to execute bats tests.
+
+### Fixed
+- Use `BINARY_YQ` target in `k8s-dogu.mk`
+
 ## [v6.2.1](https://github.com/cloudogu/makefiles/releases/tag/v6.2.1) 2022-08-24
 ### Fixed
 - Fix order of imports and use native yq for `k8s-dogu.mk` 
