@@ -1,7 +1,3 @@
-ifeq (, $(shell which yq))
- $(error "No yq in $(PATH). You need to install yq to use this makefile.")
-endif
-
 # Variables
 # Path to the dogu json of the dogu
 DOGU_JSON_FILE=$(WORKDIR)/dogu.json
