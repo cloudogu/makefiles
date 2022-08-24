@@ -1,21 +1,23 @@
-include $(WORKDIR)/build/make/k8s.mk
+ifeq (, $(shell which yq))
+ $(error "No yq in $(PATH). You need to install yq to use this makefile.")
+endif
 
 # Variables
-
 # Path to the dogu json of the dogu
 DOGU_JSON_FILE=$(WORKDIR)/dogu.json
 DOGU_JSON_DEV_FILE=${TARGET_DIR}/dogu.json
 # Name of the dogu is extracted from the dogu.json
-ARTIFACT_ID=$(shell $(BINARY_YQ) -e ".Name" $(DOGU_JSON_FILE) | sed "s|.*/||g")
+ARTIFACT_ID=$(shell yq -e ".Name" $(DOGU_JSON_FILE) | sed "s|.*/||g")
 # Namespace of the dogu is extracted from the dogu.json
-ARTIFACT_NAMESPACE=$(shell $(BINARY_YQ) -e ".Name" $(DOGU_JSON_FILE) | sed "s|/.*||g")
+ARTIFACT_NAMESPACE=$(shell yq -e ".Name" $(DOGU_JSON_FILE) | sed "s|/.*||g")
 # Namespace of the dogu is extracted from the dogu.json
-VERSION=$(shell $(BINARY_YQ) -e ".Version" $(DOGU_JSON_FILE))
+VERSION=$(shell yq -e ".Version" $(DOGU_JSON_FILE))
 # Image of the dogu is extracted from the dogu.json
-IMAGE=$(shell $(BINARY_YQ) -e ".Image" $(DOGU_JSON_FILE)):$(VERSION)
-IMAGE_DEV_WITHOUT_TAG=$(shell $(BINARY_YQ) -e ".Image" $(DOGU_JSON_FILE) | sed "s|registry\.cloudogu\.com\(.\+\)|${K3CES_REGISTRY_URL_PREFIX}\1|g")
+IMAGE=$(shell yq -e ".Image" $(DOGU_JSON_FILE)):$(VERSION)
+IMAGE_DEV_WITHOUT_TAG=$(shell yq -e ".Image" $(DOGU_JSON_FILE) | sed "s|registry\.cloudogu\.com\(.\+\)|${K3CES_REGISTRY_URL_PREFIX}\1|g")
 IMAGE_DEV=${IMAGE_DEV_WITHOUT_TAG}:${VERSION}
 
+include $(WORKDIR)/build/make/k8s.mk
 
 ##@ K8s - EcoSystem
 
