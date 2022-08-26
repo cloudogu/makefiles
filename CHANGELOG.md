@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Removed `vet` target because `vet` is used in golangci-lint #94
+  - Projects must specify the path in `sonar-project.properties` to the golanci-lint report instead of the vet report:
+  `sonar.go.golangci-lint.reportPaths=target/static-analysis/static-analysis-cs.log`
 
 ## [v6.3.0](https://github.com/cloudogu/makefiles/releases/tag/v6.3.0) 2022-08-24
 ### Added
