@@ -72,7 +72,7 @@ k8s-integration-test: $(K8S_INTEGRATION_TEST_DIR) manifests generate vet envtest
 
 # The pre generation script creates a K8s resource yaml containing generated manager yaml.
 .PHONY: k8s-create-temporary-resource
- k8s-create-temporary-resource: ${TARGET_DIR} manifests kustomize
+ k8s-create-temporary-resource: $(K8S_RESOURCE_TEMP_FOLDER) manifests kustomize
 	@echo "Generating temporary k8s resources $(K8S_RESOURCE_TEMP_YAML)..."
 	cd $(WORKDIR)/config/manager && $(KUSTOMIZE) edit set image controller=$(IMAGE)
 	$(KUSTOMIZE) build config/default > $(K8S_RESOURCE_TEMP_YAML)
