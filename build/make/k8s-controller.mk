@@ -55,7 +55,7 @@ build-controller: ${SRC} compile ## Builds the controller Go binary.
 # Allows to perform tasks before locally running the controller
 K8S_RUN_PRE_TARGETS ?=
 .PHONY: run
-run: manifests generate vet $(K8S_RUN_PRE_TARGETS) ## Run a controller from your host.
+run: manifests generate $(K8S_RUN_PRE_TARGETS) ## Run a controller from your host.
 	go run -ldflags "-X main.Version=$(VERSION)" ./main.go
 
 ##@ K8s - Integration test with envtest
@@ -64,7 +64,7 @@ $(K8S_INTEGRATION_TEST_DIR):
 	@mkdir -p $@
 
 .PHONY: k8s-integration-test
-k8s-integration-test: $(K8S_INTEGRATION_TEST_DIR) manifests generate vet envtest ## Run k8s integration tests.
+k8s-integration-test: $(K8S_INTEGRATION_TEST_DIR) manifests generate envtest ## Run k8s integration tests.
 	@echo "Running K8s integration tests..."
 	@KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test -tags=k8s_integration ./... -coverprofile ${K8S_INTEGRATION_TEST_DIR}/report-k8s-integration.out
 
