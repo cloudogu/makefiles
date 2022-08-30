@@ -6,14 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Fixed
-- Fixed golangci-lint and added new linters #94
-- Create folder `target/make/k8s` for target `k8s-create-temporary-resource` #93
+
+## [v7.0.0](https://github.com/cloudogu/makefiles/releases/tag/v7.0.0) 2022-08-30
+
+**Breaking change ahead!**
 
 ### Removed
 - Removed `vet` target because `vet` is used in golangci-lint #94
-  - Projects must specify the path in `sonar-project.properties` to the golanci-lint report instead of the vet report:
-  `sonar.go.golangci-lint.reportPaths=target/static-analysis/static-analysis-cs.log`
+    - Projects must specify the path in `sonar-project.properties` to the golanci-lint report instead of the vet report:
+      `sonar.go.golangci-lint.reportPaths=target/static-analysis/static-analysis-cs.log`
+
+### Fixed
+- Fixed golangci-lint and added new linters #94
+- Create folder `target/make/k8s` for target `k8s-create-temporary-resource` #93
 
 ## [v6.3.0](https://github.com/cloudogu/makefiles/releases/tag/v6.3.0) 2022-08-24
 ### Added
