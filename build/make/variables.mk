@@ -1,4 +1,4 @@
-TARGET_DIR=target
+TARGET_DIR=$(WORKDIR)/target
 
 WORKDIR:=$(shell pwd)
 BUILD_DIR=$(WORKDIR)/build
@@ -19,7 +19,7 @@ GO_BUILD_TAG_INTEGRATION_TEST?=integration
 GOMODULES=on
 UTILITY_BIN_PATH?=${WORKDIR}/.bin
 
-SRC:=$(shell find "${WORKDIR}" -type f -name "*.go" -not -path "./vendor/*")
+SRC:=$(shell find "${WORKDIR}" -type f -name "*.go" -not -path "*/vendor/*")
 
 # debian stuff
 DEBIAN_BUILD_DIR=$(BUILD_DIR)/deb
