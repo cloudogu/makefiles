@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## Changed
+- [#98] Target directory variable is now absolute.
+
+### Fixed
+- [#99] Exclude vendor directory for source file changes.
+
 ## [v7.0.1](https://github.com/cloudogu/makefiles/releases/tag/v7.0.1) 2022-08-30
 ### Fixed
 - Removed `vet` targets from k8s makefiles
