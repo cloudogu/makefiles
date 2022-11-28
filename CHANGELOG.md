@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v7.1.0](https://github.com/cloudogu/makefiles/releases/tag/v7.0.1) 2022-08-30
 ## Changed
 - [#98] Target directory variable is now absolute.
 
