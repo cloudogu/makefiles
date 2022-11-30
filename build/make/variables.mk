@@ -1,4 +1,4 @@
-TARGET_DIR=$(WORKDIR)/target
+TARGET_DIR=target
 
 WORKDIR:=$(shell pwd)
 BUILD_DIR=$(WORKDIR)/build
