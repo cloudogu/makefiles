@@ -20,13 +20,14 @@ K3CES_REGISTRY_URL_PREFIX="${K3S_CLUSTER_FQDN}:${K3S_LOCAL_REGISTRY_PORT}"
 K8S_RESOURCE_TEMP_FOLDER ?= $(TARGET_DIR)/make/k8s
 K8S_RESOURCE_TEMP_YAML ?= $(K8S_RESOURCE_TEMP_FOLDER)/$(ARTIFACT_ID)_$(VERSION).yaml
 
-# The current namespace is extracted from the current context.
-K8S_CURRENT_NAMESPACE=$(shell kubectl config view --minify -o jsonpath='{..namespace}')
-
 ##@ K8s - Variables
 
 .PHONY: check-all-vars
-check-all-vars: check-k8s-image-env-var check-k8s-artifact-id check-etc-hosts check-insecure-cluster-registry ## Conduct a sanity check against selected build artefacts or local environment
+check-all-vars: check-k8s-image-env-var check-k8s-artifact-id check-etc-hosts check-insecure-cluster-registry check-k8s-namespace-env-var ## Conduct a sanity check against selected build artefacts or local environment
+
+.PHONY: check-k8s-namespace-env-var
+check-k8s-namespace-env-var:
+	@$(call check_defined, NAMESPACE, k8s namespace)
 
 .PHONY: check-k8s-image-env-var
 check-k8s-image-env-var:
@@ -54,7 +55,7 @@ ${K8S_RESOURCE_TEMP_FOLDER}:
 .PHONY: k8s-delete
 k8s-delete: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Deletes all dogu related resources from the K8s cluster.
 	@echo "Delete old dogu resources..."
-	@kubectl delete -f $(K8S_RESOURCE_TEMP_YAML) --wait=false --ignore-not-found=true
+	@kubectl delete -f $(K8S_RESOURCE_TEMP_YAML) --wait=false --ignore-not-found=true --namespace=${NAMESPACE}
 
 # The additional targets executed after the generate target, executed before each apply and delete. The generate target
 # produces a temporary yaml. This yaml is accessible via K8S_RESOURCE_TEMP_YAML an can be changed before the apply/delete.
@@ -65,14 +66,14 @@ K8S_PRE_GENERATE_TARGETS ?= k8s-create-temporary-resource
 .PHONY: k8s-generate
 k8s-generate: ${BINARY_YQ} $(K8S_RESOURCE_TEMP_FOLDER) $(K8S_PRE_GENERATE_TARGETS) ## Generates the final resource yaml.
 	@echo "Applying general transformations..."
-	@sed -i "s/'{{ .Namespace }}'/$(K8S_CURRENT_NAMESPACE)/" $(K8S_RESOURCE_TEMP_YAML)
+	@sed -i "s/'{{ .Namespace }}'/$(NAMESPACE)/" $(K8S_RESOURCE_TEMP_YAML)
 	@$(BINARY_YQ) -i e "(select(.kind == \"Deployment\").spec.template.spec.containers[]|select(.image == \"*$(ARTIFACT_ID)*\").image)=\"$(IMAGE_DEV)\"" $(K8S_RESOURCE_TEMP_YAML)
 	@echo "Done."
 
 .PHONY: k8s-apply
 k8s-apply: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Applies all generated K8s resources to the current cluster and namespace.
 	@echo "Apply generated K8s resources..."
-	@kubectl apply -f $(K8S_RESOURCE_TEMP_YAML)
+	@kubectl apply -f $(K8S_RESOURCE_TEMP_YAML) --namespace=${NAMESPACE}
 
 ##@ K8s - Docker
 
