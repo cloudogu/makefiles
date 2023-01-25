@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v7.2.0](https://github.com/cloudogu/makefiles/releases/tag/v7.2.0) 2023-01-25
 ### Changed
 - [#105] Use the environment variable `NAMESPACE` from the .env file to generate and apply resources to the cluster.
 - [#103] Remove the environment variable `K8S_CLUSTER_ROOT`, because it is no longer needed.
