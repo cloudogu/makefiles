@@ -55,7 +55,7 @@ ${K8S_RESOURCE_TEMP_FOLDER}:
 .PHONY: k8s-delete
 k8s-delete: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Deletes all dogu related resources from the K8s cluster.
 	@echo "Delete old dogu resources..."
-	@kubectl delete -f $(K8S_RESOURCE_TEMP_YAML) --wait=false --ignore-not-found=true
+	@kubectl delete -f $(K8S_RESOURCE_TEMP_YAML) --wait=false --ignore-not-found=true --namespace=${NAMESPACE}
 
 # The additional targets executed after the generate target, executed before each apply and delete. The generate target
 # produces a temporary yaml. This yaml is accessible via K8S_RESOURCE_TEMP_YAML an can be changed before the apply/delete.
@@ -73,7 +73,7 @@ k8s-generate: ${BINARY_YQ} $(K8S_RESOURCE_TEMP_FOLDER) $(K8S_PRE_GENERATE_TARGET
 .PHONY: k8s-apply
 k8s-apply: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Applies all generated K8s resources to the current cluster and namespace.
 	@echo "Apply generated K8s resources..."
-	@kubectl apply -f $(K8S_RESOURCE_TEMP_YAML)
+	@kubectl apply -f $(K8S_RESOURCE_TEMP_YAML) --namespace=${NAMESPACE}
 
 ##@ K8s - Docker
 
