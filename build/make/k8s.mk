@@ -8,8 +8,6 @@ endif
 
 BINARY_YQ = $(UTILITY_BIN_PATH)/yq
 
-# The cluster root variable is used to the build images to the cluster. It can be defined in a .myenv file.
-K8S_CLUSTER_ROOT ?=
 # The productive tag of the image
 IMAGE ?=
 
@@ -28,11 +26,7 @@ K8S_CURRENT_NAMESPACE=$(shell kubectl config view --minify -o jsonpath='{..names
 ##@ K8s - Variables
 
 .PHONY: check-all-vars
-check-all-vars: check-k8s-cluster-root-env-var check-k8s-image-env-var check-k8s-artifact-id check-etc-hosts check-insecure-cluster-registry ## Conduct a sanity check against selected build artefacts or local environment
-
-.PHONY: check-k8s-cluster-root-env-var
-check-k8s-cluster-root-env-var:
-	@$(call check_defined, K8S_CLUSTER_ROOT, root path of your k3ces)
+check-all-vars: check-k8s-image-env-var check-k8s-artifact-id check-etc-hosts check-insecure-cluster-registry ## Conduct a sanity check against selected build artefacts or local environment
 
 .PHONY: check-k8s-image-env-var
 check-k8s-image-env-var:
