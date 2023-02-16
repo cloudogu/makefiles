@@ -2,7 +2,7 @@
 ARTIFACT_ID=
 VERSION=
 
-MAKEFILES_VERSION=7.1.1
+MAKEFILES_VERSION=7.3.0
 
 .DEFAULT_GOAL:=help
 
@@ -39,6 +39,7 @@ include build/make/build.mk
 include build/make/test-common.mk
 include build/make/test-integration.mk
 include build/make/test-unit.mk
+include build/make/mocks.mk
 include build/make/static-analysis.mk
 include build/make/clean.mk
 # either package-tar.mk

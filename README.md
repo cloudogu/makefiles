@@ -39,7 +39,7 @@ You can extend the help output to your own `Makefile` in two ways:
 
 Full example:
 ```makefile
-...
+#...
 include build/make/variables.mk
 
 ##@ A new section
@@ -47,7 +47,7 @@ include build/make/variables.mk
 .PHONE do-something:
 do-something: $(mybinary) ## Do something
 
-...
+#...
 ```
 
 ## Create a new project or update it
@@ -157,6 +157,13 @@ This target can be supplemented with pre- and post-targets by setting make targe
     PRE_UNITTESTS=your-pre-target
     POST_UNITTESTS=your-post-target
 ```
+
+### mocks.mk
+
+This module adds configuration for mockery and generates all mocks via the `make mocks` target.
+
+The mockery version can be specified in the make file. 
+Directories can be ignored with the `MOCKERY_IGNORED` variable.
 
 ### test-integration.mk
 

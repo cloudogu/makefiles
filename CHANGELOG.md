@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v7.3.0](https://github.com/cloudogu/makefiles/releases/tag/v7.3.0) 2023-02-16
+### Added
+- [#107] Create mocks with `make mocks`
+
+## [v7.2.0](https://github.com/cloudogu/makefiles/releases/tag/v7.2.0) 2023-01-25
+### Changed
+- [#105] Use the environment variable `NAMESPACE` from the .env file to generate and apply resources to the cluster.
+- [#103] Remove the environment variable `K8S_CLUSTER_ROOT`, because it is no longer needed.
+
 ## [v7.1.1](https://github.com/cloudogu/makefiles/releases/tag/v7.1.1) 2022-11-30
 ### Fixed
 - [#101] revert Target directory variable to be relative because it produced errors and unexpected results in already existing projects
