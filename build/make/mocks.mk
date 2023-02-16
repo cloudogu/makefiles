@@ -15,7 +15,7 @@ ${MOCKERY_YAML}:
 
 .PHONY: mocks
 mocks: ${MOCKERY_BIN} ${MOCKERY_YAML} ## This target is used to generate mocks for all interfaces in a project.
-	for dir in ${WORKDIR}/*/ ;\
+	@for dir in ${WORKDIR}/*/ ;\
  		do \
  		# removes trailing '/' \
 		dir='$${dir%*/}' ;\
