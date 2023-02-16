@@ -164,6 +164,10 @@ This module adds configuration for mockery and generates all mocks via the `make
 
 The mockery version can be specified in the make file. 
 Directories can be ignored with the `MOCKERY_IGNORED` variable.
+It can be overridden like this:
+```Makefile
+override MOCKERY_IGNORED:=${MOCKERY_IGNORED},test
+```
 
 ### test-integration.mk
 
