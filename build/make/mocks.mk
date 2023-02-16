@@ -22,7 +22,7 @@ mocks: ${MOCKERY_BIN} ${MOCKERY_YAML} ## This target is used to generate mocks f
 		dir=$${dir##*/} ;\
 		if ! echo '${MOCKERY_IGNORED}' | egrep -q "\b$${dir}\b" ;\
 		then \
-		  	echo "$${dir}" ;\
+		  	echo "Creating mocks for $${dir}" ;\
 			${MOCKERY_BIN} --all --dir $${dir} ;\
 		fi ;\
  	done ;
