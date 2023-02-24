@@ -4,8 +4,6 @@ MOCKERY_BIN=${UTILITY_BIN_PATH}/mockery
 MOCKERY_VERSION=v2.20.0
 MOCKERY_YAML=${WORKDIR}/.mockery.yaml
 
-include build/make/variables.mk
-
 ${MOCKERY_BIN}: ${UTILITY_BIN_PATH}
 	$(call go-get-tool,$(MOCKERY_BIN),github.com/vektra/mockery/v2@$(MOCKERY_VERSION))
 
