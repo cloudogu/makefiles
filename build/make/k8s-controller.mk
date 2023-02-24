@@ -88,7 +88,7 @@ controller-gen: ## Download controller-gen locally if necessary.
 KUSTOMIZE = $(UTILITY_BIN_PATH)/kustomize
 .PHONY: kustomize
 kustomize: ## Download kustomize locally if necessary.
-	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v4@v4.5.2)
+	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v4@v4.5.7)
 
 ENVTEST = $(UTILITY_BIN_PATH)/setup-envtest
 .PHONY: envtest

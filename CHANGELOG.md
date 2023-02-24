@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - [#110] Update controller-gen to v0.11.3
+- [#110] Update kustomize to v4.5.7
 ### Fixed
 - [#111] Removed double import causing messy output
 
