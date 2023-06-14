@@ -1,6 +1,7 @@
 ##@ Version
 
 # This makefile is used to get the sha256sum of a specific github tag-src.tar.gz or .zip.
+# You may set any of the following variables before your make call to change the hash url.
 
 SHA_SUM_ORGANISATION?="cloudogu"
 SHA_SUM_REPOSITORY?="ecosystem"
@@ -11,4 +12,7 @@ SHA_SUM_URL?="https://github.com/${SHA_SUM_ORGANISATION}/${SHA_SUM_REPOSITORY}/a
 .PHONY: sha-sum
 sha-sum: ## Print out the version
 	@echo "Downloading from: ${SHA_SUM_URL}"
-	@wget -O - -o /dev/null "${SHA_SUM_URL}" | sha256sum
+	@wget -O - -o /dev/null "${SHA_SUM_URL}" > .download.for.hash \
+     || (echo "Could not be downloaded" && exit 1) \
+     && cat .download.for.hash | sha256sum
+	@rm -f .download.for.hash
