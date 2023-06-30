@@ -93,7 +93,7 @@ k8s-helm-apply: ${BINARY_HELM} image-import k8s-helm-generate $(K8S_POST_GENERAT
 .PHONY: k8s-helm-delete
 k8s-helm-delete: ${BINARY_HELM} ## Uninstalls the current helm chart.
 	@echo "Uninstall helm chart"
-	@${BINARY_HELM} uninstall ${ARTIFACT_ID} || true
+	@${BINARY_HELM} uninstall ${ARTIFACT_ID}
 
 .PHONY: k8s-helm-reinstall
 k8s-helm-reinstall: k8s-helm-delete k8s-helm-apply ## Uninstalls the current helm chart and reinstalls it.
