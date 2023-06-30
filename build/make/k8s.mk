@@ -91,9 +91,9 @@ k8s-helm-apply: ${BINARY_HELM} image-import k8s-helm-generate $(K8S_POST_GENERAT
 	@${BINARY_HELM} install ${ARTIFACT_ID} ${K8S_HELM_TEMP_CHART}
 
 .PHONY: k8s-helm-package
-k8s-helm-package: k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart.
+k8s-helm-package: ${BINARY_HELM}  k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart.
 	@echo "Package generated helm chart"
-	@helm package ${K8S_HELM_TEMP_CHART} --app-version ${VERSION} -d ${K8S_HELM_TEMP_CHART}/pkg
+	@${BINARY_HELM} package ${K8S_HELM_TEMP_CHART} --app-version ${VERSION} -d ${K8S_HELM_TEMP_CHART}
 
 .PHONY: k8s-helm-delete
 k8s-helm-delete: ${BINARY_HELM} ## Uninstalls the current helm chart.
