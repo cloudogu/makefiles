@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v7.7.0](https://github.com/cloudogu/makefiles/releases/tag/v7.7.0) 2023-06-30
+### Added
+- [#121] Add make targets for packaging Helm charts
+- [#119] Add make targets for handling Helm charts
+
 ## [v7.6.0](https://github.com/cloudogu/makefiles/releases/tag/v7.6.0) 2023-06-14
 ### Added
 - [#117] Script to generate sha256sum for a given url

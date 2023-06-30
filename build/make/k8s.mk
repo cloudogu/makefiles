@@ -7,6 +7,8 @@ endif
 ## Variables
 
 BINARY_YQ = $(UTILITY_BIN_PATH)/yq
+BINARY_HELM = $(UTILITY_BIN_PATH)/helm
+BINARY_HELMIFY = $(UTILITY_BIN_PATH)/helmify
 
 # The productive tag of the image
 IMAGE ?=
@@ -19,6 +21,7 @@ K3CES_REGISTRY_URL_PREFIX="${K3S_CLUSTER_FQDN}:${K3S_LOCAL_REGISTRY_PORT}"
 # the current namespace and the dev image.
 K8S_RESOURCE_TEMP_FOLDER ?= $(TARGET_DIR)/make/k8s
 K8S_RESOURCE_TEMP_YAML ?= $(K8S_RESOURCE_TEMP_FOLDER)/$(ARTIFACT_ID)_$(VERSION).yaml
+K8S_HELM_TEMP_CHART ?= $(K8S_RESOURCE_TEMP_FOLDER)/helm/$(ARTIFACT_ID)
 
 ##@ K8s - Variables
 
@@ -75,6 +78,31 @@ k8s-apply: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Applies all generated K8
 	@echo "Apply generated K8s resources..."
 	@kubectl apply -f $(K8S_RESOURCE_TEMP_YAML) --namespace=${NAMESPACE}
 
+##@ K8s - Helm
+
+.PHONY: k8s-helm-generate
+k8s-helm-generate: k8s-generate ${BINARY_HELMIFY} $(K8S_RESOURCE_TEMP_FOLDER) $(K8S_PRE_GENERATE_TARGETS) ## Generates the final helm chart.
+	@echo "Generate helm chart..."
+	@cat $(K8S_RESOURCE_TEMP_YAML) | ${BINARY_HELMIFY} ${K8S_HELM_TEMP_CHART}
+
+.PHONY: k8s-helm-apply
+k8s-helm-apply: ${BINARY_HELM} image-import k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
+	@echo "Apply generated helm chart"
+	@${BINARY_HELM} install ${ARTIFACT_ID} ${K8S_HELM_TEMP_CHART}
+
+.PHONY: k8s-helm-package
+k8s-helm-package: ${BINARY_HELM}  k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart.
+	@echo "Package generated helm chart"
+	@${BINARY_HELM} package ${K8S_HELM_TEMP_CHART} --app-version ${VERSION} -d ${K8S_HELM_TEMP_CHART}
+
+.PHONY: k8s-helm-delete
+k8s-helm-delete: ${BINARY_HELM} ## Uninstalls the current helm chart.
+	@echo "Uninstall helm chart"
+	@${BINARY_HELM} uninstall ${ARTIFACT_ID}
+
+.PHONY: k8s-helm-reinstall
+k8s-helm-reinstall: k8s-helm-delete k8s-helm-apply ## Uninstalls the current helm chart and reinstalls it.
+
 ##@ K8s - Docker
 
 .PHONY: docker-build
@@ -115,5 +143,11 @@ __check_defined = \
     $(if $(value $1),, \
       $(error Undefined $1$(if $2, ($2))))
 
-${BINARY_YQ}: $(UTILITY_BIN_PATH) ## Download controller-gen locally if necessary.
+${BINARY_YQ}: $(UTILITY_BIN_PATH) ## Download yq locally if necessary.
 	$(call go-get-tool,$(BINARY_YQ),github.com/mikefarah/yq/v4@v4.25.1)
+
+${BINARY_HELM}: $(UTILITY_BIN_PATH) ## Download helm locally if necessary.
+	$(call go-get-tool,$(BINARY_HELM),helm.sh/helm/v3/cmd/helm@latest)
+
+${BINARY_HELMIFY}: $(UTILITY_BIN_PATH)  ## Download helmify locally if necessary.
+	$(call go-get-tool,$(BINARY_HELMIFY),github.com/arttor/helmify/cmd/helmify@latest)
