@@ -103,7 +103,7 @@ k8s-helm-generate: k8s-generate ${K8S_HELM_RESSOURCES}/Chart.yaml ${BINARY_HELMI
 .PHONY: k8s-helm-apply
 k8s-helm-apply: ${BINARY_HELM} image-import k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
 	@echo "Apply generated helm chart"
-	@${BINARY_HELM} install ${ARTIFACT_ID} ${K8S_HELM_TARGET}
+	@${BINARY_HELM} upgrade -i ${ARTIFACT_ID} ${K8S_HELM_TARGET}
 
 .PHONY: k8s-helm-package
 k8s-helm-package: ${BINARY_HELM}  k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart.
