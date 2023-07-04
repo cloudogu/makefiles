@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- [#123] Add possibility to override Chart.yaml when generating helm charts
+- [#123] Add make target to create (Helm-)Chart.yaml-template and use it in other helm targets
 
 ## [v7.7.0](https://github.com/cloudogu/makefiles/releases/tag/v7.7.0) 2023-06-30
 ### Added

@@ -21,7 +21,8 @@ K3CES_REGISTRY_URL_PREFIX="${K3S_CLUSTER_FQDN}:${K3S_LOCAL_REGISTRY_PORT}"
 # the current namespace and the dev image.
 K8S_RESOURCE_TEMP_FOLDER ?= $(TARGET_DIR)/make/k8s
 K8S_RESOURCE_TEMP_YAML ?= $(K8S_RESOURCE_TEMP_FOLDER)/$(ARTIFACT_ID)_$(VERSION).yaml
-K8S_HELM_TEMP_CHART ?= $(K8S_RESOURCE_TEMP_FOLDER)/helm/$(ARTIFACT_ID)
+K8S_HELM_TARGET ?= $(K8S_RESOURCE_TEMP_FOLDER)/helm
+K8S_HELM_RESSOURCES ?= k8s/helm
 
 ##@ K8s - Variables
 
@@ -80,20 +81,34 @@ k8s-apply: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Applies all generated K8
 
 ##@ K8s - Helm
 
+${K8S_HELM_RESSOURCES}/Chart.yaml: ${BINARY_HELM} ## Creates the Chart.yaml-template if missing
+	@echo "Create Chart.yaml..."
+	@mkdir -p ${K8S_HELM_RESSOURCES}/tmp/
+	@${BINARY_HELM} create ${K8S_HELM_RESSOURCES}/tmp/${ARTIFACT_ID}
+	@cp ${K8S_HELM_RESSOURCES}/tmp/${ARTIFACT_ID}/Chart.yaml ${K8S_HELM_RESSOURCES}/
+	@rm -dr ${K8S_HELM_RESSOURCES}/tmp
+	@sed -i 's/appVersion: ".*"/appVersion: "0.0.0-replaceme"/' ${K8S_HELM_RESSOURCES}/Chart.yaml
+	@sed -i 's/version: .*/version: 0.0.0-replaceme/' ${K8S_HELM_RESSOURCES}/Chart.yaml
+
 .PHONY: k8s-helm-generate
-k8s-helm-generate: k8s-generate ${BINARY_HELMIFY} $(K8S_RESOURCE_TEMP_FOLDER) $(K8S_PRE_GENERATE_TARGETS) ## Generates the final helm chart.
+k8s-helm-generate: k8s-generate ${K8S_HELM_RESSOURCES}/Chart.yaml ${BINARY_HELMIFY} $(K8S_RESOURCE_TEMP_FOLDER) $(K8S_PRE_GENERATE_TARGETS) ## Generates the final helm chart.
 	@echo "Generate helm chart..."
-	@cat $(K8S_RESOURCE_TEMP_YAML) | ${BINARY_HELMIFY} ${K8S_HELM_TEMP_CHART}
+	@rm -drf ${K8S_HELM_TARGET}  # delete folder, so Chart.yaml is newly created from template
+	@mkdir -p ${K8S_HELM_TARGET}
+	@cat $(K8S_RESOURCE_TEMP_YAML) | ${BINARY_HELMIFY} ${K8S_HELM_TARGET}
+	@cp ${K8S_HELM_RESSOURCES}/Chart.yaml ${K8S_HELM_TARGET}
+	@sed -i 's/appVersion: "0.0.0-replaceme"/appVersion: "${VERSION}"/' ${K8S_HELM_TARGET}/Chart.yaml
+	@sed -i 's/version: 0.0.0-replaceme/version: ${HELM_CHART_VERSION}/' ${K8S_HELM_TARGET}/Chart.yaml
 
 .PHONY: k8s-helm-apply
 k8s-helm-apply: ${BINARY_HELM} image-import k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
 	@echo "Apply generated helm chart"
-	@${BINARY_HELM} install ${ARTIFACT_ID} ${K8S_HELM_TEMP_CHART}
+	@${BINARY_HELM} install ${ARTIFACT_ID} ${K8S_HELM_TARGET}
 
 .PHONY: k8s-helm-package
 k8s-helm-package: ${BINARY_HELM}  k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart.
 	@echo "Package generated helm chart"
-	@${BINARY_HELM} package ${K8S_HELM_TEMP_CHART} --app-version ${VERSION} -d ${K8S_HELM_TEMP_CHART}
+	@${BINARY_HELM} package ${K8S_HELM_TARGET} --app-version ${VERSION} -d ${K8S_HELM_TARGET}
 
 .PHONY: k8s-helm-delete
 k8s-helm-delete: ${BINARY_HELM} ## Uninstalls the current helm chart.
