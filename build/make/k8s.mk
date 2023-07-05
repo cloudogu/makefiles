@@ -79,7 +79,7 @@ k8s-apply: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Applies all generated K8
 	@echo "Apply generated K8s resources..."
 	@kubectl apply -f $(K8S_RESOURCE_TEMP_YAML) --namespace=${NAMESPACE}
 
-##@ K8s - Helm
+##@ K8s - Helm general
 
 ${K8S_HELM_RESSOURCES}/Chart.yaml: ${BINARY_HELM} ## Creates the Chart.yaml-template if missing
 	@echo "Create Chart.yaml..."
@@ -90,33 +90,52 @@ ${K8S_HELM_RESSOURCES}/Chart.yaml: ${BINARY_HELM} ## Creates the Chart.yaml-temp
 	@sed -i 's/appVersion: ".*"/appVersion: "0.0.0-replaceme"/' ${K8S_HELM_RESSOURCES}/Chart.yaml
 	@sed -i 's/version: .*/version: 0.0.0-replaceme/' ${K8S_HELM_RESSOURCES}/Chart.yaml
 
+.PHONY: k8s-helm-delete
+k8s-helm-delete: ${BINARY_HELM} ## Uninstalls the current helm chart.
+	@echo "Uninstall helm chart"
+	@${BINARY_HELM} uninstall ${ARTIFACT_ID}
+
+##@ K8s - Helm dev environment
+
 .PHONY: k8s-helm-generate
-k8s-helm-generate: k8s-generate ${K8S_HELM_RESSOURCES}/Chart.yaml ${BINARY_HELMIFY} $(K8S_RESOURCE_TEMP_FOLDER) $(K8S_PRE_GENERATE_TARGETS) ## Generates the final helm chart.
-	@echo "Generate helm chart..."
-	@rm -drf ${K8S_HELM_TARGET}  # delete folder, so Chart.yaml is newly created from template
-	@mkdir -p ${K8S_HELM_TARGET}
-	@cat $(K8S_RESOURCE_TEMP_YAML) | ${BINARY_HELMIFY} ${K8S_HELM_TARGET}
-	@cp ${K8S_HELM_RESSOURCES}/Chart.yaml ${K8S_HELM_TARGET}
-	@sed -i 's/appVersion: "0.0.0-replaceme"/appVersion: "${VERSION}"/' ${K8S_HELM_TARGET}/Chart.yaml
-	@sed -i 's/version: 0.0.0-replaceme/version: ${HELM_CHART_VERSION}/' ${K8S_HELM_TARGET}/Chart.yaml
+k8s-helm-generate: k8s-generate ${K8S_HELM_RESSOURCES}/Chart.yaml ${BINARY_HELMIFY} $(K8S_RESOURCE_TEMP_FOLDER) ## Generates the final helm chart.
+	$(call generate_helm_chart)
 
 .PHONY: k8s-helm-apply
 k8s-helm-apply: ${BINARY_HELM} image-import k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
 	@echo "Apply generated helm chart"
 	@${BINARY_HELM} install ${ARTIFACT_ID} ${K8S_HELM_TARGET}
 
-.PHONY: k8s-helm-package
-k8s-helm-package: ${BINARY_HELM}  k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart.
+.PHONY: k8s-helm-reinstall
+k8s-helm-reinstall: k8s-helm-delete k8s-helm-apply ## Uninstalls the current helm chart and reinstalls it.
+
+##@ K8s - Helm prod environment
+
+.PHONY: k8s-helm-generate-prod
+k8s-helm-generate-prod: $(K8S_PRE_GENERATE_TARGETS) ${K8S_HELM_RESSOURCES}/Chart.yaml ${BINARY_HELMIFY} $(K8S_RESOURCE_TEMP_FOLDER) ## Generates the final helm chart with the productive image.
+	$(call generate_helm_chart)
+
+.PHONY: k8s-helm-apply-prod
+k8s-helm-apply-prod: ${BINARY_HELM} image-import k8s-helm-generate-prod $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart with the productive image.
+	@echo "Apply generated helm chart"
+	@${BINARY_HELM} install ${ARTIFACT_ID} ${K8S_HELM_TARGET}
+
+.PHONY: k8s-helm-package-prod
+k8s-helm-package-prod: ${BINARY_HELM}  k8s-helm-generate-prod $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart with the productive image.
 	@echo "Package generated helm chart"
 	@${BINARY_HELM} package ${K8S_HELM_TARGET} --app-version ${VERSION} -d ${K8S_HELM_TARGET}
 
-.PHONY: k8s-helm-delete
-k8s-helm-delete: ${BINARY_HELM} ## Uninstalls the current helm chart.
-	@echo "Uninstall helm chart"
-	@${BINARY_HELM} uninstall ${ARTIFACT_ID}
+HARBOR_USERNAME ?= $(shell bash -c 'read -p "Harbor username: " username; echo $$username')
+HARBOR_PASSWORD ?= $(shell bash -c 'read -s -p "Harbor password: " pwd; echo $$pwd')
 
-.PHONY: k8s-helm-reinstall
-k8s-helm-reinstall: k8s-helm-delete k8s-helm-apply ## Uninstalls the current helm chart and reinstalls it.
+.PHONY: k8s-helm-release-prod
+k8s-helm-release-prod: ${BINARY_HELM} k8s-helm-package-prod ## Pushes generated and packaged helm chart to harbor with the productive image.
+	@echo "Push generated and packaged helm chart"
+	@${BINARY_HELM} registry login "registry.cloudogu.com" --username ${HARBOR_USERNAME} --password ${HARBOR_PASSWORD}
+	@${BINARY_HELM} push "target/helm/k8s-component-operator-${VERSION}.tgz" "oci://registry.cloudogu.com/official/"
+
+.PHONY: k8s-helm-reinstall-prod
+k8s-helm-reinstall-prod: k8s-helm-delete k8s-helm-apply-prod ## Uninstalls the current helm chart and reinstalls it with the productive image.
 
 ##@ K8s - Docker
 
@@ -157,6 +176,16 @@ check_defined = \
 __check_defined = \
     $(if $(value $1),, \
       $(error Undefined $1$(if $2, ($2))))
+
+define generate_helm_chart
+	@echo "Generate helm chart..."
+	@rm -drf ${K8S_HELM_TARGET}  # delete folder, so Chart.yaml is newly created from template
+	@mkdir -p ${K8S_HELM_TARGET}
+	@cat $(K8S_RESOURCE_TEMP_YAML) | ${BINARY_HELMIFY} ${K8S_HELM_TARGET}
+	@cp ${K8S_HELM_RESSOURCES}/Chart.yaml ${K8S_HELM_TARGET}
+	@sed -i 's/appVersion: "0.0.0-replaceme"/appVersion: "${VERSION}"/' ${K8S_HELM_TARGET}/Chart.yaml
+	@sed -i 's/version: 0.0.0-replaceme/version: ${VERSION}/' ${K8S_HELM_TARGET}/Chart.yaml
+endef
 
 ${BINARY_YQ}: $(UTILITY_BIN_PATH) ## Download yq locally if necessary.
 	$(call go-get-tool,$(BINARY_YQ),github.com/mikefarah/yq/v4@v4.25.1)
