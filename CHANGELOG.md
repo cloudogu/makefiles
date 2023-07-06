@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v7.9.0](https://github.com/cloudogu/makefiles/releases/tag/v7.9.0) 2023-07-06
+### Added
+- [#125] Differentiate dev & prod environments and add release target
+
 ## [v7.8.0](https://github.com/cloudogu/makefiles/releases/tag/v7.8.0) 2023-07-04
 ### Added
 - [#123] Add make target to create (Helm-)Chart.yaml-template and use it in other helm targets
