@@ -126,18 +126,7 @@ k8s-helm-generate-release: $(K8S_PRE_GENERATE_TARGETS) ${K8S_HELM_RESSOURCES}/Ch
 .PHONY: k8s-helm-package-release
 k8s-helm-package-release: ${BINARY_HELM}  k8s-helm-generate-release $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart with release urls.
 	@echo "Package generated helm chart"
-	@${BINARY_HELM} package ${K8S_HELM_TARGET} --app-version ${VERSION} -d ${K8S_HELM_TARGET}
-
-
-HARBOR_REGISTRY ?= $(shell bash -c 'read -p "Harbor registry [registry.cloudogu.com]: " registry; registry=$${registry:-registry.cloudogu.com}; echo $$registry')
-HARBOR_USERNAME ?= $(shell bash -c 'read -p "Harbor username: " username; echo $$username')
-HARBOR_PASSWORD ?= $(shell bash -c 'read -s -p "Harbor password: " pwd; echo $$pwd')
-
-.PHONY: k8s-helm-release
-k8s-helm-release: ${BINARY_HELM} k8s-helm-package-release ## Pushes generated and packaged helm chart to harbor with release urls.
-	@echo "Push generated and packaged helm chart"
-	@${BINARY_HELM} registry login "${HARBOR_REGISTRY}" --username ${HARBOR_USERNAME} --password ${HARBOR_PASSWORD}
-	@${BINARY_HELM} push "target/helm/k8s-component-operator-${VERSION}.tgz" "oci://${HARBOR_REGISTRY}/${REGISTRY_NAMESPACE}/"
+	@${BINARY_HELM} package ${K8S_HELM_TARGET} -d ${K8S_HELM_TARGET}
 
 ##@ K8s - Docker
 
