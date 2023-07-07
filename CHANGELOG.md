@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+# Removed
+- [#127] Remove helmify and just copy the release resource in the helm chart because the helmify generation does not fit with our name prefixes and does not recognize some properties like `publishNotReadyAddresses` from the service spec.
 
 ## [v7.9.0](https://github.com/cloudogu/makefiles/releases/tag/v7.9.0) 2023-07-06
 ### Added
