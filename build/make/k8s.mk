@@ -121,6 +121,7 @@ k8s-helm-reinstall: k8s-helm-delete k8s-helm-apply ## Uninstalls the current hel
 
 .PHONY: k8s-helm-generate-release
 k8s-helm-generate-release: $(K8S_PRE_GENERATE_TARGETS) k8s-helm-generate-chart ## Generates the final helm chart with release urls.
+	@sed -i "s/'{{ .Namespace }}'/'{{ .Release.Namespace }}'/" ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml
 
 .PHONY: k8s-helm-package-release
 k8s-helm-package-release: ${BINARY_HELM}  k8s-helm-generate-release $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart with release urls.
