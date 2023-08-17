@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- [#129] Instead of just copy the chart.yaml the whole chart will be copied from the `k8s` to the artifact.
+  - Added additional helm args to configure definitions of helm values.
 
 ## [v7.10.0](https://github.com/cloudogu/makefiles/releases/tag/v7.10.0) 2023-07-07
 # Removed
