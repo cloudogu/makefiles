@@ -4,7 +4,6 @@ metadata:
   name: NAME
   labels:
     app: ces
-    dogu.name: NAME
 spec:
   name: NAMESPACE/NAME
   version: VERSION
