@@ -90,17 +90,17 @@ ${K8S_HELM_RESSOURCES}/Chart.yaml: ${BINARY_HELM} ## Creates the Chart.yaml-temp
 	@sed -i 's/version: .*/version: 0.0.0-replaceme/' ${K8S_HELM_RESSOURCES}/Chart.yaml
 
 .PHONY: k8s-helm-delete
-k8s-helm-delete: ${BINARY_HELM} ## Uninstalls the current helm chart.
+k8s-helm-delete: ${BINARY_HELM} check-k8s-namespace-env-var ## Uninstalls the current helm chart.
 	@echo "Uninstall helm chart"
-	@${BINARY_HELM} uninstall ${ARTIFACT_ID}
+	@${BINARY_HELM} uninstall ${ARTIFACT_ID} --namespace=${NAMESPACE} || true
 
 .PHONY: k8s-helm-generate-chart
 k8s-helm-generate-chart: ${K8S_HELM_RESSOURCES}/Chart.yaml $(K8S_RESOURCE_TEMP_FOLDER) ## Generates the final helm chart.
 	@echo "Generate helm chart..."
-	@rm -drf ${K8S_HELM_TARGET}  # delete folder, so Chart.yaml is newly created from template
+	@rm -drf ${K8S_HELM_TARGET}  # delete folder, so the chart is newly created.
 	@mkdir -p ${K8S_HELM_TARGET}/templates
 	@cp $(K8S_RESOURCE_TEMP_YAML) ${K8S_HELM_TARGET}/templates
-	@cp ${K8S_HELM_RESSOURCES}/Chart.yaml ${K8S_HELM_TARGET}
+	@cp -r ${K8S_HELM_RESSOURCES}/** ${K8S_HELM_TARGET}
 	@sed -i 's/appVersion: "0.0.0-replaceme"/appVersion: "${VERSION}"/' ${K8S_HELM_TARGET}/Chart.yaml
 	@sed -i 's/version: 0.0.0-replaceme/version: ${VERSION}/' ${K8S_HELM_TARGET}/Chart.yaml
 
@@ -109,10 +109,12 @@ k8s-helm-generate-chart: ${K8S_HELM_RESSOURCES}/Chart.yaml $(K8S_RESOURCE_TEMP_F
 .PHONY: k8s-helm-generate
 k8s-helm-generate: k8s-generate k8s-helm-generate-chart ## Generates the final helm chart with dev-urls.
 
+ADDITIONAL_HELM_APPLY_ARGS ?=
+
 .PHONY: k8s-helm-apply
-k8s-helm-apply: ${BINARY_HELM} image-import k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
+k8s-helm-apply: ${BINARY_HELM} check-k8s-namespace-env-var image-import k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
 	@echo "Apply generated helm chart"
-	@${BINARY_HELM} upgrade -i ${ARTIFACT_ID} ${K8S_HELM_TARGET}
+	@${BINARY_HELM} upgrade -i ${ARTIFACT_ID} ${K8S_HELM_TARGET} ${ADDITIONAL_HELM_APPLY_ARGS} --namespace ${NAMESPACE}
 
 .PHONY: k8s-helm-reinstall
 k8s-helm-reinstall: k8s-helm-delete k8s-helm-apply ## Uninstalls the current helm chart and reinstalls it.
