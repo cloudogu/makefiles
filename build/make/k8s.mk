@@ -112,9 +112,9 @@ k8s-helm-generate: k8s-generate k8s-helm-generate-chart ## Generates the final h
 ADDITIONAL_HELM_APPLY_ARGS ?=
 
 .PHONY: k8s-helm-apply
-k8s-helm-apply: ${BINARY_HELM} image-import k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
+k8s-helm-apply: ${BINARY_HELM} check-k8s-namespace-env-var image-import k8s-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
 	@echo "Apply generated helm chart"
-	@${BINARY_HELM} upgrade -i ${ARTIFACT_ID} ${K8S_HELM_TARGET} ${ADDITIONAL_HELM_APPLY_ARGS}
+	@${BINARY_HELM} upgrade -i ${ARTIFACT_ID} ${K8S_HELM_TARGET} ${ADDITIONAL_HELM_APPLY_ARGS} --namespace ${NAMESPACE}
 
 .PHONY: k8s-helm-reinstall
 k8s-helm-reinstall: k8s-helm-delete k8s-helm-apply ## Uninstalls the current helm chart and reinstalls it.
