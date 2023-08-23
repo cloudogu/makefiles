@@ -138,8 +138,9 @@ ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml: $(K8S_PRE_GENERATE_
 k8s-helm-package-release: ${BINARY_HELM} k8s-helm-delete-existing-tgz ${K8S_HELM_RELEASE_TGZ} k8s-helm-delete-temp-dependencies k8s-helm-remove-dependency-charts ## Generates and packages the helm chart with release urls.
 
 .PHONY: k8s-helm-delete-existing-tgz
-k8s-helm-delete-existing-tgz:
-	@rm -f ${K8S_HELM_RELEASE_TGZ}
+k8s-helm-delete-existing-tgz: ## Remove an existing Helm package.
+# remove
+	@rm -f ${K8S_HELM_RELEASE_TGZ}*
 
 ${K8S_HELM_RELEASE_TGZ}: ${BINARY_HELM} ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml k8s-helm-create-temp-dependencies $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart with release urls.
 	@echo "Package generated helm chart"
@@ -162,10 +163,15 @@ k8s-helm-delete-temp-dependencies:
 
 .PHONY: k8s-helm-remove-dependency-charts
 k8s-helm-remove-dependency-charts: ${K8S_HELM_RELEASE_TGZ}
-	@echo "Remove dependency files from ${K8S_HELM_RELEASE_TGZ}"
 # deleting dirs from a .tgz is hard so un-tar,remove dir,re-tar is a good alternative
-	@gzip --to-stdout --decompress ${K8S_HELM_RELEASE_TGZ} | tar --to-stdout --delete "${ARTIFACT_ID}/${K8S_HELM_TARGET_DEP_DIR}" -f - | gzip > ${K8S_HELM_RELEASE_TGZ}.temp
-	@rm ${K8S_HELM_RELEASE_TGZ} && mv ${K8S_HELM_RELEASE_TGZ}.temp ${K8S_HELM_RELEASE_TGZ}
+# but only if any dependency directory actually exists
+	@if tar -tf ${K8S_HELM_RELEASE_TGZ} ${ARTIFACT_ID}/${K8S_HELM_TARGET_DEP_DIR} > /dev/null 2>&1; then \
+		echo "Remove dependency files from ${K8S_HELM_RELEASE_TGZ}" ; \
+		gzip --to-stdout --decompress ${K8S_HELM_RELEASE_TGZ} | \
+		  tar --to-stdout --delete "${ARTIFACT_ID}/${K8S_HELM_TARGET_DEP_DIR}" -f - | \
+		  gzip > ${K8S_HELM_RELEASE_TGZ}.temp ; \
+		rm ${K8S_HELM_RELEASE_TGZ} && mv ${K8S_HELM_RELEASE_TGZ}.temp ${K8S_HELM_RELEASE_TGZ} ; \
+	fi
 
 .PHONY: chart-import
 chart-import: check-all-vars check-k8s-artifact-id k8s-helm-generate-chart k8s-helm-package-release image-import ## Imports the currently available image into the cluster-local registry.
