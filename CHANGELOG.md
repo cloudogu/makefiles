@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v7.12.0](https://github.com/cloudogu/makefiles/releases/tag/v7.12.0) 2023-08-23
+### Added
+- [#131] Support optional Helm chart dependencies during `k8s-helm-package-release`
+   - Please note, that the dependency charts will be created on the fly. The created Helm package will not contain the dependency charts.
+- [#131] the target `k8s-helm-init-chart` helps to create a file `k8s/helm/Chart.yaml`
+   - please note, that an existing file will be overwritten.
+
+### Changed
+- [#131] Add further additional Helm command arguments variables. All of these variables are optional:
+   - `BINARY_HELM_ADDITIONAL_PUSH_ARGS` for `helm push`
+   - `BINARY_HELM_ADDITIONAL_PACK_ARGS` for `helm package`
+   - `BINARY_HELM_ADDITIONAL_UNINST_ARGS` for `helm uninstall`
+   - `BINARY_HELM_ADDITIONAL_UPGR_ARGS` for `helm upgrade`
+
+### Fixed
+- Rename the additional Helm command argument variable `ADDITIONAL_HELM_APPLY_ARGS` to `BINARY_HELM_ADDITIONAL_UPGR_ARGS`
+- [#131] avoid to re-pack a Helm package from a previous `k8s-helm-package-release` run
+   - instead the older copy of the Helm package will be deleted prior the actual Helm package creation
+
 ## [v7.11.0](https://github.com/cloudogu/makefiles/releases/tag/v7.11.0) 2023-08-22
 ### Added
 - [#129] Instead of just copy the chart.yaml the whole chart will be copied from the `k8s` to the artifact.
