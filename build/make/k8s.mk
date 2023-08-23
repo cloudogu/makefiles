@@ -11,7 +11,7 @@ BINARY_HELM = $(UTILITY_BIN_PATH)/helm
 BINARY_HELM_VERSION?=v3.12.0-dev.1.0.20230817154107-a749b663101d
 BINARY_HELM_ADDITIONAL_PUSH_ARGS?=--plain-http
 BINARY_HELM_ADDITIONAL_PACK_ARGS?=
-BINARY_HELM_ADDITIONAL_DEL_ARGS?=
+BINARY_HELM_ADDITIONAL_UNINST_ARGS?=
 BINARY_HELM_ADDITIONAL_UPGR_ARGS?=
 
 # The productive tag of the image
@@ -99,7 +99,7 @@ ${K8S_HELM_RESSOURCES}/Chart.yaml: ${BINARY_HELM} ## Creates the Chart.yaml-temp
 .PHONY: k8s-helm-delete
 k8s-helm-delete: ${BINARY_HELM} check-k8s-namespace-env-var ## Uninstalls the current helm chart.
 	@echo "Uninstall helm chart"
-	@${BINARY_HELM} uninstall ${ARTIFACT_ID} --namespace=${NAMESPACE} ${BINARY_HELM_ADDITIONAL_DEL_ARGS} || true
+	@${BINARY_HELM} uninstall ${ARTIFACT_ID} --namespace=${NAMESPACE} ${BINARY_HELM_ADDITIONAL_UNINST_ARGS} || true
 
 .PHONY: k8s-helm-generate-chart
 k8s-helm-generate-chart: ${K8S_HELM_TARGET}/Chart.yaml
@@ -143,7 +143,7 @@ k8s-helm-delete-existing-tgz:
 
 ${K8S_HELM_RELEASE_TGZ}: ${BINARY_HELM} ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml k8s-helm-create-temp-dependencies $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the helm chart with release urls.
 	@echo "Package generated helm chart"
-	@${BINARY_HELM} package ${K8S_HELM_TARGET} -d ${K8S_HELM_TARGET}
+	@${BINARY_HELM} package ${K8S_HELM_TARGET} -d ${K8S_HELM_TARGET} ${BINARY_HELM_ADDITIONAL_PACK_ARGS}
 
 .PHONY: k8s-helm-create-temp-dependencies
 k8s-helm-create-temp-dependencies: k8s-helm-generate-chart
