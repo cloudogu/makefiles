@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v7.12.0](https://github.com/cloudogu/makefiles/releases/tag/v7.12.0) 2023-08-23
 ### Added
 - [#131] Support optional Helm chart dependencies during `k8s-helm-package-release`
    - Please note, that the dependency charts will be created on the fly. The created Helm package will not contain the dependency charts.
