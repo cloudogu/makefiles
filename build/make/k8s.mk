@@ -86,8 +86,8 @@ k8s-apply: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Applies all generated K8
 	@kubectl apply -f $(K8S_RESOURCE_TEMP_YAML) --namespace=${NAMESPACE}
 
 ##@ K8s - Helm general
-.PHONY: k8s-helm-init-helm
-k8s-helm-init-helm: ${BINARY_HELM} ## Creates a Chart.yaml-template with zero values
+.PHONY: k8s-helm-init-chart
+k8s-helm-init-chart: ${BINARY_HELM} ## Creates a Chart.yaml-template with zero values
 	@echo "Initialize ${K8S_HELM_RESSOURCES}/Chart.yaml..."
 	@mkdir -p ${K8S_HELM_RESSOURCES}/tmp/
 	@${BINARY_HELM} create ${K8S_HELM_RESSOURCES}/tmp/${ARTIFACT_ID}
@@ -102,9 +102,9 @@ k8s-helm-delete: ${BINARY_HELM} check-k8s-namespace-env-var ## Uninstalls the cu
 	@${BINARY_HELM} uninstall ${ARTIFACT_ID} --namespace=${NAMESPACE} ${BINARY_HELM_ADDITIONAL_UNINST_ARGS} || true
 
 .PHONY: k8s-helm-generate-chart
-k8s-helm-generate-chart: ${K8S_HELM_TARGET}/Chart.yaml
+k8s-helm-generate-chart: ${K8S_HELM_TARGET}/Chart.yaml ## Generates the final helm chart.
 
-${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) ## Generates the final helm chart.
+${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER)
 	@echo "Generate helm chart..."
 	@rm -drf ${K8S_HELM_TARGET}  # delete folder, so the chart is newly created.
 	@mkdir -p ${K8S_HELM_TARGET}/templates
@@ -129,9 +129,9 @@ k8s-helm-reinstall: k8s-helm-delete k8s-helm-apply ## Uninstalls the current hel
 ##@ K8s - Helm release targets
 
 .PHONY: k8s-helm-generate-release
-k8s-helm-generate-release: ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml
+k8s-helm-generate-release: ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml ## Generates the final helm chart with release urls.
 
-${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml: $(K8S_PRE_GENERATE_TARGETS) ${K8S_HELM_TARGET}/Chart.yaml ## Generates the final helm chart with release urls.
+${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml: $(K8S_PRE_GENERATE_TARGETS) ${K8S_HELM_TARGET}/Chart.yaml
 	@sed -i "s/'{{ .Namespace }}'/'{{ .Release.Namespace }}'/" ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml
 
 .PHONY: k8s-helm-package-release
