@@ -86,9 +86,9 @@ k8s-apply: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Applies all generated K8
 	@kubectl apply -f $(K8S_RESOURCE_TEMP_YAML) --namespace=${NAMESPACE}
 
 ##@ K8s - Helm general
-
-${K8S_HELM_RESSOURCES}/Chart.yaml: ${BINARY_HELM} ## Creates the Chart.yaml-template if missing
-	@echo "Create Chart.yaml..."
+.PHONY: k8s-helm-init-helm
+k8s-helm-init-helm: ${BINARY_HELM} ## Creates a Chart.yaml-template with zero values
+	@echo "Initialize ${K8S_HELM_RESSOURCES}/Chart.yaml..."
 	@mkdir -p ${K8S_HELM_RESSOURCES}/tmp/
 	@${BINARY_HELM} create ${K8S_HELM_RESSOURCES}/tmp/${ARTIFACT_ID}
 	@cp ${K8S_HELM_RESSOURCES}/tmp/${ARTIFACT_ID}/Chart.yaml ${K8S_HELM_RESSOURCES}/
@@ -104,7 +104,7 @@ k8s-helm-delete: ${BINARY_HELM} check-k8s-namespace-env-var ## Uninstalls the cu
 .PHONY: k8s-helm-generate-chart
 k8s-helm-generate-chart: ${K8S_HELM_TARGET}/Chart.yaml
 
-${K8S_HELM_TARGET}/Chart.yaml: ${K8S_HELM_RESSOURCES}/Chart.yaml $(K8S_RESOURCE_TEMP_FOLDER) ## Generates the final helm chart.
+${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) ## Generates the final helm chart.
 	@echo "Generate helm chart..."
 	@rm -drf ${K8S_HELM_TARGET}  # delete folder, so the chart is newly created.
 	@mkdir -p ${K8S_HELM_TARGET}/templates
