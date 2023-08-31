@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- [#137] Package generated chart-dependencies in helm-chart
 
 ## [v7.12.1](https://github.com/cloudogu/makefiles/releases/tag/v7.12.1) 2023-08-31
 ### Fixed
