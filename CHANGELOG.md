@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v7.12.1](https://github.com/cloudogu/makefiles/releases/tag/v7.12.1) 2023-08-31
+### Fixed
+- [#133] Added missing template-file `k8s-helm-temp-chart.yaml`
+
 ## [v7.12.0](https://github.com/cloudogu/makefiles/releases/tag/v7.12.0) 2023-08-23
 ### Added
 - [#131] Support optional Helm chart dependencies during `k8s-helm-package-release`
