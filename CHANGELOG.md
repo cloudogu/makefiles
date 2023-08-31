@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - [#137] Package generated chart-dependencies in helm-chart
+### Changed
+- [#135] Updated controller-gen to v0.13.0
 
 ## [v7.12.1](https://github.com/cloudogu/makefiles/releases/tag/v7.12.1) 2023-08-31
 ### Fixed
