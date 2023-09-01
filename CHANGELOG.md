@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v7.13.1](https://github.com/cloudogu/makefiles/releases/tag/v7.13.1) 2023-09-01
 ### Fixed
 - [#139] Use `yq` from `bin` instead of the host machine to fix pipeline errors.
 
