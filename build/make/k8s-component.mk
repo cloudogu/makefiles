@@ -19,6 +19,7 @@ K8S_HELM_RESSOURCES ?= k8s/helm
 K8S_HELM_RELEASE_TGZ=${K8S_HELM_TARGET}/${ARTIFACT_ID}-${VERSION}.tgz
 K8S_HELM_DEV_RELEASE_TGZ=${K8S_HELM_TARGET}/${ARTIFACT_ID}-${DEV_VERSION}.tgz
 K8S_HELM_TARGET_DEP_DIR=charts
+K8S_HELM_ARTIFACT_NAMESPACE?=k8s
 
 K8S_RESOURCE_COMPONENT ?= "${K8S_RESOURCE_TEMP_FOLDER}/component-${ARTIFACT_ID}-${VERSION}.yaml"
 K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML ?= $(WORKDIR)/build/make/k8s-component.tpl
@@ -74,10 +75,10 @@ helm-reinstall: helm-delete helm-apply ## Uninstalls the current helm chart and 
 helm-chart-import: check-all-vars check-k8s-artifact-id helm-generate-chart helm-package-release image-import ## Imports the currently available chart into the cluster-local registry.
 	@if [[ ${STAGE} == "development" ]]; then \
 		echo "Import ${K8S_HELM_DEV_RELEASE_TGZ} into K8s cluster ${K3CES_REGISTRY_URL_PREFIX}..."; \
-		${BINARY_HELM} push ${K8S_HELM_DEV_RELEASE_TGZ} oci://${K3CES_REGISTRY_URL_PREFIX}/${ARTIFACT_NAMESPACE} ${BINARY_HELM_ADDITIONAL_PUSH_ARGS}; \
+		${BINARY_HELM} push ${K8S_HELM_DEV_RELEASE_TGZ} oci://${K3CES_REGISTRY_URL_PREFIX}/${K8S_HELM_ARTIFACT_NAMESPACE} ${BINARY_HELM_ADDITIONAL_PUSH_ARGS}; \
 	else \
 	  	echo "Import ${K8S_HELM_RELEASE_TGZ} into K8s cluster ${K3CES_REGISTRY_URL_PREFIX}..."; \
-        ${BINARY_HELM} push ${K8S_HELM_RELEASE_TGZ} oci://${K3CES_REGISTRY_URL_PREFIX}/${ARTIFACT_NAMESPACE} ${BINARY_HELM_ADDITIONAL_PUSH_ARGS}; \
+        ${BINARY_HELM} push ${K8S_HELM_RELEASE_TGZ} oci://${K3CES_REGISTRY_URL_PREFIX}/${K8S_HELM_ARTIFACT_NAMESPACE} ${BINARY_HELM_ADDITIONAL_PUSH_ARGS}; \
     fi
 	@echo "Done."
 
@@ -120,9 +121,9 @@ ${BINARY_HELM}: $(UTILITY_BIN_PATH) ## Download helm locally if necessary.
 component-generate: ${K8S_RESOURCE_TEMP_FOLDER} ## Generate the component yaml resource.
 	@echo "Generating temporary K8s component resource: ${K8S_RESOURCE_COMPONENT}"
 	@if [[ ${STAGE} == "development" ]]; then \
-		sed "s|NAMESPACE|$(ARTIFACT_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" | sed "s|NAME|$(ARTIFACT_ID)|g"  | sed "s|VERSION|$(DEV_VERSION)|g" > "${K8S_RESOURCE_COMPONENT}"; \
+		sed "s|NAMESPACE|$(K8S_HELM_ARTIFACT_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" | sed "s|NAME|$(ARTIFACT_ID)|g"  | sed "s|VERSION|$(DEV_VERSION)|g" > "${K8S_RESOURCE_COMPONENT}"; \
 	else \
-		sed "s|NAMESPACE|$(ARTIFACT_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" | sed "s|NAME|$(ARTIFACT_ID)|g"  | sed "s|VERSION|$(VERSION)|g" > "${K8S_RESOURCE_COMPONENT}"; \
+		sed "s|NAMESPACE|$(K8S_HELM_ARTIFACT_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" | sed "s|NAME|$(ARTIFACT_ID)|g"  | sed "s|VERSION|$(VERSION)|g" > "${K8S_RESOURCE_COMPONENT}"; \
 	fi
 
 .PHONY: component-apply
