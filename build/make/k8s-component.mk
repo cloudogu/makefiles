@@ -1,7 +1,4 @@
-RAND:=$(shell echo $$RANDOM)
-DEV_BUILD_VERSION:=$$((${RAND} + 1000 ))
-DEV_VERSION?=${VERSION}-${DEV_BUILD_VERSION}
-
+DEV_VERSION?=${VERSION}-dev
 ## Image URL to use all building/pushing image targets
 IMAGE_DEV?=${K3CES_REGISTRY_URL_PREFIX}/${ARTIFACT_ID}:${DEV_VERSION}
 

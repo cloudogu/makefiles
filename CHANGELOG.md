@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - [#141] Add target to generate, apply etc. components resources.
-  - Because of the new dev proxy registry image tags will now receive a random build number. This prevents the registry proxy to pull the remote image. The random make variable `IMAGE_DEV` is now part of the `k8s-component.mk` and projects no longer need to override it.
+  - Because of the new dev proxy registry image tags will now receive a `-dev` suffix to avoid getting a version that matches tags in the remote registry. This prevents the registry proxy to pull the remote image. The random make variable `IMAGE_DEV` is now part of the `k8s-component.mk` and projects no longer need to override it.
 
 ### Changed
 - Changed name of component targets for better readability.
