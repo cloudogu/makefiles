@@ -35,7 +35,7 @@ helm-init-chart: ${BINARY_HELM} ## Creates a Chart.yaml-template with zero value
 	@sed -i 's/version: .*/version: 0.0.0-replaceme/' ${K8S_HELM_RESSOURCES}/Chart.yaml
 
 .PHONY: helm-generate-chart
-helm-generate-chart: k8s-generate ${K8S_HELM_TARGET}/Chart.yaml helm-create-temp-dependencies ## Generates the final helm chart.
+helm-generate-chart: k8s-generate ${K8S_HELM_TARGET}/Chart.yaml helm-create-dependencies ## Generates the final helm chart.
 
 .PHONY: ${K8S_HELM_TARGET}/Chart.yaml
 ${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) k8s-generate
@@ -101,14 +101,14 @@ ${K8S_HELM_RELEASE_TGZ}: ${BINARY_HELM} ${K8S_HELM_TARGET}/templates/$(ARTIFACT_
 	@echo "Package generated helm chart"
 	@${BINARY_HELM} package ${K8S_HELM_TARGET} -d ${K8S_HELM_TARGET} ${BINARY_HELM_ADDITIONAL_PACK_ARGS}
 
-.PHONY: helm-create-temp-dependencies
-helm-create-temp-dependencies: ${BINARY_YQ} ${K8S_HELM_TARGET}/Chart.yaml
+.PHONY: helm-create-dependencies
+helm-create-dependencies: ${BINARY_YQ} ${K8S_HELM_TARGET}/Chart.yaml
 # we use helm dependencies internally but never use them as "official" dependency because the namespace may differ
 # instead we create empty dependencies to satisfy the helm package call and delete the whole directory from the chart.tgz later-on.
 	@echo "Create helm temp dependencies (if they exist)"
 	@for dep in `${BINARY_YQ} -e '.dependencies[].name // ""' ${K8S_HELM_TARGET}/Chart.yaml`; do \
 		mkdir -p ${K8S_HELM_TARGET}/${K8S_HELM_TARGET_DEP_DIR}/$${dep} ; \
-		sed "s|replaceme|$${dep}|g" $(BUILD_DIR)/make/k8s-helm-temp-chart.yaml > ${K8S_HELM_TARGET}/${K8S_HELM_TARGET_DEP_DIR}/$${dep}/Chart.yaml ; \
+		sed "s|replaceme|$${dep}|g" $(BUILD_DIR)/make/k8s-helm-dependency.tpl > ${K8S_HELM_TARGET}/${K8S_HELM_TARGET_DEP_DIR}/$${dep}/Chart.yaml ; \
 	done
 
 ${BINARY_HELM}: $(UTILITY_BIN_PATH) ## Download helm locally if necessary.
