@@ -3,15 +3,15 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-wait_for_ok(){
+wait_for_ok() {
   printf "\n"
   OK=false
-  while [[ ${OK} != "ok" ]] ; do
+  while [[ ${OK} != "ok" ]]; do
     read -r -p "${1} (type 'ok'): " OK
   done
 }
 
-ask_yes_or_no(){
+ask_yes_or_no() {
   local ANSWER=""
 
   while [ "${ANSWER}" != "y" ] && [ "${ANSWER}" != "n" ]; do
@@ -21,21 +21,21 @@ ask_yes_or_no(){
   echo "${ANSWER}"
 }
 
-get_current_version_by_makefile(){
+get_current_version_by_makefile() {
   grep '^VERSION=[0-9[:alpha:].-]*$' Makefile | sed s/VERSION=//g
 }
 
-get_current_version_by_dogu_json(){
+get_current_version_by_dogu_json() {
   jq ".Version" --raw-output dogu.json
 }
 
-read_new_version(){
+read_new_version() {
   local NEW_RELEASE_VERSION
   read -r -p "Current Version is v${CURRENT_TOOL_VERSION}. Please provide the new version: v" NEW_RELEASE_VERSION
   echo "${NEW_RELEASE_VERSION}"
 }
 
-validate_new_version(){
+validate_new_version() {
   local NEW_RELEASE_VERSION="${1}"
   # Validate that release version does not start with vv
   if [[ ${NEW_RELEASE_VERSION} = v* ]]; then
@@ -46,24 +46,24 @@ validate_new_version(){
       NEW_RELEASE_VERSION="${NEW_RELEASE_VERSION:1}"
       echo "Release version now is: ${NEW_RELEASE_VERSION}"
     fi
-  fi;
+  fi
 }
 
-start_git_flow_release(){
+start_git_flow_release() {
   local NEW_RELEASE_VERSION="${1}"
   # Do gitflow
   git flow init --defaults --force
 
   mainBranchExists="$(git show-ref refs/remotes/origin/main || echo "")"
   if [ -n "$mainBranchExists" ]; then
-      echo 'Using "main" branch for production releases'
-      git flow config set master main
-      git checkout main
-      git pull origin main
+    echo 'Using "main" branch for production releases'
+    git flow config set master main
+    git checkout main
+    git pull origin main
   else
-      echo 'Using "master" branch for production releases'
-      git checkout master
-      git pull origin master
+    echo 'Using "master" branch for production releases'
+    git checkout master
+    git pull origin master
   fi
 
   git checkout develop
@@ -77,7 +77,7 @@ start_git_flow_release(){
 # extension points:
 # - update_versions_modify_files <newVersionNumber> - update a file with the new version number
 # - update_versions_stage_modified_files - stage a modified file to prepare the file for the up-coming commit
-update_versions(){
+update_versions() {
   local NEW_RELEASE_VERSION="${1}"
 
   if [[ $(type -t update_versions_modify_files) == function ]]; then
@@ -92,7 +92,7 @@ update_versions(){
   # Update version in dogu.json
   if [ -f "dogu.json" ]; then
     echo "Updating version in dogu.json..."
-    jq ".Version = \"${NEW_RELEASE_VERSION}\"" dogu.json > dogu2.json && mv dogu2.json dogu.json
+    jq ".Version = \"${NEW_RELEASE_VERSION}\"" dogu.json >dogu2.json && mv dogu2.json dogu.json
   fi
 
   # Update version in Dockerfile
@@ -110,7 +110,7 @@ update_versions(){
   # Update version in package.json
   if [ -f "package.json" ]; then
     echo "Updating version in package.json..."
-    jq ".version = \"${NEW_RELEASE_VERSION}\"" package.json > package2.json && mv package2.json package.json
+    jq ".version = \"${NEW_RELEASE_VERSION}\"" package.json >package2.json && mv package2.json package.json
   fi
 
   # Update version in pom.xml
@@ -133,7 +133,7 @@ update_versions(){
   fi
 
   if [ -f "dogu.json" ]; then
-      git add dogu.json
+    git add dogu.json
   fi
 
   if [ -f "Dockerfile" ]; then
@@ -155,7 +155,7 @@ update_versions(){
   git commit -m "Bump version"
 }
 
-update_changelog(){
+update_changelog() {
   local NEW_RELEASE_VERSION="${1}"
 
   # Changelog update
@@ -186,8 +186,8 @@ update_changelog(){
   git commit -m "Update changelog"
 }
 
-show_diff(){
-  if ! git diff --exit-code > /dev/null; then
+show_diff() {
+  if ! git diff --exit-code >/dev/null; then
     echo "There are still uncommitted changes:"
     echo ""
     echo "# # # # # # # # # #"
@@ -206,7 +206,7 @@ show_diff(){
   echo "# # # # # # # # # #"
 }
 
-finish_release_and_push(){
+finish_release_and_push() {
   local CURRENT_VERSION="${1}"
   local NEW_RELEASE_VERSION="${2}"
 
@@ -217,4 +217,81 @@ finish_release_and_push(){
   echo "Switching back to develop and deleting branch release/v${NEW_RELEASE_VERSION}..."
   git checkout develop
   git branch -D release/v"${NEW_RELEASE_VERSION}"
+}
+
+LOCAL_TRIVY_CVE_LIST=""
+REMOTE_TRIVY_CVE_LIST=""
+#TRIVY_RESULT_PATH="/tmp/trivy"
+TRIVY_RESULT_PATH="${PWD}/trivy"
+TRIVY_RESULT_FILE="${TRIVY_RESULT_PATH}/results.json"
+
+getActualCVEs() {
+  mkdir -p "${TRIVY_RESULT_PATH}"
+  local USERNAME="${1}"
+  local PASSWORD="${2}"
+  dockerLogin "${USERNAME}" "${PASSWORD}"
+  pullRemoteImage
+  scanImage
+  parseTrivyJsonResult "local"
+  buildImage
+  scanImage
+  parseTrivyJsonResult "remote"
+  rm -rf "${TRIVY_RESULT_PATH}"
+
+  echo "Remote CVES:\n"
+  echo "${REMOTE_TRIVY_CVE_LIST}"
+  echo "Local CVES:\n"
+  echo "${LOCAL_TRIVY_CVE_LIST}"
+}
+
+dockerLogin() {
+  local USERNAME="${1}"
+  local PASSWORD="${2}"
+  docker login registry.cloudogu.com -u "${USERNAME}" -p "${PASSWORD}"
+}
+
+pullRemoteImage() {
+  local IMAGE
+  local VERSION
+  IMAGE=$(jq -r .Image dogu.json)
+  VERSION=$(jq -r .Version dogu.json)
+  docker pull "${IMAGE}:${VERSION}"
+}
+
+buildImage() {
+  IMAGE=$(jq -r .Image dogu.json)
+  VERSION=$(jq -r .Version dogu.json)
+  docker build . -t "${IMAGE}:${VERSION}"
+}
+
+scanImage() {
+  local IMAGE
+  local VERSION
+  IMAGE=$(jq -r .Image dogu.json)
+  VERSION=$(jq -r .Version dogu.json)
+  # TODO save db in volume to reuse it.
+  docker run -v /var/run/docker.sock:/var/run/docker.sock -v "${TRIVY_RESULT_PATH}":/result aquasec/trivy -f json -o /result/results.json image "${IMAGE}:${VERSION}"
+}
+
+parseTrivyJsonResult() {
+  local DESTINATION_RESULT="${1}"
+
+  IFS=$'\n'
+  RESULTS_WITH_VULNS=$(cat "${TRIVY_RESULT_FILE}" | jq -c '.Results[] | select(.Vulnerabilities)')
+  echo "Extract CVE IDs"
+  CVE_LIST=""
+  for VULNS in $(echo "${RESULTS_WITH_VULNS}" | jq -c .Vulnerabilities); do
+    for VULN in $(echo "${VULNS}" | jq -c .[]); do
+      # TODO filter level of cves
+      ID="$(echo "${VULN}" | jq -rc .VulnerabilityID)"
+      CVE_LIST+="${ID} "
+    done
+  done
+  unset IFS
+
+  if [[ "${DESTINATION_RESULT}" == "local" ]]; then
+    LOCAL_TRIVY_CVE_LIST="${CVE_LIST}"
+    elif [[ "${DESTINATION_RESULT}" == "remote" ]]; then
+    REMOTE_TRIVY_CVE_LIST="${CVE_LIST}"
+  fi
 }

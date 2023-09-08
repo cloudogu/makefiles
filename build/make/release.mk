@@ -9,3 +9,7 @@ dogu-release: ## Start a dogu release
 .PHONY: go-release
 go-release: ## Start a go tool release
 	build/make/release.sh go-tool
+
+.PHONY: dogu-re-release
+dogu-re-release: ## Start a dogu re release of a new build fix CVEs
+	@build/make/re-release.sh "${REGISTRY_USERNAME}" "${REGISTRY_PASSWORD}"
