@@ -221,12 +221,14 @@ finish_release_and_push() {
 
 LOCAL_TRIVY_CVE_LIST=""
 REMOTE_TRIVY_CVE_LIST=""
-#TRIVY_RESULT_PATH="/tmp/trivy"
-TRIVY_RESULT_PATH="${PWD}/trivy"
-TRIVY_RESULT_FILE="${TRIVY_RESULT_PATH}/results.json"
+#TRIVY_PATH="/tmp/trivy"
+TRIVY_PATH="${PWD}/trivy"
+TRIVY_RESULT_FILE="${TRIVY_PATH}/results.json"
+TRIVY_CACHE_DIR="${TRIVY_PATH}/db"
+TRIVY_DOCKER_CACHE_DIR=/tmp/db
 
 getActualCVEs() {
-  mkdir -p "${TRIVY_RESULT_PATH}"
+  mkdir -p "${TRIVY_PATH}"
   local USERNAME="${1}"
   local PASSWORD="${2}"
   dockerLogin "${USERNAME}" "${PASSWORD}"
@@ -236,7 +238,7 @@ getActualCVEs() {
   buildImage
   scanImage
   parseTrivyJsonResult "remote"
-  rm -rf "${TRIVY_RESULT_PATH}"
+  #rm -rf "${TRIVY_PATH}"
 
   echo "Remote CVES:\n"
   echo "${REMOTE_TRIVY_CVE_LIST}"
@@ -269,8 +271,7 @@ scanImage() {
   local VERSION
   IMAGE=$(jq -r .Image dogu.json)
   VERSION=$(jq -r .Version dogu.json)
-  # TODO save db in volume to reuse it.
-  docker run -v /var/run/docker.sock:/var/run/docker.sock -v "${TRIVY_RESULT_PATH}":/result aquasec/trivy -f json -o /result/results.json image "${IMAGE}:${VERSION}"
+  docker run -v "${TRIVY_CACHE_DIR}":"${TRIVY_DOCKER_CACHE_DIR}"  -v /var/run/docker.sock:/var/run/docker.sock -v "${TRIVY_PATH}":/result aquasec/trivy --cache-dir "${TRIVY_DOCKER_CACHE_DIR}" -f json -o /result/results.json image "${IMAGE}:${VERSION}"
 }
 
 parseTrivyJsonResult() {
@@ -278,7 +279,6 @@ parseTrivyJsonResult() {
 
   IFS=$'\n'
   RESULTS_WITH_VULNS=$(cat "${TRIVY_RESULT_FILE}" | jq -c '.Results[] | select(.Vulnerabilities)')
-  echo "Extract CVE IDs"
   CVE_LIST=""
   for VULNS in $(echo "${RESULTS_WITH_VULNS}" | jq -c .Vulnerabilities); do
     for VULN in $(echo "${VULNS}" | jq -c .[]); do
