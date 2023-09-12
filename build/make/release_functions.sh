@@ -231,13 +231,14 @@ getActualCVEs() {
   mkdir -p "${TRIVY_PATH}"
   local USERNAME="${1}"
   local PASSWORD="${2}"
+  local SEVERITY="${3}"
   dockerLogin "${USERNAME}" "${PASSWORD}"
   pullRemoteImage
   scanImage
-  parseTrivyJsonResult "local"
+  parseTrivyJsonResult "local" "${SEVERITY}"
   buildImage
   scanImage
-  parseTrivyJsonResult "remote"
+  parseTrivyJsonResult "remote" "${SEVERITY}"
   #rm -rf "${TRIVY_PATH}"
 
   echo "Remote CVES:\n"
@@ -276,14 +277,30 @@ scanImage() {
 
 parseTrivyJsonResult() {
   local DESTINATION_RESULT="${1}"
+  local SEVERITY="${2}"
+
+  local JQ_SEVERITY_FILTER=""
+  if [[ "${SEVERITY}" == "CRITICAL" ]]; then
+    JQ_SEVERITY_FILTER='select(.Severity == "CRITICAL")'
+  elif [[ "${SEVERITY}" == "HIGH" ]]; then
+    JQ_SEVERITY_FILTER='select(.Severity == "CRITICAL" or .Severity == "HIGH")'
+  elif [[ "${SEVERITY}" == "MEDIUM" ]]; then
+    JQ_SEVERITY_FILTER='select(.Severity == "CRITICAL" or .Severity == "HIGH" or .Severity == "MEDIUM")'
+  elif [[ "${SEVERITY}" == "LOW" ]]; then
+    JQ_SEVERITY_FILTER='select(.Severity == "CRITICAL" or .Severity == "HIGH" or .Severity == "MEDIUM" or .Severity == "LOW")'
+  else
+    echo "Unknown severity level: ${SEVERITY_FILTER}"
+    exit 1
+  fi
 
   IFS=$'\n'
+  local RESULTS_WITH_VULNS
   RESULTS_WITH_VULNS=$(cat "${TRIVY_RESULT_FILE}" | jq -c '.Results[] | select(.Vulnerabilities)')
-  CVE_LIST=""
+  local CVE_LIST=""
   for VULNS in $(echo "${RESULTS_WITH_VULNS}" | jq -c .Vulnerabilities); do
     for VULN in $(echo "${VULNS}" | jq -c .[]); do
-      # TODO filter level of cves
-      ID="$(echo "${VULN}" | jq -rc .VulnerabilityID)"
+      local ID
+      ID=$(echo "${VULN}" | jq -rc "${JQ_SEVERITY_FILTER} | .VulnerabilityID")
       CVE_LIST+="${ID} "
     done
   done

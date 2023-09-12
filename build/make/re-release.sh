@@ -35,7 +35,7 @@ source "$(pwd)/build/make/release_functions.sh"
 USERNAME="${1}"
 PASSWORD="${2}"
 
-getActualCVEs "${USERNAME}" "${PASSWORD}"
+getActualCVEs "${USERNAME}" "${PASSWORD}" "LOW"
 
 # TODO If length(local)<length(remote cves list) Trigger Re-Release
 # TODO Commit Changelog Entry with fixed cves. Annotate that this is a automatic release
