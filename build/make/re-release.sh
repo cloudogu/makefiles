@@ -3,59 +3,64 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# Extension points in release.sh:
-#
-# A custom release argument file will be sourced if found. The custom release arg file may implement one or more bash
-# functions which either release.sh or release_functions.sh define. If such a custom release function is found the
-# release script must define the argument list which the custom release function will receive during the release.
-
-#sourceCustomReleaseArgs() {
-#  RELEASE_ARGS_FILE="${1}"
-#
-#  if [[ -f "${RELEASE_ARGS_FILE}" ]]; then
-#    echo "Using custom release args file ${RELEASE_ARGS_FILE}"
-#
-#    sourceCustomReleaseExitCode=0
-#    # shellcheck disable=SC1090
-#    source "${RELEASE_ARGS_FILE}" || sourceCustomReleaseExitCode=$?
-#    if [[ ${sourceCustomReleaseExitCode} -ne 0 ]]; then
-#      echo "Error while sourcing custom release arg file ${sourceCustomReleaseExitCode}. Exiting."
-#      exit 9
-#    fi
-#  fi
-#}
-#
-#PROJECT_DIR="$(pwd)"
-#RELEASE_ARGS_FILE="${PROJECT_DIR}/release_args.sh"
-#
-#sourceCustomReleaseArgs "${RELEASE_ARGS_FILE}"
-
 source "$(pwd)/build/make/release_functions.sh"
 
 USERNAME="${1}"
 PASSWORD="${2}"
 
-getActualCVEs "${USERNAME}" "${PASSWORD}" "LOW"
+#getRemoteAndLocalCVEList "${USERNAME}" "${PASSWORD}"
 
-# TODO If length(local)<length(remote cves list) Trigger Re-Release
-# TODO Commit Changelog Entry with fixed cves. Annotate that this is a automatic release
-# TODO Start regular release flow
+### Testdata
+#LOCAL_TRIVY_CVE_LIST_MEDIUM="CVE-1 CVE-2 CVE-2 CVE-3 CVE-4"
+#REMOTE_TRIVY_CVE_LIST_MEDIUM="CVE-1 CVE-2 CVE-3 CVE-4"
+
+function intersectArrays {
+  local I=("$1")
+  local J=("$2")
+  local RESULT=()
+
+  for i in ${I}; do
+    found=0
+    for j in ${J}; do
+      [[ "${j}" == "${i}" ]] && { found=1; break; }
+    done
+
+    [[ $found == 0 ]] && RESULT+=("$i")
+  done
+
+  echo "${RESULT[@]}"
+}
+
+CVE_IN_REMOTE_BUT_NOT_LOCAL=$(intersectArrays "${REMOTE_TRIVY_CVE_LIST_MEDIUM}" "${LOCAL_TRIVY_CVE_LIST_MEDIUM}")
+CVE_IN_LOCAL_BUT_NOT_REMOTE=$(intersectArrays "${LOCAL_TRIVY_CVE_LIST_MEDIUM}" "${REMOTE_TRIVY_CVE_LIST_MEDIUM}")
+
+if [[ -n "${CVE_IN_LOCAL_BUT_NOT_REMOTE}" ]]; then
+  echo "Added new vulnerabilities:"
+  echo "${CVE_IN_LOCAL_BUT_NOT_REMOTE[@]}"
+  exit 2
+fi
+
+if [[ -z "${CVE_IN_REMOTE_BUT_NOT_LOCAL}" ]]; then
+  echo "Fixed no new vulnerabilities"
+  exit 3
+fi
+
 
 echo "=====Starting Release process====="
 
-#if [ "${TYPE}" == "dogu" ];then
-#  CURRENT_TOOL_VERSION=$(get_current_version_by_dogu_json)
-#else
-#  CURRENT_TOOL_VERSION=$(get_current_version_by_makefile)
-#fi
-#
-#NEW_RELEASE_VERSION="$(read_new_version)"
-#
-#validate_new_version "${NEW_RELEASE_VERSION}"
-#start_git_flow_release "${NEW_RELEASE_VERSION}"
-#update_versions "${NEW_RELEASE_VERSION}"
-#update_changelog "${NEW_RELEASE_VERSION}"
-#show_diff
+if [ "${TYPE}" == "dogu" ];then
+  CURRENT_TOOL_VERSION=$(get_current_version_by_dogu_json)
+else
+  CURRENT_TOOL_VERSION=$(get_current_version_by_makefile)
+fi
+
+NEW_RELEASE_VERSION="$(read_new_version)"
+
+validate_new_version "${NEW_RELEASE_VERSION}"
+start_git_flow_release "${NEW_RELEASE_VERSION}"
+update_versions "${NEW_RELEASE_VERSION}"
+update_changelog "${NEW_RELEASE_VERSION}"
+show_diff
 #finish_release_and_push "${CURRENT_TOOL_VERSION}" "${NEW_RELEASE_VERSION}"
 
 echo "=====Finished Release process====="

@@ -157,6 +157,7 @@ update_versions() {
 
 update_changelog() {
   local NEW_RELEASE_VERSION="${1}"
+  local FIXED_CVE_LIST="${2}"
 
   # Changelog update
   CURRENT_DATE=$(date --rfc-3339=date)
@@ -168,6 +169,9 @@ update_changelog() {
     echo "Please add one to make it comply to https://keepachangelog.com/en/1.0.0/"
     wait_for_ok "Please insert a \"## [Unreleased]\" line into CHANGELOG.md now."
   done
+
+  # TODO If ### Fixed exist -> replace with ### Fixed\n-fix CVE-123,CVE-345...
+  # TODO If not Replace [Unreleased] with [Unreleased]\n###Fixed\n-fix CVE...
 
   # Add new title line to changelog
   sed -i "s|## \[Unreleased\]|## \[Unreleased\]\n\n${NEW_CHANGELOG_TITLE}|g" CHANGELOG.md
@@ -219,32 +223,44 @@ finish_release_and_push() {
   git branch -D release/v"${NEW_RELEASE_VERSION}"
 }
 
-LOCAL_TRIVY_CVE_LIST=""
-REMOTE_TRIVY_CVE_LIST=""
+LOCAL_TRIVY_CVE_LIST_CRITICAL=""
+LOCAL_TRIVY_CVE_LIST_HIGH=""
+LOCAL_TRIVY_CVE_LIST_MEDIUM=""
+LOCAL_TRIVY_CVE_LIST_LOW=""
+REMOTE_TRIVY_CVE_LIST_CRITICAL=""
+REMOTE_TRIVY_CVE_LIST_HIGH=""
+REMOTE_TRIVY_CVE_LIST_MEDIUM=""
+REMOTE_TRIVY_CVE_LIST_LOW=""
 #TRIVY_PATH="/tmp/trivy"
 TRIVY_PATH="${PWD}/trivy"
 TRIVY_RESULT_FILE="${TRIVY_PATH}/results.json"
 TRIVY_CACHE_DIR="${TRIVY_PATH}/db"
 TRIVY_DOCKER_CACHE_DIR=/tmp/db
 
-getActualCVEs() {
+getRemoteAndLocalCVEList() {
   mkdir -p "${TRIVY_PATH}"
   local USERNAME="${1}"
   local PASSWORD="${2}"
-  local SEVERITY="${3}"
   dockerLogin "${USERNAME}" "${PASSWORD}"
-  pullRemoteImage
-  scanImage
-  parseTrivyJsonResult "local" "${SEVERITY}"
-  buildImage
-  scanImage
-  parseTrivyJsonResult "remote" "${SEVERITY}"
+  getImageCVEListByType "local"
+  getImageCVEListByType "remote"
   #rm -rf "${TRIVY_PATH}"
+}
 
-  echo "Remote CVES:\n"
-  echo "${REMOTE_TRIVY_CVE_LIST}"
-  echo "Local CVES:\n"
-  echo "${LOCAL_TRIVY_CVE_LIST}"
+getImageCVEListByType() {
+  local TYPE="${1}"
+  mkdir -p "${TRIVY_PATH}"
+  if [[ "${TYPE}" == "local" ]]; then
+    buildLocalImage
+  elif [[ "${TYPE}" == "remote" ]]; then
+    pullRemoteImage
+  else
+    echo "Unknown type. Use local or remote"
+    exit 1
+  fi
+
+  scanImage
+  parseTrivyJsonResult "${TYPE}"
 }
 
 dockerLogin() {
@@ -261,7 +277,7 @@ pullRemoteImage() {
   docker pull "${IMAGE}:${VERSION}"
 }
 
-buildImage() {
+buildLocalImage() {
   IMAGE=$(jq -r .Image dogu.json)
   VERSION=$(jq -r .Version dogu.json)
   docker build . -t "${IMAGE}:${VERSION}"
@@ -272,43 +288,30 @@ scanImage() {
   local VERSION
   IMAGE=$(jq -r .Image dogu.json)
   VERSION=$(jq -r .Version dogu.json)
-  docker run -v "${TRIVY_CACHE_DIR}":"${TRIVY_DOCKER_CACHE_DIR}"  -v /var/run/docker.sock:/var/run/docker.sock -v "${TRIVY_PATH}":/result aquasec/trivy --cache-dir "${TRIVY_DOCKER_CACHE_DIR}" -f json -o /result/results.json image "${IMAGE}:${VERSION}"
+  docker run -v "${TRIVY_CACHE_DIR}":"${TRIVY_DOCKER_CACHE_DIR}" -v /var/run/docker.sock:/var/run/docker.sock -v "${TRIVY_PATH}":/result aquasec/trivy --cache-dir "${TRIVY_DOCKER_CACHE_DIR}" -f json -o /result/results.json image "${IMAGE}:${VERSION}"
 }
 
 parseTrivyJsonResult() {
   local DESTINATION_RESULT="${1}"
-  local SEVERITY="${2}"
 
-  local JQ_SEVERITY_FILTER=""
-  if [[ "${SEVERITY}" == "CRITICAL" ]]; then
-    JQ_SEVERITY_FILTER='select(.Severity == "CRITICAL")'
-  elif [[ "${SEVERITY}" == "HIGH" ]]; then
-    JQ_SEVERITY_FILTER='select(.Severity == "CRITICAL" or .Severity == "HIGH")'
-  elif [[ "${SEVERITY}" == "MEDIUM" ]]; then
-    JQ_SEVERITY_FILTER='select(.Severity == "CRITICAL" or .Severity == "HIGH" or .Severity == "MEDIUM")'
-  elif [[ "${SEVERITY}" == "LOW" ]]; then
-    JQ_SEVERITY_FILTER='select(.Severity == "CRITICAL" or .Severity == "HIGH" or .Severity == "MEDIUM" or .Severity == "LOW")'
-  else
-    echo "Unknown severity level: ${SEVERITY_FILTER}"
-    exit 1
-  fi
-
-  IFS=$'\n'
-  local RESULTS_WITH_VULNS
-  RESULTS_WITH_VULNS=$(cat "${TRIVY_RESULT_FILE}" | jq -c '.Results[] | select(.Vulnerabilities)')
-  local CVE_LIST=""
-  for VULNS in $(echo "${RESULTS_WITH_VULNS}" | jq -c .Vulnerabilities); do
-    for VULN in $(echo "${VULNS}" | jq -c .[]); do
-      local ID
-      ID=$(echo "${VULN}" | jq -rc "${JQ_SEVERITY_FILTER} | .VulnerabilityID")
-      CVE_LIST+="${ID} "
-    done
-  done
-  unset IFS
+  local CRITICAL_CVE_LIST
+  CRITICAL_CVE_LIST=$(cat "${TRIVY_RESULT_FILE}" | jq -rc '[.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == "CRITICAL") | .VulnerabilityID] | join(" ")')
+  local HIGH_CVE_LIST
+  HIGH_CVE_LIST=$(cat "${TRIVY_RESULT_FILE}" | jq -rc '[.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == "HIGH") | .VulnerabilityID] | join(" ")')
+  local MEDIUM_CVE_LIST
+  MEDIUM_CVE_LIST=$(cat "${TRIVY_RESULT_FILE}" | jq -rc '[.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == "MEDIUM") | .VulnerabilityID] | join(" ")')
+  local LOW_CVE_LIST
+  LOW_CVE_LIST=$(cat "${TRIVY_RESULT_FILE}" | jq -rc '[.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == "LOW") | .VulnerabilityID] | join(" ")')
 
   if [[ "${DESTINATION_RESULT}" == "local" ]]; then
-    LOCAL_TRIVY_CVE_LIST="${CVE_LIST}"
-    elif [[ "${DESTINATION_RESULT}" == "remote" ]]; then
-    REMOTE_TRIVY_CVE_LIST="${CVE_LIST}"
+#    LOCAL_TRIVY_CVE_LIST_HIGH="${HIGH_CVE_LIST}"
+#    LOCAL_TRIVY_CVE_LIST_CRITICAL="${CRITICAL_CVE_LIST}"
+    LOCAL_TRIVY_CVE_LIST_MEDIUM="${MEDIUM_CVE_LIST}"
+#    LOCAL_TRIVY_CVE_LIST_LOW="${LOW_CVE_LIST}"
+  elif [[ "${DESTINATION_RESULT}" == "remote" ]]; then
+#    REMOTE_TRIVY_CVE_LIST_HIGH="${HIGH_CVE_LIST}"
+#    REMOTE_TRIVY_CVE_LIST_CRITICAL="${CVE_LIST_CRITICAL}"
+    REMOTE_TRIVY_CVE_LIST_MEDIUM="${MEDIUM_CVE_LIST}"
+#    REMOTE_TRIVY_CVE_LIST_LOW="${LOW_CVE_LIST}"
   fi
 }
