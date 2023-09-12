@@ -125,8 +125,6 @@ component-generate: ${K8S_RESOURCE_TEMP_FOLDER} ## Generate the component yaml r
 
 .PHONY: component-apply
 component-apply: check-k8s-namespace-env-var image-import helm-generate helm-chart-import component-generate $(K8S_POST_GENERATE_TARGETS) ## Applies the component yaml resource to the actual defined context.
-# Delete an existent cr before apply because otherwise it would be possible to force a downgrade operation which is not supported by the component-operator.
-	@@kubectl delete -f "${K8S_RESOURCE_COMPONENT}" --namespace="${NAMESPACE}" || true
 	@kubectl apply -f "${K8S_RESOURCE_COMPONENT}" --namespace="${NAMESPACE}"
 	@echo "Done."
 
