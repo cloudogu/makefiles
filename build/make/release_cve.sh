@@ -72,7 +72,7 @@ REGISTRY_URL="registry.cloudogu.com"
 LOCAL_TRIVY_CVE_LIST=""
 REMOTE_TRIVY_CVE_LIST=""
 
-CVE_SEVERITY="MEDIUM"
+CVE_SEVERITY="CRITICAL"
 
 TRIVY_PATH="/tmp/trivy-dogu-cve-release"
 TRIVY_RESULT_FILE="${TRIVY_PATH}/results.json"
