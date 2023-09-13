@@ -5,7 +5,7 @@ set -o pipefail
 
 wait_for_ok() {
   printf "\n"
-  OK=false
+  local OK=false
   while [[ ${OK} != "ok" ]]; do
     read -r -p "${1} (type 'ok'): " OK
   done
@@ -41,6 +41,7 @@ validate_new_version() {
   if [[ ${NEW_RELEASE_VERSION} = v* ]]; then
     echo "WARNING: The new release version (v${NEW_RELEASE_VERSION}) starts with 'vv'."
     echo "You must not enter the v when defining the new version."
+    local ANSWER
     ANSWER=$(ask_yes_or_no "Should the first v be removed?")
     if [ "${ANSWER}" == "y" ]; then
       NEW_RELEASE_VERSION="${NEW_RELEASE_VERSION:1}"
@@ -54,6 +55,7 @@ start_git_flow_release() {
   # Do gitflow
   git flow init --defaults --force
 
+  local mainBranchExists
   mainBranchExists="$(git show-ref refs/remotes/origin/main || echo "")"
   if [ -n "$mainBranchExists" ]; then
     echo 'Using "main" branch for production releases'
@@ -81,7 +83,7 @@ update_versions() {
   local NEW_RELEASE_VERSION="${1}"
 
   if [[ $(type -t update_versions_modify_files) == function ]]; then
-    preSkriptExitCode=0
+    local preSkriptExitCode=0
     update_versions_modify_files "${NEW_RELEASE_VERSION}" || preSkriptExitCode=$?
     if [[ ${preSkriptExitCode} -ne 0 ]]; then
       echo "ERROR: custom update_versions_modify_files() exited with exit code ${preSkriptExitCode}"
@@ -160,8 +162,9 @@ update_changelog() {
   local FIXED_CVE_LIST="${2}"
 
   # Changelog update
+  local CURRENT_DATE
   CURRENT_DATE=$(date --rfc-3339=date)
-  NEW_CHANGELOG_TITLE="## [v${NEW_RELEASE_VERSION}] - ${CURRENT_DATE}"
+  local NEW_CHANGELOG_TITLE="## [v${NEW_RELEASE_VERSION}] - ${CURRENT_DATE}"
   # Check if "Unreleased" tag exists
   while ! grep --silent "## \[Unreleased\]" CHANGELOG.md; do
     echo ""
@@ -192,6 +195,8 @@ update_changelog() {
   git commit -m "Update changelog"
 }
 
+# addFixedCVEListFromReRelease is used in dogu cve releases. The method adds the fixed CVEs under the ### Fixed header
+# in the unreleased section.
 addFixedCVEListFromReRelease() {
   local FIXED_CVE_LIST="${1}"
 
@@ -200,9 +205,11 @@ addFixedCVEListFromReRelease() {
   local FIXED_EXISTS_IN_UNRELEASED
   FIXED_EXISTS_IN_UNRELEASED=$(awk '/^\#\# \[Unreleased\]$/{flag=1;next}/^\#\# \[/{flag=0}flag' CHANGELOG.md | grep -e "^### Fixed$" || true)
   if [[ -n "${FIXED_EXISTS_IN_UNRELEASED}" ]]; then
+    # extend fixed header with CVEs.
     CVE_SED_SEARCH="^\#\#\# Fixed$"
     CVE_SED_REPLACE="\#\#\# Fixed\n- Fixed ${FIXED_CVE_LIST}"
   else
+    # extend unreleased header with fixed header and CVEs.
     CVE_SED_SEARCH="^\#\# \[Unreleased\]$"
     CVE_SED_REPLACE="\#\# \[Unreleased\]\n\#\#\# Fixed\n- Fixed ${FIXED_CVE_LIST}"
 

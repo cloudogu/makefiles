@@ -284,5 +284,7 @@ This module enables you to use bower via the `bower-install` target.
 ### release.mk
 
 This module holds the `dogu-release` or other binary release related targets for starting automated production releases.
+Additionally, to the regular `dogu-release` the module contains a `dogu-cve-release`. This target checks if a simple
+build of a dogu eliminates critical CVEs. If yes a release process will be triggered.
 
 Only include this module in dogu or Golang repositories that support a dedicated release flow!

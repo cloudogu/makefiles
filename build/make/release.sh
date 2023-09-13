@@ -15,7 +15,7 @@ sourceCustomReleaseArgs() {
   if [[ -f "${RELEASE_ARGS_FILE}" ]]; then
     echo "Using custom release args file ${RELEASE_ARGS_FILE}"
 
-    sourceCustomReleaseExitCode=0
+    local sourceCustomReleaseExitCode=0
     # shellcheck disable=SC1090
     source "${RELEASE_ARGS_FILE}" || sourceCustomReleaseExitCode=$?
     if [[ ${sourceCustomReleaseExitCode} -ne 0 ]]; then
@@ -30,10 +30,11 @@ RELEASE_ARGS_FILE="${PROJECT_DIR}/release_args.sh"
 
 sourceCustomReleaseArgs "${RELEASE_ARGS_FILE}"
 
+# shellcheck disable=SC1090
 source "$(pwd)/build/make/release_functions.sh"
 
 TYPE="${1}"
-FIXED_CVE_LIST="${2}"
+FIXED_CVE_LIST="${2:-""}"
 
 echo "=====Starting Release process====="
 
@@ -51,6 +52,6 @@ update_versions "${NEW_RELEASE_VERSION}"
 update_changelog "${NEW_RELEASE_VERSION}" "${FIXED_CVE_LIST}"
 show_diff
 
-#finish_release_and_push "${CURRENT_TOOL_VERSION}" "${NEW_RELEASE_VERSION}"
+finish_release_and_push "${CURRENT_TOOL_VERSION}" "${NEW_RELEASE_VERSION}"
 
 echo "=====Finished Release process====="

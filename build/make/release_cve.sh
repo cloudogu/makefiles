@@ -8,8 +8,11 @@ function diffArrays {
   local J=("$2")
   local RESULT=()
 
+  local i
+  # shellcheck disable=SC2128
   for i in ${I}; do
     local FOUND=0
+    local j
     for j in ${J}; do
       [[ "${j}" == "${i}" ]] && {
         FOUND=1
@@ -66,10 +69,10 @@ parseTrivyJsonResult() {
 }
 
 REGISTRY_URL="registry.cloudogu.com"
-LOCAL_TRIVY_CVE_LIST_CRITICAL=""
-REMOTE_TRIVY_CVE_LIST_CRITICAL=""
+LOCAL_TRIVY_CVE_LIST=""
+REMOTE_TRIVY_CVE_LIST=""
 
-CVE_SEVERITY="CRITICAL"
+CVE_SEVERITY="MEDIUM"
 
 TRIVY_PATH="/tmp/trivy-dogu-cve-release"
 TRIVY_RESULT_FILE="${TRIVY_PATH}/results.json"
@@ -97,16 +100,16 @@ dockerLogin "${USERNAME}" "${PASSWORD}"
 mkdir -p "${TRIVY_PATH}" # Cache will not be removed after release. rm requires root because the trivy container only runs with root.
 pullRemoteImage
 scanImage
-parseTrivyJsonResult "${CVE_SEVERITY}" "${TRIVY_RESULT_FILE}"
+REMOTE_TRIVY_CVE_LIST=$(parseTrivyJsonResult "${CVE_SEVERITY}" "${TRIVY_RESULT_FILE}")
 
 buildLocalImage
 scanImage
-parseTrivyJsonResult "${CVE_SEVERITY}" "${TRIVY_RESULT_FILE}"
+LOCAL_TRIVY_CVE_LIST=$(parseTrivyJsonResult "${CVE_SEVERITY}" "${TRIVY_RESULT_FILE}")
 
 dockerLogout
 
-CVE_IN_REMOTE_BUT_NOT_LOCAL=$(diffArrays "${REMOTE_TRIVY_CVE_LIST_CRITICAL}" "${LOCAL_TRIVY_CVE_LIST_CRITICAL}")
-CVE_IN_LOCAL_BUT_NOT_REMOTE=$(diffArrays "${LOCAL_TRIVY_CVE_LIST_CRITICAL}" "${REMOTE_TRIVY_CVE_LIST_CRITICAL}")
+CVE_IN_REMOTE_BUT_NOT_LOCAL=$(diffArrays "${REMOTE_TRIVY_CVE_LIST}" "${LOCAL_TRIVY_CVE_LIST}")
+CVE_IN_LOCAL_BUT_NOT_REMOTE=$(diffArrays "${LOCAL_TRIVY_CVE_LIST}" "${REMOTE_TRIVY_CVE_LIST}")
 
 if [[ -n "${CVE_IN_LOCAL_BUT_NOT_REMOTE}" ]]; then
   echo "Abort release. Added new vulnerabilities:"
