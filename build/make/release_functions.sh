@@ -170,8 +170,10 @@ update_changelog() {
     wait_for_ok "Please insert a \"## [Unreleased]\" line into CHANGELOG.md now."
   done
 
-  # TODO If ### Fixed exist -> replace with ### Fixed\n-fix CVE-123,CVE-345...
-  # TODO If not Replace [Unreleased] with [Unreleased]\n###Fixed\n-fix CVE...
+  if [[ -n "${FIXED_CVE_LIST}" ]]; then
+    # Add fixed CVEs in unreleased section
+    addFixedCVEListFromReRelease "${FIXED_CVE_LIST}"
+  fi
 
   # Add new title line to changelog
   sed -i "s|## \[Unreleased\]|## \[Unreleased\]\n\n${NEW_CHANGELOG_TITLE}|g" CHANGELOG.md
@@ -188,6 +190,30 @@ update_changelog() {
 
   git add CHANGELOG.md
   git commit -m "Update changelog"
+}
+
+addFixedCVEListFromReRelease() {
+  local FIXED_CVE_LIST="${1}"
+
+  local CVE_SED_SEARCH=""
+  local CVE_SED_REPLACE=""
+  local FIXED_EXISTS_IN_UNRELEASED
+  FIXED_EXISTS_IN_UNRELEASED=$(awk '/^\#\# \[Unreleased\]$/{flag=1;next}/^\#\# \[/{flag=0}flag' CHANGELOG.md | grep -e "^### Fixed$" || true)
+  if [[ -n "${FIXED_EXISTS_IN_UNRELEASED}" ]]; then
+    CVE_SED_SEARCH="^\#\#\# Fixed$"
+    CVE_SED_REPLACE="\#\#\# Fixed\n- Fixed ${FIXED_CVE_LIST}"
+  else
+    CVE_SED_SEARCH="^\#\# \[Unreleased\]$"
+    CVE_SED_REPLACE="\#\# \[Unreleased\]\n\#\#\# Fixed\n- Fixed ${FIXED_CVE_LIST}"
+
+    local ANY_EXISTS_UNRELEASED
+    ANY_EXISTS_UNRELEASED=$(awk '/^\#\# \[Unreleased\]$/{flag=1;next}/^\#\# \[/{flag=0}flag' CHANGELOG.md | grep -e "^\#\#\# Added$" -e "^\#\#\# Fixed$" -e "^\#\#\# Changed$" || true)
+    if [[ -n ${ANY_EXISTS_UNRELEASED} ]]; then
+      CVE_SED_REPLACE+="\n"
+    fi
+  fi
+
+  sed -i "0,/${CVE_SED_SEARCH}/s//${CVE_SED_REPLACE}/" CHANGELOG.md
 }
 
 show_diff() {
@@ -221,97 +247,4 @@ finish_release_and_push() {
   echo "Switching back to develop and deleting branch release/v${NEW_RELEASE_VERSION}..."
   git checkout develop
   git branch -D release/v"${NEW_RELEASE_VERSION}"
-}
-
-LOCAL_TRIVY_CVE_LIST_CRITICAL=""
-LOCAL_TRIVY_CVE_LIST_HIGH=""
-LOCAL_TRIVY_CVE_LIST_MEDIUM=""
-LOCAL_TRIVY_CVE_LIST_LOW=""
-REMOTE_TRIVY_CVE_LIST_CRITICAL=""
-REMOTE_TRIVY_CVE_LIST_HIGH=""
-REMOTE_TRIVY_CVE_LIST_MEDIUM=""
-REMOTE_TRIVY_CVE_LIST_LOW=""
-#TRIVY_PATH="/tmp/trivy"
-TRIVY_PATH="${PWD}/trivy"
-TRIVY_RESULT_FILE="${TRIVY_PATH}/results.json"
-TRIVY_CACHE_DIR="${TRIVY_PATH}/db"
-TRIVY_DOCKER_CACHE_DIR=/tmp/db
-
-getRemoteAndLocalCVEList() {
-  mkdir -p "${TRIVY_PATH}"
-  local USERNAME="${1}"
-  local PASSWORD="${2}"
-  dockerLogin "${USERNAME}" "${PASSWORD}"
-  getImageCVEListByType "local"
-  getImageCVEListByType "remote"
-  #rm -rf "${TRIVY_PATH}"
-}
-
-getImageCVEListByType() {
-  local TYPE="${1}"
-  mkdir -p "${TRIVY_PATH}"
-  if [[ "${TYPE}" == "local" ]]; then
-    buildLocalImage
-  elif [[ "${TYPE}" == "remote" ]]; then
-    pullRemoteImage
-  else
-    echo "Unknown type. Use local or remote"
-    exit 1
-  fi
-
-  scanImage
-  parseTrivyJsonResult "${TYPE}"
-}
-
-dockerLogin() {
-  local USERNAME="${1}"
-  local PASSWORD="${2}"
-  docker login registry.cloudogu.com -u "${USERNAME}" -p "${PASSWORD}"
-}
-
-pullRemoteImage() {
-  local IMAGE
-  local VERSION
-  IMAGE=$(jq -r .Image dogu.json)
-  VERSION=$(jq -r .Version dogu.json)
-  docker pull "${IMAGE}:${VERSION}"
-}
-
-buildLocalImage() {
-  IMAGE=$(jq -r .Image dogu.json)
-  VERSION=$(jq -r .Version dogu.json)
-  docker build . -t "${IMAGE}:${VERSION}"
-}
-
-scanImage() {
-  local IMAGE
-  local VERSION
-  IMAGE=$(jq -r .Image dogu.json)
-  VERSION=$(jq -r .Version dogu.json)
-  docker run -v "${TRIVY_CACHE_DIR}":"${TRIVY_DOCKER_CACHE_DIR}" -v /var/run/docker.sock:/var/run/docker.sock -v "${TRIVY_PATH}":/result aquasec/trivy --cache-dir "${TRIVY_DOCKER_CACHE_DIR}" -f json -o /result/results.json image "${IMAGE}:${VERSION}"
-}
-
-parseTrivyJsonResult() {
-  local DESTINATION_RESULT="${1}"
-
-  local CRITICAL_CVE_LIST
-  CRITICAL_CVE_LIST=$(cat "${TRIVY_RESULT_FILE}" | jq -rc '[.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == "CRITICAL") | .VulnerabilityID] | join(" ")')
-  local HIGH_CVE_LIST
-  HIGH_CVE_LIST=$(cat "${TRIVY_RESULT_FILE}" | jq -rc '[.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == "HIGH") | .VulnerabilityID] | join(" ")')
-  local MEDIUM_CVE_LIST
-  MEDIUM_CVE_LIST=$(cat "${TRIVY_RESULT_FILE}" | jq -rc '[.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == "MEDIUM") | .VulnerabilityID] | join(" ")')
-  local LOW_CVE_LIST
-  LOW_CVE_LIST=$(cat "${TRIVY_RESULT_FILE}" | jq -rc '[.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == "LOW") | .VulnerabilityID] | join(" ")')
-
-  if [[ "${DESTINATION_RESULT}" == "local" ]]; then
-#    LOCAL_TRIVY_CVE_LIST_HIGH="${HIGH_CVE_LIST}"
-#    LOCAL_TRIVY_CVE_LIST_CRITICAL="${CRITICAL_CVE_LIST}"
-    LOCAL_TRIVY_CVE_LIST_MEDIUM="${MEDIUM_CVE_LIST}"
-#    LOCAL_TRIVY_CVE_LIST_LOW="${LOW_CVE_LIST}"
-  elif [[ "${DESTINATION_RESULT}" == "remote" ]]; then
-#    REMOTE_TRIVY_CVE_LIST_HIGH="${HIGH_CVE_LIST}"
-#    REMOTE_TRIVY_CVE_LIST_CRITICAL="${CVE_LIST_CRITICAL}"
-    REMOTE_TRIVY_CVE_LIST_MEDIUM="${MEDIUM_CVE_LIST}"
-#    REMOTE_TRIVY_CVE_LIST_LOW="${LOW_CVE_LIST}"
-  fi
 }

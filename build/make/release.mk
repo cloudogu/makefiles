@@ -10,6 +10,6 @@ dogu-release: ## Start a dogu release
 go-release: ## Start a go tool release
 	build/make/release.sh go-tool
 
-.PHONY: dogu-re-release
-dogu-re-release: ## Start a dogu re release of a new build fix CVEs
-	@build/make/re-release.sh "${REGISTRY_USERNAME}" "${REGISTRY_PASSWORD}"
+.PHONY: dogu-cve-release
+dogu-cve-release: ## Start a dogu release of a new build if the local build fixes critical CVEs
+	@build/make/release_cve.sh "${REGISTRY_USERNAME}" "${REGISTRY_PASSWORD}"
