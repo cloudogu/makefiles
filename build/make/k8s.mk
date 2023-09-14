@@ -119,5 +119,8 @@ __check_defined = \
     $(if $(value $1),, \
       $(error Undefined $1$(if $2, ($2))))
 
+.PHONY: install-yq ## Installs the yq YAML editor.
+install-yq: ${BINARY_YQ}
+
 ${BINARY_YQ}: $(UTILITY_BIN_PATH) ## Download yq locally if necessary.
 	$(call go-get-tool,$(BINARY_YQ),github.com/mikefarah/yq/v4@v4.25.1)
