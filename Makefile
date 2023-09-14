@@ -57,4 +57,5 @@ include build/make/release.mk
 include build/make/k8s-dogu.mk
 # or k8s-controller.mk; only include this in k8s-controller repositories
 include build/make/k8s-controller.mk
+include build/make/bats.mk
 

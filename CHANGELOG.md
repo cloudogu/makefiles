@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- [#143] Add release target for dogus if a simple rebuild fixes critical CVEs.
+- [#143] Add release target `dogu-cve-release` for dogus if a simple rebuild fixes critical CVEs.
 
 ## [v8.0.0](https://github.com/cloudogu/makefiles/releases/tag/v8.0.0) 2023-09-12
 ### Added

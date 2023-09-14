@@ -5,8 +5,8 @@ set -o pipefail
 
 wait_for_ok() {
   printf "\n"
-  local OK=false
-  while [[ ${OK} != "ok" ]]; do
+  local OK="false"
+  while [[ "${OK}" != "ok" ]]; do
     read -r -p "${1} (type 'ok'): " OK
   done
 }
@@ -174,7 +174,6 @@ update_changelog() {
   done
 
   if [[ -n "${FIXED_CVE_LIST}" ]]; then
-    # Add fixed CVEs in unreleased section
     addFixedCVEListFromReRelease "${FIXED_CVE_LIST}"
   fi
 
@@ -198,29 +197,29 @@ update_changelog() {
 # addFixedCVEListFromReRelease is used in dogu cve releases. The method adds the fixed CVEs under the ### Fixed header
 # in the unreleased section.
 addFixedCVEListFromReRelease() {
-  local FIXED_CVE_LIST="${1}"
+  local fixed_cve_list="${1}"
 
-  local CVE_SED_SEARCH=""
-  local CVE_SED_REPLACE=""
-  local FIXED_EXISTS_IN_UNRELEASED
-  FIXED_EXISTS_IN_UNRELEASED=$(awk '/^\#\# \[Unreleased\]$/{flag=1;next}/^\#\# \[/{flag=0}flag' CHANGELOG.md | grep -e "^### Fixed$" || true)
-  if [[ -n "${FIXED_EXISTS_IN_UNRELEASED}" ]]; then
+  local cve_sed_search=""
+  local cve_sed_replace=""
+  local fixed_exists_in_unreleased
+  fixed_exists_in_unreleased=$(awk '/^\#\# \[Unreleased\]$/{flag=1;next}/^\#\# \[/{flag=0}flag' CHANGELOG.md | grep -e "^### Fixed$" || true)
+  if [[ -n "${fixed_exists_in_unreleased}" ]]; then
     # extend fixed header with CVEs.
-    CVE_SED_SEARCH="^\#\#\# Fixed$"
-    CVE_SED_REPLACE="\#\#\# Fixed\n- Fixed ${FIXED_CVE_LIST}"
+    cve_sed_search="^\#\#\# Fixed$"
+    cve_sed_replace="\#\#\# Fixed\n- Fixed ${fixed_cve_list}"
   else
     # extend unreleased header with fixed header and CVEs.
-    CVE_SED_SEARCH="^\#\# \[Unreleased\]$"
-    CVE_SED_REPLACE="\#\# \[Unreleased\]\n\#\#\# Fixed\n- Fixed ${FIXED_CVE_LIST}"
+    cve_sed_search="^\#\# \[Unreleased\]$"
+    cve_sed_replace="\#\# \[Unreleased\]\n\#\#\# Fixed\n- Fixed ${fixed_cve_list}"
 
-    local ANY_EXISTS_UNRELEASED
-    ANY_EXISTS_UNRELEASED=$(awk '/^\#\# \[Unreleased\]$/{flag=1;next}/^\#\# \[/{flag=0}flag' CHANGELOG.md | grep -e "^\#\#\# Added$" -e "^\#\#\# Fixed$" -e "^\#\#\# Changed$" || true)
-    if [[ -n ${ANY_EXISTS_UNRELEASED} ]]; then
-      CVE_SED_REPLACE+="\n"
+    local any_exists_unreleased
+    any_exists_unreleased=$(awk '/^\#\# \[Unreleased\]$/{flag=1;next}/^\#\# \[/{flag=0}flag' CHANGELOG.md | grep -e "^\#\#\# Added$" -e "^\#\#\# Fixed$" -e "^\#\#\# Changed$" || true)
+    if [[ -n ${any_exists_unreleased} ]]; then
+      cve_sed_replace+="\n"
     fi
   fi
 
-  sed -i "0,/${CVE_SED_SEARCH}/s//${CVE_SED_REPLACE}/" CHANGELOG.md
+  sed -i "0,/${cve_sed_search}/s//${cve_sed_replace}/" CHANGELOG.md
 }
 
 show_diff() {

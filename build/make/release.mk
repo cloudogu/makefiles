@@ -12,4 +12,4 @@ go-release: ## Start a go tool release
 
 .PHONY: dogu-cve-release
 dogu-cve-release: ## Start a dogu release of a new build if the local build fixes critical CVEs
-	@build/make/release_cve.sh "${REGISTRY_USERNAME}" "${REGISTRY_PASSWORD}"
+	@bash -c "build/make/release_cve.sh ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD}"
