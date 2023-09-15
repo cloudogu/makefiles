@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The target can be executed with a `DRY_RUN` environment variable for added developer experience.
 - Add missing K8s and bats target descriptions on the [README.md](README.md) 
 
+## [v8.1.0](https://github.com/cloudogu/makefiles/releases/tag/v8.1.0) 2023-09-15
+### Removed
+- [#147] Remove Dummy-Chart-Dependencies from Helm-Chart-Generation
+
 ## [v8.0.0](https://github.com/cloudogu/makefiles/releases/tag/v8.0.0) 2023-09-12
 ### Added
 - [#141] Add target to generate, apply etc. components resources.
