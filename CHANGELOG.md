@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- [#143] Add release target `dogu-cve-release` for dogus if a simple rebuild fixes critical CVEs.
+  - The target can be executed with a `DRY_RUN` environment variable for added developer experience.
+- Add missing K8s and bats target descriptions on the [README.md](README.md) 
 
 ## [v8.1.0](https://github.com/cloudogu/makefiles/releases/tag/v8.1.0) 2023-09-15
 ### Removed
