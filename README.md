@@ -68,7 +68,6 @@ include build/make/k8s-dogu.mk
 # or k8s-controller.mk; only include this in k8s-controller repositories
 include build/make/k8s-controller.mk
 include build/make/bats.mk
-
 ```
 
 ## Overview over make targets
@@ -357,7 +356,7 @@ Only include this module in dogu or Golang repositories that support a dedicated
 ### bats.mk
 
 This module enables you to run BATS shell tests via the `unit-test-shell` target. All you need is a directory with BATS
-tests in `${yourProjectDir}/batsTEsts` (overrideable with the variable `TESTS_DIR`).
+tests in `${yourProjectDir}/batsTests` (overrideable with the variable `TESTS_DIR`).
 
 ### K8s-related makefiles
 
@@ -365,11 +364,11 @@ tests in `${yourProjectDir}/batsTEsts` (overrideable with the variable `TESTS_DI
 
 This module provides generic targets for developing K8s Cloudogu EcoSystem
 
-- `image-import` imports the currently available image into the cluster-local registry.
-- `docker-dev-tag` tags a Docker image for local K8s-CES deployment.
-- `docker-build` builds the docker image of the K8s app.
-- `k8s-generate` generates one concatenated resource YAML
-- `k8s-apply` applies all generated K8s resources to the current cluster and namespace
+- `image-import` - imports the currently available image into the cluster-local registry.
+- `docker-dev-tag` - tags a Docker image for local K8s-CES deployment.
+- `docker-build` - builds the docker image of the K8s app.
+- `k8s-generate` - generates one concatenated resource YAML
+- `k8s-apply` - applies all generated K8s resources to the current cluster and namespace
 - check single or all of these variables:
    - `check-all-vars`
    - `check-k8s-namespace-env-var`
@@ -396,7 +395,7 @@ This module provides targets for developing K8s Cloudogu EcoSystem components (i
 - Component-oriented targets
    - `component-generate` - Generate the component YAML resource
    - `component-apply` - Applies the component yaml resource to the actual defined context.
-   - `component-reinstall` - Reinstalls the component yaml resource from the actual defined context.
+   - `component-reinstall` - Re-installs the component yaml resource from the actual defined context.
    - `component-delete` - Deletes the component yaml resource from the actual defined context.
 
 #### k8s-dogu.mk
