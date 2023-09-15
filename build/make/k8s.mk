@@ -67,7 +67,7 @@ K8S_PRE_GENERATE_TARGETS ?= k8s-create-temporary-resource
 k8s-generate: ${BINARY_YQ} $(K8S_RESOURCE_TEMP_FOLDER) $(K8S_PRE_GENERATE_TARGETS) ## Generates the final resource yaml.
 	@echo "Applying general transformations..."
 	@sed -i "s/'{{ .Namespace }}'/$(NAMESPACE)/" $(K8S_RESOURCE_TEMP_YAML)
-	@if [[ ${STAGE} == "development" ]]; then \
+	@if [[ "${STAGE}" == "development" ]]; then \
 	  $(BINARY_YQ) -i e "(select(.kind == \"Deployment\").spec.template.spec.containers[]|select(.image == \"*$(ARTIFACT_ID)*\").image)=\"$(IMAGE_DEV)\"" $(K8S_RESOURCE_TEMP_YAML); \
 	else \
 	  $(BINARY_YQ) -i e "(select(.kind == \"Deployment\").spec.template.spec.containers[]|select(.image == \"*$(ARTIFACT_ID)*\").image)=\"$(IMAGE)\"" $(K8S_RESOURCE_TEMP_YAML); \
@@ -118,6 +118,9 @@ check_defined = \
 __check_defined = \
     $(if $(value $1),, \
       $(error Undefined $1$(if $2, ($2))))
+
+.PHONY: install-yq ## Installs the yq YAML editor.
+install-yq: ${BINARY_YQ}
 
 ${BINARY_YQ}: $(UTILITY_BIN_PATH) ## Download yq locally if necessary.
 	$(call go-get-tool,$(BINARY_YQ),github.com/mikefarah/yq/v4@v4.25.1)
