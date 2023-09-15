@@ -354,3 +354,62 @@ Additionally, to the regular `dogu-release` the module contains a `dogu-cve-rele
 build of a dogu eliminates critical CVEs. If this is the case, a release process will be triggered.
 
 Only include this module in dogu or Golang repositories that support a dedicated release flow!
+### bats.mk
+
+This module enables you to run BATS shell tests via the `unit-test-shell` target. All you need is a directory with BATS
+tests in `${yourProjectDir}/batsTEsts` (overrideable with the variable `TESTS_DIR`).
+
+### K8s-related makefiles
+
+#### k8s.mk
+
+This module provides generic targets for developing K8s Cloudogu EcoSystem
+
+- `image-import` imports the currently available image into the cluster-local registry.
+- `docker-dev-tag` tags a Docker image for local K8s-CES deployment.
+- `docker-build` builds the docker image of the K8s app.
+- `k8s-generate` generates one concatenated resource YAML
+- `k8s-apply` applies all generated K8s resources to the current cluster and namespace
+- check single or all of these variables:
+   - `check-all-vars`
+   - `check-k8s-namespace-env-var`
+   - `check-k8s-image-env-var`
+   - `check-k8s-artifact-id`
+   - `check-etc-hosts`
+   - `check-insecure-cluster-registry`
+
+#### k8s-component.mk
+
+This module provides targets for developing K8s Cloudogu EcoSystem components (including controllers)
+- General helm targets
+  - `helm-init-chart` - Creates a Chart.yaml-template with zero values
+  - `helm-generate-chart` - Generates the final helm chart
+- Helm developing targets
+   - `helm-generate` - Generates the final helm chart with dev-urls
+   - `helm-apply` - Generates and installs the helm chart
+   - `helm-delete` - Uninstalls the current helm chart
+   - `helm-reinstall` - Uninstalls the current helm chart and re-installs it
+   - `helm-chart-import` - Imports the currently available chart into the cluster-local registry
+- Release targets
+  - `helm-package-release` - Generates and packages the helm chart with release urls.
+  - `helm-generate-release` - Generates the final helm chart with release urls.
+- Component-oriented targets
+   - `component-generate` - Generate the component YAML resource
+   - `component-apply` - Applies the component yaml resource to the actual defined context.
+   - `component-reinstall` - Reinstalls the component yaml resource from the actual defined context.
+   - `component-delete` - Deletes the component yaml resource from the actual defined context.
+
+#### k8s-dogu.mk
+
+This module provides targets for developing Dogus with a K8s Cloudogu EcoSystem.
+
+- `build` - Builds a new version of the dogu and deploys it into the K8s-EcoSystem.
+- `install-dogu-descriptor` - Installs a configmap with current dogu.json into the cluster.
+
+#### k8s-controller.mk
+
+This module provides targets for K8s Cloudogu EcoSystem controllers.
+
+- `k8s-integration-test` - Run k8s integration tests.
+- `controller-release` - Interactively starts the release workflow.
+- `build: helm-apply` - Builds a new version of the dogu and deploys it into the K8s-EcoSystem.
