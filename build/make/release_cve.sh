@@ -76,7 +76,7 @@ function buildLocalImage() {
 }
 
 function scanImage() {
-  docker run -v "${TRIVY_CACHE_DIR}":"${TRIVY_DOCKER_CACHE_DIR}" -v /var/run/docker.sock:/var/run/docker.sock -v "${TRIVY_PATH}":/result aquasec/trivy --cache-dir "${TRIVY_DOCKER_CACHE_DIR}" -f json -o /result/results.json image "${TRIVY_IMAGE_SCAN_FLAGS}" "$(imageFromDogu):$(versionFromDogu)"
+  docker run -v "${TRIVY_CACHE_DIR}":"${TRIVY_DOCKER_CACHE_DIR}" -v /var/run/docker.sock:/var/run/docker.sock -v "${TRIVY_PATH}":/result aquasec/trivy --cache-dir "${TRIVY_DOCKER_CACHE_DIR}" -f json -o /result/results.json image ${TRIVY_IMAGE_SCAN_FLAGS:+"${TRIVY_IMAGE_SCAN_FLAGS}"} "$(imageFromDogu):$(versionFromDogu)"
 }
 
 function parseTrivyJsonResult() {
@@ -103,6 +103,7 @@ TRIVY_IMAGE_SCAN_FLAGS=
 
 USERNAME=""
 PASSWORD=""
+DRY_RUN=
 
 function runMain() {
   readCredentialsIfUnset
@@ -136,14 +137,16 @@ function runMain() {
     exit 3
   fi
 
-  "${RELEASE_SH}" "dogu-cve-release" "${cve_in_remote_but_not_in_local}"
+  "${RELEASE_SH}" "dogu-cve-release" "${cve_in_remote_but_not_in_local}" "${DRY_RUN}"
 }
 
 # make the script only runMain when executed, not when sourced from bats tests
 if [[ -n "${BASH_VERSION}" && "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  USERNAME="${1}"
-  PASSWORD="${2}"
+  USERNAME="${1:-""}"
+  PASSWORD="${2:-""}"
   TRIVY_IMAGE_SCAN_FLAGS="${3:-""}"
+  DRY_RUN="${4:-""}"
+
   TRIVY_PATH="/tmp/trivy-dogu-cve-release-$(nameFromDogu)"
   TRIVY_RESULT_FILE="${TRIVY_PATH}/results.json"
   TRIVY_CACHE_DIR="${TRIVY_PATH}/db"

@@ -250,7 +250,7 @@ teardown() {
   assert_failure "3"
 }
 
-@test "runMain should start release process if cves will be fixed" {
+@test "runMain should start release process if cves will be fixed without dry run option" {
   source "${MAKE_DIR}/release_cve.sh"
   export TRIVY_PATH="${BATS_TMPDIR}/trivy"
   export TRIVY_RESULT_FILE="${TRIVY_PATH}/results.json"
@@ -294,6 +294,55 @@ teardown() {
   assert_equal "$(mock_get_call_args "${jq}" "9")" "-r .Version dogu.json"
   assert_equal "$(mock_get_call_args "${jq}" "10")" "-rc [.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == \"CRITICAL\") | .VulnerabilityID] | join(\" \") /tmp/trivy/results.json"
   assert_equal "$(mock_get_call_num "${release_script}")" "1"
-  assert_equal "$(mock_get_call_args "${release_script}" "1")" "dogu-cve-release CVE-2"
+  assert_equal "$(mock_get_call_args "${release_script}" "1")" "dogu-cve-release CVE-2 "
+  assert_success
+}
+
+@test "runMain should start release process if cves will be fixed with dry run option" {
+  source "${MAKE_DIR}/release_cve.sh"
+  export TRIVY_PATH="${BATS_TMPDIR}/trivy"
+  export TRIVY_RESULT_FILE="${TRIVY_PATH}/results.json"
+  export TRIVY_CACHE_DIR="${TRIVY_PATH}/db"
+  export TRIVY_DOCKER_CACHE_DIR=/tmp/db
+  export TRIVY_IMAGE_SCAN_FLAGS="--use this"
+  export RELEASE_SH="${release_script}"
+  export DRY_RUN="true"
+
+  export USERNAME="user"
+  export PASSWORD="password"
+
+  mock_set_output "${jq}" "jenkins" "1"
+  mock_set_output "${jq}" "1.0.0" "2"
+  mock_set_output "${jq}" "jenkins" "3"
+  mock_set_output "${jq}" "1.0.0" "4"
+  mock_set_output "${jq}" "CVE-1 CVE-2" "5"
+  mock_set_output "${jq}" "jenkins" "6"
+  mock_set_output "${jq}" "1.0.0" "7"
+  mock_set_output "${jq}" "jenkins" "8"
+  mock_set_output "${jq}" "1.0.0" "9"
+  mock_set_output "${jq}" "CVE-1" "10"
+
+  run runMain
+
+  assert_equal "$(mock_get_call_num "${docker}")" "6"
+  assert_equal "$(mock_get_call_args "${docker}" "1")" "login registry.cloudogu.com -u user -p password"
+  assert_equal "$(mock_get_call_args "${docker}" "2")" "pull jenkins:1.0.0"
+  assert_equal "$(mock_get_call_args "${docker}" "3")" "run -v ${TRIVY_CACHE_DIR}:/tmp/db -v /var/run/docker.sock:/var/run/docker.sock -v ${TRIVY_PATH}:/result aquasec/trivy --cache-dir ${TRIVY_DOCKER_CACHE_DIR} -f json -o /result/results.json image ${TRIVY_IMAGE_SCAN_FLAGS} jenkins:1.0.0"
+  assert_equal "$(mock_get_call_args "${docker}" "4")" "build . -t jenkins:1.0.0"
+  assert_equal "$(mock_get_call_args "${docker}" "5")" "run -v ${TRIVY_CACHE_DIR}:/tmp/db -v /var/run/docker.sock:/var/run/docker.sock -v ${TRIVY_PATH}:/result aquasec/trivy --cache-dir ${TRIVY_DOCKER_CACHE_DIR} -f json -o /result/results.json image ${TRIVY_IMAGE_SCAN_FLAGS} jenkins:1.0.0"
+  assert_equal "$(mock_get_call_args "${docker}" "6")" "logout registry.cloudogu.com"
+  assert_equal "$(mock_get_call_num "${jq}")" "10"
+  assert_equal "$(mock_get_call_args "${jq}" "1")" "-r .Image dogu.json"
+  assert_equal "$(mock_get_call_args "${jq}" "2")" "-r .Version dogu.json"
+  assert_equal "$(mock_get_call_args "${jq}" "3")" "-r .Image dogu.json"
+  assert_equal "$(mock_get_call_args "${jq}" "4")" "-r .Version dogu.json"
+  assert_equal "$(mock_get_call_args "${jq}" "5")" "-rc [.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == \"CRITICAL\") | .VulnerabilityID] | join(\" \") /tmp/trivy/results.json"
+  assert_equal "$(mock_get_call_args "${jq}" "6")" "-r .Image dogu.json"
+  assert_equal "$(mock_get_call_args "${jq}" "7")" "-r .Version dogu.json"
+  assert_equal "$(mock_get_call_args "${jq}" "8")" "-r .Image dogu.json"
+  assert_equal "$(mock_get_call_args "${jq}" "9")" "-r .Version dogu.json"
+  assert_equal "$(mock_get_call_args "${jq}" "10")" "-rc [.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == \"CRITICAL\") | .VulnerabilityID] | join(\" \") /tmp/trivy/results.json"
+  assert_equal "$(mock_get_call_num "${release_script}")" "1"
+  assert_equal "$(mock_get_call_args "${release_script}" "1")" "dogu-cve-release CVE-2 true"
   assert_success
 }

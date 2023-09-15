@@ -73,6 +73,19 @@ start_git_flow_release() {
   git flow release start v"${NEW_RELEASE_VERSION}"
 }
 
+start_dry_run_release() {
+  local NEW_RELEASE_VERSION="${1}"
+
+  git checkout -b dryrun/v"${NEW_RELEASE_VERSION}"
+}
+
+abort_dry_run_release() {
+  local NEW_RELEASE_VERSION="${1}"
+
+  git checkout develop
+  git branch -D dryrun/v"${NEW_RELEASE_VERSION}"
+}
+
 # update_versions updates files with the new release version and interactively asks the user for verification. If okay
 # the updated files will be staged to git and finally committed.
 #
