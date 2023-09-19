@@ -16,6 +16,9 @@ BINARY_YQ = $(UTILITY_BIN_PATH)/yq
 # The productive tag of the image
 IMAGE ?=
 
+# Set production as default stage. Use "development" as stage in your .env file to generate artifacts
+# with development images pointing to K3S_CLUSTER_FQDN.
+STAGE?=production
 K3S_CLUSTER_FQDN?=k3ces.local
 K3S_LOCAL_REGISTRY_PORT?=30099
 K3CES_REGISTRY_URL_PREFIX="${K3S_CLUSTER_FQDN}:${K3S_LOCAL_REGISTRY_PORT}"

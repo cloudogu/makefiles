@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - [#150] Set bash as default shell in `k8s.mk`.
+- Add stage `production` as default variable in `k8s.mk`.
 
 ## [v8.2.0](https://github.com/cloudogu/makefiles/releases/tag/v8.2.0) 2023-09-15
 ### Added
