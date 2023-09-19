@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- [#150] Set bash as default shell in `k8s.mk`.
+- Add stage `production` as default variable in `k8s.mk`.
+- Template `{{ .Namespace }}` from the resource only in the non helm dev target `k8s-apply` with the current namespace.
+  When creating a helm chart use `{{ .Release.Namespace }}` for the current namespace at deploy time.
 
 ## [v8.2.0](https://github.com/cloudogu/makefiles/releases/tag/v8.2.0) 2023-09-15
 ### Added
