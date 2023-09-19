@@ -40,6 +40,7 @@ ${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) k8s-generate
 	@rm -drf ${K8S_HELM_TARGET}  # delete folder, so the chart is newly created.
 	@mkdir -p ${K8S_HELM_TARGET}/templates
 	@cp $(K8S_RESOURCE_TEMP_YAML) ${K8S_HELM_TARGET}/templates
+	@sed -i "s/'{{ .Namespace }}'/'{{ .Release.Namespace }}'/" ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml
 	@cp -r ${K8S_HELM_RESSOURCES}/** ${K8S_HELM_TARGET}
 	@if [[ ${STAGE} == "development" ]]; then \
   	  sed -i 's/appVersion: "0.0.0-replaceme"/appVersion: '$(DEV_VERSION)'/' ${K8S_HELM_TARGET}/Chart.yaml; \
