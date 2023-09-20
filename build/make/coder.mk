@@ -31,6 +31,7 @@ TEST_WORKSPACE_PREFIX?=test-${TEMPLATE_NAME}
 CODER_USER?=$(shell if [ -x "$(command -v coder)" ]; then coder users show me -o json | jq -r '.username'; else echo ""; fi )
 
 CONTAINER_BIN?=$(shell if [ -x "$(command -v podman)" ]; then echo "podman"; else echo "docker"; fi)
+GOPASS_BIN?=$(shell command -v gopass 2> /dev/null)
 
 EXCLUDED_TEMPLATE_FILES?=rich-parameters.yaml variables.yaml
 
@@ -105,6 +106,16 @@ createRelease: createTemplateRelease ${CONTAINER_IMAGE_TARGZ} trivyscanImage ## 
 cleanCoderRelease: ## clean release directory
 	rm -rf "${RELEASE_DIR}"
 	mkdir -p "${RELEASE_DIR}"
+
+.PHONY: loadGopassSecrets
+loadGopassSecrets: ${ADDITIONAL_SECRETS_TARGET} ## load secrets from gopass into secret files, so that the build process works locally
+	@if [ -n "${GOPASS_BIN}" ]; then \
+	    ${GOPASS_BIN} show ces/websites/registry.cloudogu.com/robot_coder_jenkins | tail -n 1 | sed -e "s/^username: //" > ${IMAGE_REGISTRY_USER_FILE}; \
+	    ${GOPASS_BIN} show ces/websites/registry.cloudogu.com/robot_coder_jenkins | head -n 1  > ${IMAGE_REGISTRY_PW_FILE}; \
+	else \
+		echo "error: no gopass installed. Please create secrets yourself"; \
+		exit 1; \
+	fi
 
 .PHONY: imageRegistryLogin
 imageRegistryLogin: ${IMAGE_REGISTRY_USER_FILE} ${IMAGE_REGISTRY_PW_FILE} ## log into the registry
