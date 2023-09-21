@@ -5,6 +5,71 @@ This repository holds makefiles for building Cloudogu tools, especially those wr
 
 Please note that `make` only accepts `Makefile`s that are **only** indented with tabs.
 
+## Quick Example
+
+```makefile
+# Set these to the desired values
+ARTIFACT_ID=
+VERSION=
+
+MAKEFILES_VERSION=8.0.0
+
+.DEFAULT_GOAL:=help
+
+# set PRE_COMPILE to define steps that shall be executed before the go build
+# PRE_COMPILE=
+
+# set GO_ENV_VARS to define go environment variables for the go build
+# GO_ENV_VARS = CGO_ENABLED=0
+
+# set PRE_UNITTESTS and POST_UNITTESTS to define steps that shall be executed before or after the unit tests
+# PRE_UNITTESTS?=
+# POST_UNITTESTS?=
+
+# set PREPARE_PACKAGE to define a target that should be executed before the package build
+# PREPARE_PACKAGE=
+
+# set ADDITIONAL_CLEAN to define a target that should be executed before the clean target, e.g.
+# ADDITIONAL_CLEAN=clean_deb
+# clean_deb:
+#     rm -rf ${DEBIAN_BUILD_DIR}
+
+# APT_REPO controls the target apt repository for deploy-debian.mk
+# -> APT_REPO=ces-premium results in a deploy to the premium apt repository
+# -> Everything else results in a deploy to the public repositories
+APT_REPO?=ces
+
+include build/make/variables.mk
+
+# You may want to overwrite existing variables for target actions to fit into your project.
+
+include build/make/self-update.mk
+include build/make/dependencies-gomod.mk
+include build/make/build.mk
+include build/make/test-common.mk
+include build/make/test-integration.mk
+include build/make/test-unit.mk
+include build/make/mocks.mk
+include build/make/static-analysis.mk
+include build/make/clean.mk
+# either package-tar.mk
+include build/make/package-tar.mk
+# or package-debian.mk
+include build/make/package-debian.mk
+# deploy-debian.mk depends on package-debian.mk
+include build/make/deploy-debian.mk
+include build/make/digital-signature.mk
+include build/make/yarn.mk
+include build/make/bower.mk
+# only include this in repositories which support the automatic release process (like dogus or golang apps)
+include build/make/release.mk
+# either k8s-dogu.mk
+include build/make/k8s-dogu.mk
+# or k8s-controller.mk; only include this in k8s-controller repositories
+include build/make/k8s-controller.mk
+include build/make/bats.mk
+```
+
 ## Overview over make targets
 
 Starting with makefiles v5.0.0 `make help` will produce an overview of make popular targets:
@@ -284,5 +349,66 @@ This module enables you to use bower via the `bower-install` target.
 ### release.mk
 
 This module holds the `dogu-release` or other binary release related targets for starting automated production releases.
+Additionally, to the regular `dogu-release` the module contains a `dogu-cve-release`. This target checks if a simple
+build of a dogu eliminates critical CVEs. If this is the case, a release process will be triggered.
 
 Only include this module in dogu or Golang repositories that support a dedicated release flow!
+### bats.mk
+
+This module enables you to run BATS shell tests via the `unit-test-shell` target. All you need is a directory with BATS
+tests in `${yourProjectDir}/batsTests` (overrideable with the variable `TESTS_DIR`).
+
+### K8s-related makefiles
+
+#### k8s.mk
+
+This module provides generic targets for developing K8s Cloudogu EcoSystem
+
+- `image-import` - imports the currently available image into the cluster-local registry.
+- `docker-dev-tag` - tags a Docker image for local K8s-CES deployment.
+- `docker-build` - builds the docker image of the K8s app.
+- `k8s-generate` - generates one concatenated resource YAML
+- `k8s-apply` - applies all generated K8s resources to the current cluster and namespace
+- check single or all of these variables:
+   - `check-all-vars`
+   - `check-k8s-namespace-env-var`
+   - `check-k8s-image-env-var`
+   - `check-k8s-artifact-id`
+   - `check-etc-hosts`
+   - `check-insecure-cluster-registry`
+
+#### k8s-component.mk
+
+This module provides targets for developing K8s Cloudogu EcoSystem components (including controllers)
+- General helm targets
+  - `helm-init-chart` - Creates a Chart.yaml-template with zero values
+  - `helm-generate-chart` - Generates the final helm chart
+- Helm developing targets
+   - `helm-generate` - Generates the final helm chart with dev-urls
+   - `helm-apply` - Generates and installs the helm chart
+   - `helm-delete` - Uninstalls the current helm chart
+   - `helm-reinstall` - Uninstalls the current helm chart and re-installs it
+   - `helm-chart-import` - Imports the currently available chart into the cluster-local registry
+- Release targets
+  - `helm-package-release` - Generates and packages the helm chart with release urls.
+  - `helm-generate-release` - Generates the final helm chart with release urls.
+- Component-oriented targets
+   - `component-generate` - Generate the component YAML resource
+   - `component-apply` - Applies the component yaml resource to the actual defined context.
+   - `component-reinstall` - Re-installs the component yaml resource from the actual defined context.
+   - `component-delete` - Deletes the component yaml resource from the actual defined context.
+
+#### k8s-dogu.mk
+
+This module provides targets for developing Dogus with a K8s Cloudogu EcoSystem.
+
+- `build` - Builds a new version of the dogu and deploys it into the K8s-EcoSystem.
+- `install-dogu-descriptor` - Installs a configmap with current dogu.json into the cluster.
+
+#### k8s-controller.mk
+
+This module provides targets for K8s Cloudogu EcoSystem controllers.
+
+- `k8s-integration-test` - Run k8s integration tests.
+- `controller-release` - Interactively starts the release workflow.
+- `build: helm-apply` - Builds a new version of the dogu and deploys it into the K8s-EcoSystem.
