@@ -11,6 +11,7 @@ CODER_LIB_PATH=${BUILD_DIR}/make/coder-lib.sh
 
 RELEASE_DIR=${WORKDIR}/release
 MAKE_CHANGE_TOKEN_DIR=${RELEASE_DIR}/make
+CONTAINER_FILE?=${CONTAINER_BUILD_DIR}/Dockerfile
 CONTAINER_IMAGE_CHANGE_TOKEN?=${MAKE_CHANGE_TOKEN_DIR}/${TEMPLATE_NAME}_image_id.txt
 CONTAINER_IMAGE_TAR?=${RELEASE_DIR}/${TEMPLATE_NAME}.tar
 CONTAINER_IMAGE_TARGZ?=${RELEASE_DIR}/${TEMPLATE_NAME}.tar.gz
@@ -38,10 +39,44 @@ EXCLUDED_TEMPLATE_FILES?=rich-parameters.yaml variables.yaml
 
 ##@ Coder template development
 
-.PHONY: buildImage
-buildImage: ${CONTAINER_IMAGE_CHANGE_TOKEN} ## build the container image
+${SECRETS_DIR}:
+	mkdir -p ${SECRETS_DIR}
 
-${CONTAINER_IMAGE_CHANGE_TOKEN}:
+${IMAGE_REGISTRY_USER_FILE}: ${SECRETS_DIR}
+ifeq ($(ENVIRONMENT), local)
+		@echo "Found developer environment. creating secret ${IMAGE_REGISTRY_USER_FILE}"
+		@${GOPASS_BIN} show ces/websites/registry.cloudogu.com/robot_coder_jenkins | tail -n 1 | sed -e "s/^username: //" > ${IMAGE_REGISTRY_USER_FILE};
+else
+		@echo "Found CI environment. Please create secrets yourself"
+endif
+
+${IMAGE_REGISTRY_PW_FILE}: ${SECRETS_DIR}
+ifeq ($(ENVIRONMENT), local)
+		@echo "Found developer environment. creating secret ${IMAGE_REGISTRY_PW_FILE}"
+		@${GOPASS_BIN} show ces/websites/registry.cloudogu.com/robot_coder_jenkins | head -n 1  > ${IMAGE_REGISTRY_PW_FILE};
+else
+		@echo "Found CI environment. Please create secrets yourself"
+endif
+
+.PHONY: loadGopassSecrets
+loadGopassSecrets: ${IMAGE_REGISTRY_USER_FILE} ${IMAGE_REGISTRY_PW_FILE} ${ADDITIONAL_SECRETS_TARGET} ## load secrets from gopass into secret files, so that the build process works locally
+
+.PHONY: imageRegistryLogin
+imageRegistryLogin: loadGopassSecrets ${IMAGE_REGISTRY_USER_FILE} ${IMAGE_REGISTRY_PW_FILE} ## log in to the registry
+	@${CONTAINER_BIN} login -u "$$(cat ${IMAGE_REGISTRY_USER_FILE})" --password-stdin '${IMAGE_REGISTRY}' < ${IMAGE_REGISTRY_PW_FILE}
+
+.PHONY: imageRegistryLogout
+imageRegistryLogout: ## log out of the registry
+	@${CONTAINER_BIN} logout '${IMAGE_REGISTRY}'
+
+.PHONY: buildImage
+buildImage: imageRegistryLogin ${CONTAINER_IMAGE_CHANGE_TOKEN} ## build the container image
+	@echo "if the build is not triggered without a change in the dockerfile, try to delete ${CONTAINER_IMAGE_CHANGE_TOKEN}"
+
+.PHONY: ci-buildImage
+ci-buildImage: ${CONTAINER_IMAGE_CHANGE_TOKEN} ## build the container image without automatic secret management
+
+${CONTAINER_IMAGE_CHANGE_TOKEN}: ${CONTAINER_FILE}
 	@. ${CODER_LIB_PATH} && buildImage ${IMAGE_TAG} ${CONTAINER_BUILD_DIR} ${SECRETS_DIR} ${CONTAINER_BIN}
 	@mkdir -p ${MAKE_CHANGE_TOKEN_DIR}
 	@${CONTAINER_BIN} image ls --format="{{.ID}}" ${IMAGE_TAG} > ${CONTAINER_IMAGE_CHANGE_TOKEN}
@@ -106,24 +141,6 @@ createRelease: createTemplateRelease ${CONTAINER_IMAGE_TARGZ} trivyscanImage ## 
 cleanCoderRelease: ## clean release directory
 	rm -rf "${RELEASE_DIR}"
 	mkdir -p "${RELEASE_DIR}"
-
-.PHONY: loadGopassSecrets
-loadGopassSecrets: ${ADDITIONAL_SECRETS_TARGET} ## load secrets from gopass into secret files, so that the build process works locally
-	@if [ -n "${GOPASS_BIN}" ]; then \
-	    ${GOPASS_BIN} show ces/websites/registry.cloudogu.com/robot_coder_jenkins | tail -n 1 | sed -e "s/^username: //" > ${IMAGE_REGISTRY_USER_FILE}; \
-	    ${GOPASS_BIN} show ces/websites/registry.cloudogu.com/robot_coder_jenkins | head -n 1  > ${IMAGE_REGISTRY_PW_FILE}; \
-	else \
-		echo "error: no gopass installed. Please create secrets yourself"; \
-		exit 1; \
-	fi
-
-.PHONY: imageRegistryLogin
-imageRegistryLogin: ${IMAGE_REGISTRY_USER_FILE} ${IMAGE_REGISTRY_PW_FILE} ## log into the registry
-	@${CONTAINER_BIN} login -u "$$(cat ${IMAGE_REGISTRY_USER_FILE})" --password-stdin '${IMAGE_REGISTRY}' < ${IMAGE_REGISTRY_PW_FILE}
-
-.PHONY: imageRegistryLogout
-imageRegistryLogout: ## log out of the registry
-	@${CONTAINER_BIN} logout '${IMAGE_REGISTRY}'
 
 .PHONY: pushImage
 pushImage: ## push the container image into the registry
