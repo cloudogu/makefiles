@@ -70,11 +70,14 @@ imageRegistryLogout: ## log out of the registry
 	@${CONTAINER_BIN} logout '${IMAGE_REGISTRY}'
 
 .PHONY: buildImage
-buildImage: imageRegistryLogin ${CONTAINER_IMAGE_CHANGE_TOKEN} ## build the container image
+buildImage: buildImage-$(ENVIRONMENT) ## build the container image
+
+.PHONY: buildImage-local
+buildImage-local: imageRegistryLogin ${CONTAINER_IMAGE_CHANGE_TOKEN} ## build the container image locally
 	@echo "if the build is not triggered without a change in the dockerfile, try to delete ${CONTAINER_IMAGE_CHANGE_TOKEN}"
 
-.PHONY: ci-buildImage
-ci-buildImage: ${CONTAINER_IMAGE_CHANGE_TOKEN} ## build the container image without automatic secret management
+.PHONY: buildImage-ci
+buildImage-ci: ${CONTAINER_IMAGE_CHANGE_TOKEN} ## build the container image without automatic secret management
 
 ${CONTAINER_IMAGE_CHANGE_TOKEN}: ${CONTAINER_FILE}
 	@. ${CODER_LIB_PATH} && buildImage ${IMAGE_TAG} ${CONTAINER_BUILD_DIR} ${SECRETS_DIR} ${CONTAINER_BIN}
