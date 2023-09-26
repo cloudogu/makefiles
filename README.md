@@ -397,6 +397,9 @@ This module provides targets for developing K8s Cloudogu EcoSystem components (i
    - `component-apply` - Applies the component yaml resource to the actual defined context.
    - `component-reinstall` - Re-installs the component yaml resource from the actual defined context.
    - `component-delete` - Deletes the component yaml resource from the actual defined context.
+- Component-CRD targets
+  - `helm-generate-crd-chart` - Generate the helm chart containing the CRDs 
+  - `helm-package-crd` - Generates and packages the helm chart containing the CRDs
 
 #### k8s-dogu.mk
 
