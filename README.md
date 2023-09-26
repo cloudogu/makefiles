@@ -397,9 +397,6 @@ This module provides targets for developing K8s Cloudogu EcoSystem components (i
    - `component-apply` - Applies the component yaml resource to the actual defined context.
    - `component-reinstall` - Re-installs the component yaml resource from the actual defined context.
    - `component-delete` - Deletes the component yaml resource from the actual defined context.
-- Component-CRD targets
-  - `helm-generate-crd-chart` - Generate the helm chart containing the CRDs 
-  - `helm-package-crd` - Generates and packages the helm chart containing the CRDs
 
 #### k8s-dogu.mk
 
@@ -415,3 +412,15 @@ This module provides targets for K8s Cloudogu EcoSystem controllers.
 - `k8s-integration-test` - Run k8s integration tests.
 - `controller-release` - Interactively starts the release workflow.
 - `build: helm-apply` - Builds a new version of the dogu and deploys it into the K8s-EcoSystem.
+
+#### k8s-crd.mk
+This module provides targets for managing K8S Custom Resource Definitions (CRDs) of CES controllers.
+
+- `crd-helm-generate-chart` - Generate the helm chart containing the CRDs
+- `crd-helm-apply` - Generates and installs the helm chart containing the CRDs
+- `crd-helm-delete` - Uninstalls the helm chart containing the CRDs
+- `crd-helm-package` - Generates and packages the helm chart containing the CRDs
+- `crd-helm-chart-import` - Imports the currently available CRD chart into the cluster-local registry
+- `crd-component-generate` - Generate the CRD component YAML resource
+- `crd-component-apply` - Applies the CRD component yaml resource to the actual defined context.
+- `crd-component-delete` - Deletes the CRD component yaml resource from the actual defined context.
