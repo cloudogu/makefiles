@@ -57,7 +57,7 @@ ${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) k8s-generate
 helm-generate: helm-generate-chart ## Generates the final helm chart with dev-urls.
 
 .PHONY: helm-apply
-helm-apply: ${BINARY_HELM} check-k8s-namespace-env-var image-import helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
+helm-apply: ${BINARY_HELM} check-k8s-namespace-env-var $(PRE_APPLY_TARGETS) helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
 	@echo "Apply generated helm chart"
 	@${BINARY_HELM} upgrade -i ${ARTIFACT_ID} ${K8S_HELM_TARGET} ${BINARY_HELM_ADDITIONAL_UPGR_ARGS} --namespace ${NAMESPACE}
 
@@ -70,7 +70,7 @@ helm-delete: ${BINARY_HELM} check-k8s-namespace-env-var ## Uninstalls the curren
 helm-reinstall: helm-delete helm-apply ## Uninstalls the current helm chart and reinstalls it.
 
 .PHONY: helm-chart-import
-helm-chart-import: check-all-vars check-k8s-artifact-id helm-generate-chart helm-package-release image-import ## Imports the currently available chart into the cluster-local registry.
+helm-chart-import: check-all-vars check-k8s-artifact-id helm-generate-chart helm-package-release ## Imports the currently available chart into the cluster-local registry.
 	@if [[ ${STAGE} == "development" ]]; then \
 		echo "Import ${K8S_HELM_DEV_RELEASE_TGZ} into K8s cluster ${K3CES_REGISTRY_URL_PREFIX}..."; \
 		${BINARY_HELM} push ${K8S_HELM_DEV_RELEASE_TGZ} oci://${K3CES_REGISTRY_URL_PREFIX}/${K8S_HELM_ARTIFACT_NAMESPACE} ${BINARY_HELM_ADDITIONAL_PUSH_ARGS}; \
@@ -115,7 +115,7 @@ component-generate: ${K8S_RESOURCE_TEMP_FOLDER} ## Generate the component yaml r
 	fi
 
 .PHONY: component-apply
-component-apply: check-k8s-namespace-env-var image-import helm-generate helm-chart-import component-generate $(K8S_POST_GENERATE_TARGETS) ## Applies the component yaml resource to the actual defined context.
+component-apply: check-k8s-namespace-env-var $(PRE_APPLY_TARGETS) helm-generate helm-chart-import component-generate $(K8S_POST_GENERATE_TARGETS) ## Applies the component yaml resource to the actual defined context.
 	@kubectl apply -f "${K8S_RESOURCE_COMPONENT}" --namespace="${NAMESPACE}"
 	@echo "Done."
 
