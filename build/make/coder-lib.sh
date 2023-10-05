@@ -2,8 +2,19 @@
 # a collection of helpful functions to update coder workspaces for rapid development
 set -e -u -x -o pipefail
 
+function getContainerBin() {
+  if [ -x "$(command -v podman)" ]; then
+    echo "podman";
+  else
+    echo "docker";
+  fi
+}
+
 function getCoderUser() {
-  coder users show me -o json | jq -r '.username'
+  # check if coder is installed, so that there is no problem with build and release targets if this is called before
+  if [ -x "$(command -v coder)" ]; then
+    coder users show me -o json | jq -r '.username';
+  fi
 }
 
 function getAllWorkspaces() {
