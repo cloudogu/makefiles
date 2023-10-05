@@ -45,7 +45,7 @@ ${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) k8s-generate
 	@cp -r ${K8S_HELM_RESSOURCES}/** ${K8S_HELM_TARGET}
 	@if [[ ${STAGE} == "development" ]]; then \
   	  sed -i 's/appVersion: "0.0.0-replaceme"/appVersion: '$(DEV_VERSION)'/' ${K8S_HELM_TARGET}/Chart.yaml; \
-  	  sed -i 's/version: 0.0.0-replaceme/version:  '$(DEV_VERSION)'/' ${K8S_HELM_TARGET}/Chart.yaml; \
+  	  sed -i 's/version: 0.0.0-replaceme/version: '$(DEV_VERSION)'/' ${K8S_HELM_TARGET}/Chart.yaml; \
   	else \
   	  sed -i 's/appVersion: "0.0.0-replaceme"/appVersion: "${VERSION}"/' ${K8S_HELM_TARGET}/Chart.yaml; \
       sed -i 's/version: 0.0.0-replaceme/version: ${VERSION}/' ${K8S_HELM_TARGET}/Chart.yaml; \
