@@ -106,17 +106,19 @@ ${BINARY_HELM}: $(UTILITY_BIN_PATH) ## Download helm locally if necessary.
 ##@ K8s - Component dev targets
 
 .PHONY: component-generate
-component-generate: ${K8S_RESOURCE_TEMP_FOLDER} ## Generate the component yaml resource.
-	@echo "Generating temporary K8s component resource: ${K8S_RESOURCE_COMPONENT}"
+component-generate: ${K8S_RESOURCE_TEMP_FOLDER} ${BINARY_YQ} ## Generate the component yaml resource.
+	@echo "Generating temporary K8s component resource: $'{K8S_RESOURCE_COMPONENT}"
+	@cp "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" "${K8S_RESOURCE_COMPONENT}"
+	@$(BINARY_YQ) -i ".metadata.name = \"$(ARTIFACT_ID)\"" "${K8S_RESOURCE_COMPONENT}"
+	@$(BINARY_YQ) -i ".spec.namespace = \"$(K8S_HELM_ARTIFACT_NAMESPACE)\"" "${K8S_RESOURCE_COMPONENT}"
+	@$(BINARY_YQ) -i ".spec.name = \"$(ARTIFACT_ID)\"" "${K8S_RESOURCE_COMPONENT}"
 	@if [[ ${STAGE} == "development" ]]; then \
-		sed "s|namespace: NAMESPACE|namespace: $(K8S_HELM_ARTIFACT_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" | sed "s|name: NAME|name: $(ARTIFACT_ID)|g"  | sed "s|VERSION|$(DEV_VERSION)|g" > "${K8S_RESOURCE_COMPONENT}"; \
+		$(BINARY_YQ) -i ".spec.version = \"$(DEV_VERSION)\"" "${K8S_RESOURCE_COMPONENT}"; \
 	else \
-		sed "s|namespace: NAMESPACE|namespace: $(K8S_HELM_ARTIFACT_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" | sed "s|name: NAME|name: $(ARTIFACT_ID)|g"  | sed "s|VERSION|$(VERSION)|g" > "${K8S_RESOURCE_COMPONENT}"; \
-	fi; \
-	if [[ -n "${COMPONENT_DEPLOY_NAMESPACE}" ]]; then \
-  		sed -i "s|DEPLOY_NAMESPACE|$(COMPONENT_DEPLOY_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT}"; \
-  	else \
-  	  	sed -i "s|deployNamespace: DEPLOY_NAMESPACE||g" "${K8S_RESOURCE_COMPONENT}"; \
+		$(BINARY_YQ) -i ".spec.version = \"$(VERSION)\"" "${K8S_RESOURCE_COMPONENT}"; \
+	fi
+	@if [[ -n "${COMPONENT_DEPLOY_NAMESPACE}" ]]; then \
+  		$(BINARY_YQ) -i ".spec.deployNamespace = \"$(COMPONENT_DEPLOY_NAMESPACE)\"" "${K8S_RESOURCE_COMPONENT}"; \
 	fi
 
 .PHONY: component-apply
