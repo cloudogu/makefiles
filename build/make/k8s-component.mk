@@ -35,7 +35,7 @@ helm-init-chart: ${BINARY_HELM} ## Creates a Chart.yaml-template with zero value
 helm-generate-chart: k8s-generate ${K8S_HELM_TARGET}/Chart.yaml ## Generates the final helm chart.
 
 .PHONY: ${K8S_HELM_TARGET}/Chart.yaml
-${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) k8s-generate
+${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) k8s-generate helm-update-dependencies
 	@echo "Generate helm chart..."
 	@rm -drf ${K8S_HELM_TARGET}  # delete folder, so the chart is newly created.
 	@mkdir -p ${K8S_HELM_TARGET}/templates
@@ -57,7 +57,7 @@ ${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) k8s-generate
 helm-generate: helm-generate-chart ## Generates the final helm chart with dev-urls.
 
 .PHONY: helm-apply
-helm-apply: ${BINARY_HELM} helm-update-dependencies check-k8s-namespace-env-var $(PRE_APPLY_TARGETS) helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
+helm-apply: ${BINARY_HELM} check-k8s-namespace-env-var $(PRE_APPLY_TARGETS) helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
 	@echo "Apply generated helm chart"
 	@${BINARY_HELM} upgrade -i ${ARTIFACT_ID} ${K8S_HELM_TARGET} ${BINARY_HELM_ADDITIONAL_UPGR_ARGS} --namespace ${NAMESPACE}
 
@@ -89,7 +89,7 @@ ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml: $(K8S_PRE_GENERATE_
 	@sed -i "s/'{{ .Namespace }}'/'{{ .Release.Namespace }}'/" ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml
 
 .PHONY: helm-package-release
-helm-package-release: ${BINARY_HELM} helm-update-dependencies helm-delete-existing-tgz ${K8S_HELM_RELEASE_TGZ} ## Generates and packages the helm chart with release urls.
+helm-package-release: ${BINARY_HELM} helm-delete-existing-tgz ${K8S_HELM_RELEASE_TGZ} ## Generates and packages the helm chart with release urls.
 
 .PHONY: helm-delete-existing-tgz
 helm-delete-existing-tgz: ## Remove an existing Helm package.
