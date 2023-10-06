@@ -109,9 +109,14 @@ ${BINARY_HELM}: $(UTILITY_BIN_PATH) ## Download helm locally if necessary.
 component-generate: ${K8S_RESOURCE_TEMP_FOLDER} ## Generate the component yaml resource.
 	@echo "Generating temporary K8s component resource: ${K8S_RESOURCE_COMPONENT}"
 	@if [[ ${STAGE} == "development" ]]; then \
-		sed "s|NAMESPACE|$(K8S_HELM_ARTIFACT_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" | sed "s|NAME|$(ARTIFACT_ID)|g"  | sed "s|VERSION|$(DEV_VERSION)|g" > "${K8S_RESOURCE_COMPONENT}"; \
+		sed "s|namespace: NAMESPACE|namespace: $(K8S_HELM_ARTIFACT_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" | sed "s|name: NAME|name: $(ARTIFACT_ID)|g"  | sed "s|VERSION|$(DEV_VERSION)|g" > "${K8S_RESOURCE_COMPONENT}"; \
 	else \
-		sed "s|NAMESPACE|$(K8S_HELM_ARTIFACT_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" | sed "s|NAME|$(ARTIFACT_ID)|g"  | sed "s|VERSION|$(VERSION)|g" > "${K8S_RESOURCE_COMPONENT}"; \
+		sed "s|namespace: NAMESPACE|namespace: $(K8S_HELM_ARTIFACT_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}" | sed "s|name: NAME|name: $(ARTIFACT_ID)|g"  | sed "s|VERSION|$(VERSION)|g" > "${K8S_RESOURCE_COMPONENT}"; \
+	fi; \
+	if [[ -n "${COMPONENT_DEPLOY_NAMESPACE}" ]]; then \
+  		sed -i "s|DEPLOY_NAMESPACE|$(COMPONENT_DEPLOY_NAMESPACE)|g" "${K8S_RESOURCE_COMPONENT}"; \
+  	else \
+  	  	sed -i "s|deployNamespace: DEPLOY_NAMESPACE||g" "${K8S_RESOURCE_COMPONENT}"; \
 	fi
 
 .PHONY: component-apply

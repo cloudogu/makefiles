@@ -8,3 +8,4 @@ spec:
   name: NAME
   namespace: NAMESPACE
   version: VERSION
+  deployNamespace: DEPLOY_NAMESPACE
