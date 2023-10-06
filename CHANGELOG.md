@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v8.7.0](https://github.com/cloudogu/makefiles/releases/tag/v8.7.0) 2023-10-06
+### Changed
+- [#159] Update Helm binary to 3.13
+- [#160] Add more Helm support
+  - new `install-helm` phony target enables preparing Helm calls outside the makefile
+  - update Helm chart dependencies in order to have dependencies after generating a proper chart 
+
 ## [v8.6.0](https://github.com/cloudogu/makefiles/releases/tag/v8.6.0) 2023-10-06
 ### Changed
 - [#154] Make the `image-import` for k8s components and controllers configurable.

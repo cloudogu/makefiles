@@ -5,7 +5,7 @@ IMAGE_DEV?=${K3CES_REGISTRY_URL_PREFIX}/${ARTIFACT_ID}:${DEV_VERSION}
 include $(WORKDIR)/build/make/k8s.mk
 
 BINARY_HELM = $(UTILITY_BIN_PATH)/helm
-BINARY_HELM_VERSION?=v3.12.0-dev.1.0.20230817154107-a749b663101d
+BINARY_HELM_VERSION?=v3.13.0
 BINARY_HELM_ADDITIONAL_PUSH_ARGS?=--plain-http
 BINARY_HELM_ADDITIONAL_PACK_ARGS?=
 BINARY_HELM_ADDITIONAL_UNINST_ARGS?=
@@ -35,7 +35,7 @@ helm-init-chart: ${BINARY_HELM} ## Creates a Chart.yaml-template with zero value
 helm-generate-chart: k8s-generate ${K8S_HELM_TARGET}/Chart.yaml ## Generates the final helm chart.
 
 .PHONY: ${K8S_HELM_TARGET}/Chart.yaml
-${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) k8s-generate
+${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) k8s-generate helm-update-dependencies
 	@echo "Generate helm chart..."
 	@rm -drf ${K8S_HELM_TARGET}  # delete folder, so the chart is newly created.
 	@mkdir -p ${K8S_HELM_TARGET}/templates
@@ -133,3 +133,10 @@ component-delete: check-k8s-namespace-env-var component-generate $(K8S_POST_GENE
 
 .PHONY: component-reinstall
 component-reinstall: component-delete  component-apply ## Reinstalls the component yaml resource from the actual defined context.
+
+.PHONY: helm-update-dependencies
+helm-update-dependencies: ${BINARY_HELM}
+	@$(BINARY_HELM) dependency update "${K8S_HELM_RESSOURCES}"
+
+.PHONY: install-helm
+install-helm: ${BINARY_HELM}
