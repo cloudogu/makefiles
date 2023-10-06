@@ -5,7 +5,7 @@ IMAGE_DEV?=${K3CES_REGISTRY_URL_PREFIX}/${ARTIFACT_ID}:${DEV_VERSION}
 include $(WORKDIR)/build/make/k8s.mk
 
 BINARY_HELM = $(UTILITY_BIN_PATH)/helm
-BINARY_HELM_VERSION?=v3.12.0-dev.1.0.20230817154107-a749b663101d
+BINARY_HELM_VERSION?=v3.13.0
 BINARY_HELM_ADDITIONAL_PUSH_ARGS?=--plain-http
 BINARY_HELM_ADDITIONAL_PACK_ARGS?=
 BINARY_HELM_ADDITIONAL_UNINST_ARGS?=
@@ -57,7 +57,7 @@ ${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) k8s-generate
 helm-generate: helm-generate-chart ## Generates the final helm chart with dev-urls.
 
 .PHONY: helm-apply
-helm-apply: ${BINARY_HELM} check-k8s-namespace-env-var $(PRE_APPLY_TARGETS) helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
+helm-apply: ${BINARY_HELM} helm-update-dependencies check-k8s-namespace-env-var $(PRE_APPLY_TARGETS) helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the helm chart.
 	@echo "Apply generated helm chart"
 	@${BINARY_HELM} upgrade -i ${ARTIFACT_ID} ${K8S_HELM_TARGET} ${BINARY_HELM_ADDITIONAL_UPGR_ARGS} --namespace ${NAMESPACE}
 
@@ -89,7 +89,7 @@ ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml: $(K8S_PRE_GENERATE_
 	@sed -i "s/'{{ .Namespace }}'/'{{ .Release.Namespace }}'/" ${K8S_HELM_TARGET}/templates/$(ARTIFACT_ID)_$(VERSION).yaml
 
 .PHONY: helm-package-release
-helm-package-release: ${BINARY_HELM} helm-delete-existing-tgz ${K8S_HELM_RELEASE_TGZ} ## Generates and packages the helm chart with release urls.
+helm-package-release: ${BINARY_HELM} helm-update-dependencies helm-delete-existing-tgz ${K8S_HELM_RELEASE_TGZ} ## Generates and packages the helm chart with release urls.
 
 .PHONY: helm-delete-existing-tgz
 helm-delete-existing-tgz: ## Remove an existing Helm package.
@@ -133,3 +133,10 @@ component-delete: check-k8s-namespace-env-var component-generate $(K8S_POST_GENE
 
 .PHONY: component-reinstall
 component-reinstall: component-delete  component-apply ## Reinstalls the component yaml resource from the actual defined context.
+
+.PHONY: helm-update-dependencies
+helm-update-dependencies: ${BINARY_HELM}
+	@$(BINARY_HELM) dependency update "${K8S_HELM_RESSOURCES}"
+
+.PHONY: install-helm
+install-helm: ${BINARY_HELM}
