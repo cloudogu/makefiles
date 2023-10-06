@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v8.7.0](https://github.com/cloudogu/makefiles/releases/tag/v8.7.0) 2023-10-06
 ### Changed
 - [#159] Update Helm binary to 3.13
 - [#160] Add more Helm support
