@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- [#154] Make the `image-import` for k8s components and controllers configurable.
+  - With this change k8s-components do not have to create own wrapper targets for apply task without the `image-import`. They must override `PRE_APPLY_TARGETS` with an empty string and can use regular targets like `helm-apply` or `component-apply`.
+- [#158] Changed Component CR generation. Components can now use the variable `COMPONENT_DEPLOY_NAMESPACE` that will be used as the field `deployNamespace` in the CR.
 
 ## [v8.5.1](https://github.com/cloudogu/makefiles/releases/tag/v8.5.1) 2023-10-05
 ### Fixed
