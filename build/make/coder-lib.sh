@@ -51,23 +51,27 @@ function generateUniqueWorkspaceName() {
 
 function buildImage() {
   local tag="$1"
-  local buildDir="${2:-./build}"
-  local secretDir="${3:-./secretArgs}"
+  local containerBuildDir="${2:-./container}"
+  local secretDir="${3:-./secrets}"
   local containerExec="${4:-podman}"
-  local secretArgs=()
+
   # include build-secrets if there are any
-  # shellcheck disable=SC2231
-  for secretPath in $secretDir/*; do
-    # do not match .sh scripts
-    [[ $secretPath == *.sh ]] && continue
-    local secretName
-    secretName=$(basename "$secretPath")
-    secretArgs+=("--secret=id=$secretName,src=$secretDir/$secretName")
-  done
+  local secretArgs=()
+  if [ -d "$secretDir" ]; then
+    # shellcheck disable=SC2231
+    for secretPath in $secretDir/*; do
+      # do not match .sh scripts
+      [[ $secretPath == *.sh ]] && continue
+      local secretName
+      secretName=$(basename "$secretPath")
+      secretArgs+=("--secret=id=$secretName,src=$secretDir/$secretName")
+    done
+  fi
+
   if [ "$containerExec" = "podman" ]; then
-    $containerExec build -t "$tag" --pull=newer "$buildDir" "${secretArgs[@]}"
+    $containerExec build -t "$tag" --pull=newer "$containerBuildDir" "${secretArgs[@]}"
   else
-    $containerExec build -t "$tag" --pull "$buildDir" "${secretArgs[@]}"
+    $containerExec build -t "$tag" --pull "$containerBuildDir" "${secretArgs[@]}"
   fi
 }
 
