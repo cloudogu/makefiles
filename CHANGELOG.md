@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v8.7.1](https://github.com/cloudogu/makefiles/releases/tag/v8.7.1) 2023-10-12
+### Fixed
+- [#162] fix coder build if secrets dir does not exist
+
 ## [v8.7.0](https://github.com/cloudogu/makefiles/releases/tag/v8.7.0) 2023-10-06
 ### Changed
 - [#159] Update Helm binary to 3.13
