@@ -157,6 +157,7 @@ if [[ -n "${BASH_VERSION}" && "${BASH_SOURCE[0]}" == "${0}" ]]; then
   PASSWORD="${2:-""}"
   TRIVY_IMAGE_SCAN_FLAGS="${3:-""}"
   DRY_RUN="${4:-""}"
+  CVE_SEVERITY="${5:-""}"
 
   TRIVY_PATH="/tmp/trivy-dogu-cve-release-$(nameFromDogu)"
   TRIVY_RESULT_FILE="${TRIVY_PATH}/results.json"
