@@ -81,7 +81,7 @@ function pullRemoteImage() {
 }
 
 function buildLocalImage() {
-  docker build . -t "$(imageFromDogu):$(versionFromDogu)"
+  docker build --no-cache . -t "$(imageFromDogu):$(versionFromDogu)"
 }
 
 function scanImage() {
@@ -94,7 +94,7 @@ function parseTrivyJsonResult() {
 
   # First select results which have the property "Vulnerabilities". Filter the vulnerability ids with the given severity and afterward put the values in an array.
   # This array is used to format the values with join(" ") in a whitespace delimited string list.
-  jq -rc "[.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == \"${severity}\") | .VulnerabilityID] | join(\" \")" "${trivy_result_file}"
+  jq -rc "[.Results[] | select(.Vulnerabilities) | .Vulnerabilities | .[] | select(.Severity == \"${severity}\") | .VulnerabilityID] | unique | join(\" \")" "${trivy_result_file}"
 }
 
 RELEASE_SH="build/make/release.sh"
