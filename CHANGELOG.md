@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v8.7.3](https://github.com/cloudogu/makefiles/releases/tag/v8.7.3) 2023-10-20
+### Fixed
+- [#166] use --no-cache in dogu-cve-release 
+- [#166] make fixed CVE-list unique
+
 ## [v8.7.2](https://github.com/cloudogu/makefiles/releases/tag/v8.7.2) 2023-10-20
 ### Fixed
 - [#164] make cve severity configurable

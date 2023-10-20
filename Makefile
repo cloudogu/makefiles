@@ -1,6 +1,6 @@
 # Set these to the desired values
 ARTIFACT_ID=makefiles
-MAKEFILES_VERSION=8.7.2
+MAKEFILES_VERSION=8.7.3
 VERSION=${MAKEFILES_VERSION}
 
 .DEFAULT_GOAL:=help
