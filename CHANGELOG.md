@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v8.7.2](https://github.com/cloudogu/makefiles/releases/tag/v8.7.2) 2023-10-20
+### Fixed
+- [#164] make cve severity configurable
+
 ## [v8.7.1](https://github.com/cloudogu/makefiles/releases/tag/v8.7.1) 2023-10-12
 ### Fixed
 - [#162] fix coder build if secrets dir does not exist
