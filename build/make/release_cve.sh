@@ -3,6 +3,15 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+function readCveSeverityIfUnset() {
+  if [ -z "${CVE_SEVERITY}" ]; then
+    echo "CVE_SEVERITY is unset"
+    while [[ -z ${CVE_SEVERITY} ]]; do
+      read -r -p "select the desired cve severity (CRITICAL, HIGH, MEDIUM, ...): " CVE_SEVERITY
+    done
+  fi
+}
+
 function readCredentialsIfUnset() {
   if [ -z "${USERNAME}" ]; then
     echo "username is unset"
@@ -93,7 +102,7 @@ RELEASE_SH="build/make/release.sh"
 REGISTRY_URL="registry.cloudogu.com"
 DOGU_JSON_FILE="dogu.json"
 
-CVE_SEVERITY="CRITICAL"
+CVE_SEVERITY=
 
 TRIVY_PATH=
 TRIVY_RESULT_FILE=
@@ -106,6 +115,7 @@ PASSWORD=""
 DRY_RUN=
 
 function runMain() {
+  readCveSeverityIfUnset
   readCredentialsIfUnset
   dockerLogin
 
@@ -137,6 +147,7 @@ function runMain() {
     exit 3
   fi
 
+  echo "Fixed ${CVE_SEVERITY} CVEs: ${cve_in_remote_but_not_in_local}"
   "${RELEASE_SH}" "dogu-cve-release" "${cve_in_remote_but_not_in_local}" "${DRY_RUN}"
 }
 
@@ -146,6 +157,7 @@ if [[ -n "${BASH_VERSION}" && "${BASH_SOURCE[0]}" == "${0}" ]]; then
   PASSWORD="${2:-""}"
   TRIVY_IMAGE_SCAN_FLAGS="${3:-""}"
   DRY_RUN="${4:-""}"
+  CVE_SEVERITY="${5:-""}"
 
   TRIVY_PATH="/tmp/trivy-dogu-cve-release-$(nameFromDogu)"
   TRIVY_RESULT_FILE="${TRIVY_PATH}/results.json"
