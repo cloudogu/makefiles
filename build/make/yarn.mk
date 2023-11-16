@@ -18,7 +18,7 @@ $(YARN_TARGET): $(YARN_LOCK) $(PASSWD)
 
 .PHONY yarn-publish-ci:
 yarn-publish-ci: ## Execute yarn publish with '--non-interactive' flag to suppress the version prompt
-	@echo "Executing yarn..."
+	@echo "Executing yarn publish..."
 	@docker run --rm \
 	  -u "$(UID_NR):$(GID_NR)" \
 	  -v $(PASSWD):/etc/passwd:ro \
@@ -29,7 +29,7 @@ yarn-publish-ci: ## Execute yarn publish with '--non-interactive' flag to suppre
 
 .PHONY yarn-publish: ## Execute yarn publish
 yarn-publish: $(YARN_BUILD_TARGET)
-	@echo "Executing yarn..."
+	@echo "Executing yarn publish..."
 	@docker run --rm \
 	  -u "$(UID_NR):$(GID_NR)" \
 	  -v $(PASSWD):/etc/passwd:ro \
