@@ -6,6 +6,10 @@
 dogu-release: ## Start a dogu release
 	build/make/release.sh dogu
 
+.PHONY: node-release
+node-release: ## Start a node package release
+	build/make/release.sh node-pkg
+
 .PHONY: go-release
 go-release: ## Start a go tool release
 	build/make/release.sh go-tool
