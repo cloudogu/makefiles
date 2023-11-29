@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `manifests` can be found by including `build/make/k8s-crd.mk`
   - `generate` can be found by including `build/make/k8s-controller.mk`
 - the k8s/controller target `generate` renames to `generate-deepcopy` for better understandability
-- the k8s/crd target `crd-helm-generate-chart` aliases now to `${HELM_CRD_TARGET}/Chart.yaml` and executes prior two checks: `validate-crd-chart`, `validate-crd`
+- the k8s/crd target `crd-helm-generate-chart` aliases now to `${HELM_CRD_TARGET_DIR}/Chart.yaml` and executes prior two checks: `validate-crd-chart`, `validate-crd`
 - the k8s/dogu variable `DOGU_JSON_DEV_FILE` is no longer a relative path but absolute
 
 ### Removed
