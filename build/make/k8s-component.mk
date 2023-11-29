@@ -15,9 +15,9 @@ K8S_HELM_ARTIFACT_NAMESPACE?=k8s
 
 K8S_RESOURCE_COMPONENT ?= "${K8S_RESOURCE_TEMP_FOLDER}/component-${ARTIFACT_ID}-${VERSION}.yaml"
 K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML ?= $(BUILD_DIR)/make/k8s-component.tpl
-# HELM_PRE_GENERATE_TARGETS allows to execute targets after the Helm files have been copied to K8S_HELM_TARGET but before the Helm chart is modified.
+# HELM_PRE_GENERATE_TARGETS allows to execute targets that affect Helm source files AND Helm target files.
 HELM_PRE_GENERATE_TARGETS ?=
-# HELM_POST_GENERATE_TARGETS allows to execute targets after the Helm files have been copied to K8S_HELM_TARGET and after the Helm chart is modified.
+# HELM_POST_GENERATE_TARGETS allows to execute targets that only affect Helm target files.
 HELM_POST_GENERATE_TARGETS ?=
 HELM_PRE_APPLY_TARGETS ?=
 COMPONENT_PRE_APPLY_TARGETS ?=
@@ -38,7 +38,7 @@ helm-generate: ${K8S_HELM_TARGET}/Chart.yaml ${HELM_POST_GENERATE_TARGETS} ## Ge
 
 # this is phony because of it is easier this way than the makefile-single-run way
 .PHONY: ${K8S_HELM_TARGET}/Chart.yaml
-${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) validate-chart copy-helm-files ${HELM_PRE_GENERATE_TARGETS}
+${K8S_HELM_TARGET}/Chart.yaml: $(K8S_RESOURCE_TEMP_FOLDER) validate-chart ${HELM_PRE_GENERATE_TARGETS} copy-helm-files
 	@echo "Generate Helm chart..."
 	@if [[ ${STAGE} == "development" ]]; then \
   	  sed -i 's/appVersion: "0.0.0-replaceme"/appVersion: '$(COMPONENT_DEV_VERSION)'/' ${K8S_HELM_TARGET}/Chart.yaml; \
