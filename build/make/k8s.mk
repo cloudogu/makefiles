@@ -30,9 +30,7 @@ K3CES_REGISTRY_URL_PREFIX="${K3S_CLUSTER_FQDN}:${K3S_LOCAL_REGISTRY_PORT}"
 
 # Variables for the temporary yaml files. These are used as template to generate a development resource containing
 # the current namespace and the dev image.
-K8S_RESOURCE_TEMP_FOLDER ?= $(WORKDIR)/$(TARGET_DIR)/k8s
-# K8S_RESOURCE_TEMP_YAML is used by non-component artifacts like k8s-dogus.
-K8S_RESOURCE_TEMP_YAML ?= $(K8S_RESOURCE_TEMP_FOLDER)/$(ARTIFACT_ID)_$(VERSION).yaml
+K8S_RESOURCE_TEMP_FOLDER ?= $(TARGET_DIR)/k8s
 
 ##@ K8s - Variables
 

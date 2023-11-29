@@ -1,7 +1,7 @@
 ARTIFACT_CRD_ID=$(ARTIFACT_ID)-crd
 DEV_CRD_VERSION?=${VERSION}-dev
-K8S_HELM_CRD_TARGET?=$(K8S_RESOURCE_TEMP_FOLDER)/helm-crd
-K8S_HELM_CRD_RESSOURCES?=k8s/helm-crd
+K8S_HELM_CRD_TARGET ?= $(K8S_RESOURCE_TEMP_FOLDER)/helm-crd
+K8S_HELM_CRD_RESSOURCES ?= k8s/helm-crd
 K8S_HELM_CRD_RELEASE_TGZ=${K8S_HELM_CRD_TARGET}/${ARTIFACT_CRD_ID}-${VERSION}.tgz
 K8S_HELM_CRD_DEV_RELEASE_TGZ=${K8S_HELM_CRD_TARGET}/${ARTIFACT_CRD_ID}-${DEV_CRD_VERSION}.tgz
 
@@ -15,17 +15,15 @@ K8S_COPY_CRD_TARGET_DIR?=
 ##@ K8s - CRD targets
 
 .PHONY: manifests
-manifests: ${K8S_CRD_COMPONENT_SOURCE} ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+manifests: ${CRD_SRC_GO} ${CONTROLLER_GEN} manifests-run ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 
-${K8S_CRD_COMPONENT_SOURCE}: ${CRD_SRC_GO} ${CONTROLLER_GEN}
+.PHONY: manifests-run
+manifests-run:
 	@echo "Generate manifests..."
 	@$(CONTROLLER_GEN) crd paths="./..." output:crd:artifacts:config=k8s/helm-crd/templates
-	@if [ "${K8S_COPY_CRD_TARGET_DIR}" != "" ] ; then \
-  		cp ${K8S_CRD_COMPONENT_SOURCE} ${K8S_COPY_CRD_TARGET_DIR}; \
-  	  fi
 
-.PHONY: crd-helm-generate-chart ## Generates the Helm CRD chart
-crd-helm-generate-chart: validate-crd-chart validate-crd ${K8S_HELM_CRD_TARGET}/Chart.yaml
+.PHONY: crd-helm-generate ## Generates the Helm CRD chart
+crd-helm-generate: manifests validate-crd-chart ${K8S_HELM_CRD_TARGET}/Chart.yaml
 
 # this is phony because of it is easier this way than the makefile-single-run way
 .PHONY: ${K8S_HELM_CRD_TARGET}/Chart.yaml
@@ -52,15 +50,8 @@ validate-crd-chart:
        exit 23 ; \
     fi
 
-.PHONY: validate-crd
-validate-crd:
-	@if [ ! -f ${K8S_CRD_COMPONENT_SOURCE} ] ; then \
-       echo "Could not find CRD source. Did you point 'K8S_CRD_COMPONENT_SOURCE' to your source CRD file?" ; \
-       exit 24 ; \
-    fi
-
 .PHONY: crd-helm-apply
-crd-helm-apply: ${K8S_CRD_COMPONENT_SOURCE} ${BINARY_HELM} check-k8s-namespace-env-var crd-helm-generate-chart $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the Helm CRD chart.
+crd-helm-apply: ${BINARY_HELM} check-k8s-namespace-env-var crd-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the Helm CRD chart.
 	@echo "Apply generated Helm CRD chart"
 	@${BINARY_HELM} upgrade -i ${ARTIFACT_CRD_ID} ${K8S_HELM_CRD_TARGET} ${BINARY_HELM_ADDITIONAL_UPGR_ARGS} --namespace ${NAMESPACE}
 
@@ -76,12 +67,12 @@ crd-helm-package: crd-helm-delete-existing-tgz ${K8S_HELM_CRD_RELEASE_TGZ} ## Ge
 crd-helm-delete-existing-tgz: ## Remove an existing Helm CRD package.
 	@rm -f ${K8S_HELM_CRD_RELEASE_TGZ}*
 
-${K8S_HELM_CRD_RELEASE_TGZ}: ${BINARY_HELM} crd-helm-generate-chart $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the Helm CRD chart.
+${K8S_HELM_CRD_RELEASE_TGZ}: ${BINARY_HELM} crd-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the Helm CRD chart.
 	@echo "Package generated helm crd-chart"
 	@${BINARY_HELM} package ${K8S_HELM_CRD_TARGET} -d ${K8S_HELM_CRD_TARGET} ${BINARY_HELM_ADDITIONAL_PACK_ARGS}
 
 .PHONY: crd-helm-chart-import
-crd-helm-chart-import: check-all-vars check-k8s-artifact-id crd-helm-generate-chart crd-helm-package ## Imports the currently available Helm CRD chart into the cluster-local registry.
+crd-helm-chart-import: check-all-vars check-k8s-artifact-id crd-helm-generate crd-helm-package ## Imports the currently available Helm CRD chart into the cluster-local registry.
 	@if [[ ${STAGE} == "development" ]]; then \
 		echo "Import ${K8S_HELM_CRD_DEV_RELEASE_TGZ} into K8s cluster ${K3CES_REGISTRY_URL_PREFIX}..."; \
 		${BINARY_HELM} push ${K8S_HELM_CRD_DEV_RELEASE_TGZ} oci://${K3CES_REGISTRY_URL_PREFIX}/${K8S_HELM_ARTIFACT_NAMESPACE} ${BINARY_HELM_ADDITIONAL_PUSH_ARGS}; \

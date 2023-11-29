@@ -1,6 +1,6 @@
 # This script requires the k8s.mk script
-include $(WORKDIR)/build/make/k8s-component.mk
-include $(WORKDIR)/build/make/k8s-crd.mk
+include ${BUILD_DIR}/make/k8s-component.mk
+include ${BUILD_DIR}/make/k8s-crd.mk
 
 ## Variables
 
@@ -35,7 +35,7 @@ build-controller: ${SRC} compile ## Builds the controller Go binary.
 # Allows to perform tasks before locally running the controller
 K8S_RUN_PRE_TARGETS ?=
 .PHONY: run
-run: ${K8S_CRD_COMPONENT_SOURCE} generate $(K8S_RUN_PRE_TARGETS) ## Run a controller from your host.
+run: generate-deepcopy $(K8S_RUN_PRE_TARGETS) ## Run a controller from your host.
 	go run -ldflags "-X main.Version=$(VERSION)" ./main.go
 
 ##@ K8s - Integration test with envtest
@@ -44,15 +44,11 @@ $(K8S_INTEGRATION_TEST_DIR):
 	@mkdir -p $@
 
 .PHONY: k8s-integration-test
-k8s-integration-test: $(K8S_INTEGRATION_TEST_DIR) ${K8S_CRD_COMPONENT_SOURCE} generate ${ENVTEST} ## Run k8s integration tests.
+k8s-integration-test: $(K8S_INTEGRATION_TEST_DIR) ${ENVTEST} ## Run k8s integration tests.
 	@echo "Running K8s integration tests..."
 	@KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) -p path)" go test -tags=k8s_integration ./... -coverprofile ${K8S_INTEGRATION_TEST_DIR}/report-k8s-integration.out
 
 ##@ Controller specific targets
-
-.PHONY: generate
-generate: generate-deepcopy ## Deprecated: please use generate-deepcopy instead
-	@echo "WARNING: Being called as 'generate'. Please migrate to the makefile target 'generate-deepcopy'"
 
 .PHONY: generate-deepcopy
 generate-deepcopy: ${CONTROLLER_GEN} ## Generate code containing DeepCopy* method implementations.
