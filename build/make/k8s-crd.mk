@@ -1,21 +1,19 @@
-ARTIFACT_CRD_ID=$(ARTIFACT_ID)-crd
-DEV_CRD_VERSION?=${VERSION}-dev
+ARTIFACT_CRD_ID = $(ARTIFACT_ID)-crd
+DEV_CRD_VERSION ?= ${VERSION}-dev
+K8S_HELM_CRD_SOURCE ?= ${WORKDIR}/k8s/helm-crd
 K8S_HELM_CRD_TARGET ?= $(K8S_RESOURCE_TEMP_FOLDER)/helm-crd
-K8S_HELM_CRD_RESSOURCES ?= k8s/helm-crd
-K8S_HELM_CRD_RELEASE_TGZ=${K8S_HELM_CRD_TARGET}/${ARTIFACT_CRD_ID}-${VERSION}.tgz
-K8S_HELM_CRD_DEV_RELEASE_TGZ=${K8S_HELM_CRD_TARGET}/${ARTIFACT_CRD_ID}-${DEV_CRD_VERSION}.tgz
+K8S_HELM_CRD_RELEASE_TGZ = ${K8S_HELM_CRD_TARGET}/${ARTIFACT_CRD_ID}-${VERSION}.tgz
+K8S_HELM_CRD_DEV_RELEASE_TGZ = ${K8S_HELM_CRD_TARGET}/${ARTIFACT_CRD_ID}-${DEV_CRD_VERSION}.tgz
 
 K8S_RESOURCE_CRD_COMPONENT ?= "${K8S_RESOURCE_TEMP_FOLDER}/component-${ARTIFACT_CRD_ID}-${VERSION}.yaml"
 K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML ?= $(BUILD_DIR)/make/k8s-component.tpl
-# K8S_CRD_COMPONENT_SOURCE must contain an absolute path(s) to CRD YAML files which will be created by ${CONTROLLER_GEN}.
-K8S_CRD_COMPONENT_SOURCE?=${K8S_HELM_CRD_RESSOURCES}/no-files-configured
-# K8S_COPY_CRD_TARGET_DIR may contain an secondary directory to which all generated CRD YAMLs will be (additionally) copied.
-K8S_COPY_CRD_TARGET_DIR?=
+# K8S_CRD_POST_MANIFEST_TARGETS can be used to post-process CRD YAMLs after their creation.
+K8S_CRD_POST_MANIFEST_TARGETS ?=
 
 ##@ K8s - CRD targets
 
 .PHONY: manifests
-manifests: ${CRD_SRC_GO} ${CONTROLLER_GEN} manifests-run ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+manifests: ${CONTROLLER_GEN} manifests-run ${K8S_CRD_POST_MANIFEST_TARGETS} ## Generate CustomResourceDefinition YAMLs.
 
 .PHONY: manifests-run
 manifests-run:
@@ -23,7 +21,7 @@ manifests-run:
 	@$(CONTROLLER_GEN) crd paths="./..." output:crd:artifacts:config=k8s/helm-crd/templates
 
 .PHONY: crd-helm-generate ## Generates the Helm CRD chart
-crd-helm-generate: manifests validate-crd-chart ${K8S_HELM_CRD_TARGET}/Chart.yaml
+crd-helm-generate: manifests validate-crd-chart ${K8S_HELM_CRD_TARGET}/Chart.yaml ${K8S_POST_CRD_HELM_GENERATE_TARGETS}
 
 # this is phony because of it is easier this way than the makefile-single-run way
 .PHONY: ${K8S_HELM_CRD_TARGET}/Chart.yaml
@@ -31,7 +29,7 @@ ${K8S_HELM_CRD_TARGET}/Chart.yaml: ${K8S_RESOURCE_TEMP_FOLDER}
 	@echo "Copying Helm CRD files..."
 	@rm -drf ${K8S_HELM_CRD_TARGET}/templates
 	@mkdir -p ${K8S_HELM_CRD_TARGET}/templates
-	@cp -r ${K8S_HELM_CRD_RESSOURCES}/** ${K8S_HELM_CRD_TARGET}
+	@cp -r ${K8S_HELM_CRD_SOURCE}/** ${K8S_HELM_CRD_TARGET}
 
 	@echo "Generate Helm CRD chart..."
 	@sed -i 's/name: artifact-crd-replaceme/name: ${ARTIFACT_CRD_ID}/' ${K8S_HELM_CRD_TARGET}/Chart.yaml
@@ -45,13 +43,13 @@ ${K8S_HELM_CRD_TARGET}/Chart.yaml: ${K8S_RESOURCE_TEMP_FOLDER}
 
 .PHONY: validate-crd-chart
 validate-crd-chart:
-	@if [ ! -f ${K8S_HELM_CRD_RESSOURCES}/Chart.yaml ] ; then \
-       echo "Could not find CRD source Helm chart under \$${K8S_HELM_CRD_RESSOURCES}/Chart.yaml" ; \
+	@if [ ! -f ${K8S_HELM_CRD_SOURCE}/Chart.yaml ] ; then \
+       echo "Could not find CRD source Helm chart under \$${K8S_HELM_CRD_SOURCE}/Chart.yaml" ; \
        exit 23 ; \
     fi
 
 .PHONY: crd-helm-apply
-crd-helm-apply: ${BINARY_HELM} check-k8s-namespace-env-var crd-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and installs the Helm CRD chart.
+crd-helm-apply: ${BINARY_HELM} check-k8s-namespace-env-var crd-helm-generate ## Generates and installs the Helm CRD chart.
 	@echo "Apply generated Helm CRD chart"
 	@${BINARY_HELM} upgrade -i ${ARTIFACT_CRD_ID} ${K8S_HELM_CRD_TARGET} ${BINARY_HELM_ADDITIONAL_UPGR_ARGS} --namespace ${NAMESPACE}
 
@@ -67,7 +65,7 @@ crd-helm-package: crd-helm-delete-existing-tgz ${K8S_HELM_CRD_RELEASE_TGZ} ## Ge
 crd-helm-delete-existing-tgz: ## Remove an existing Helm CRD package.
 	@rm -f ${K8S_HELM_CRD_RELEASE_TGZ}*
 
-${K8S_HELM_CRD_RELEASE_TGZ}: ${BINARY_HELM} crd-helm-generate $(K8S_POST_GENERATE_TARGETS) ## Generates and packages the Helm CRD chart.
+${K8S_HELM_CRD_RELEASE_TGZ}: ${BINARY_HELM} crd-helm-generate ## Generates and packages the Helm CRD chart.
 	@echo "Package generated helm crd-chart"
 	@${BINARY_HELM} package ${K8S_HELM_CRD_TARGET} -d ${K8S_HELM_CRD_TARGET} ${BINARY_HELM_ADDITIONAL_PACK_ARGS}
 
@@ -92,11 +90,11 @@ crd-component-generate: ${K8S_RESOURCE_TEMP_FOLDER} ## Generate the CRD componen
 	fi
 
 .PHONY: crd-component-apply
-crd-component-apply: check-k8s-namespace-env-var crd-helm-chart-import crd-component-generate $(K8S_POST_GENERATE_TARGETS) ## Applies the CRD component YAML resource to the actual defined context.
+crd-component-apply: check-k8s-namespace-env-var crd-helm-chart-import crd-component-generate ## Applies the CRD component YAML resource to the actual defined context.
 	@kubectl apply -f "${K8S_RESOURCE_CRD_COMPONENT}" --namespace="${NAMESPACE}"
 	@echo "Done."
 
 .PHONY: crd-component-delete
-crd-component-delete: check-k8s-namespace-env-var crd-component-generate $(K8S_POST_GENERATE_TARGETS) ## Deletes the CRD component YAML resource from the actual defined context.
+crd-component-delete: check-k8s-namespace-env-var crd-component-generate ## Deletes the CRD component YAML resource from the actual defined context.
 	@kubectl delete -f "${K8S_RESOURCE_CRD_COMPONENT}" --namespace="${NAMESPACE}" || true
 	@echo "Done."

@@ -1,6 +1,4 @@
 COMPONENT_DEV_VERSION?=${VERSION}-dev
-## Image URL to use all building/pushing image targets
-IMAGE_DEV?=${K3CES_REGISTRY_URL_PREFIX}/${ARTIFACT_ID}
 
 include ${BUILD_DIR}/make/k8s.mk
 
@@ -17,10 +15,10 @@ K8S_HELM_ARTIFACT_NAMESPACE?=k8s
 
 K8S_RESOURCE_COMPONENT ?= "${K8S_RESOURCE_TEMP_FOLDER}/component-${ARTIFACT_ID}-${VERSION}.yaml"
 K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML ?= $(BUILD_DIR)/make/k8s-component.tpl
-HELM_PRE_GENERATE_TARGETS?=
-HELM_PRE_APPLY_TARGETS?=
-HELM_POST_GENERATE_TARGETS?=
-COMPONENT_PRE_APPLY_TARGETS?=
+HELM_PRE_GENERATE_TARGETS ?=
+HELM_PRE_APPLY_TARGETS ?=
+HELM_POST_GENERATE_TARGETS ?=
+COMPONENT_PRE_APPLY_TARGETS ?=
 
 ##@ K8s - Helm general
 .PHONY: helm-init-chart
@@ -62,6 +60,10 @@ validate-chart:
        exit 22 ; \
     fi
 
+.PHONY: helm-update-dependencies
+helm-update-dependencies: ${BINARY_HELM} ## Update Helm chart dependencies
+	@$(BINARY_HELM) dependency update "${K8S_HELM_RESSOURCES}"
+
 ##@ K8s - Helm dev targets
 
 .PHONY: helm-apply
@@ -87,10 +89,6 @@ helm-chart-import: check-all-vars check-k8s-artifact-id helm-generate helm-packa
         ${BINARY_HELM} push ${K8S_HELM_RELEASE_TGZ} oci://${K3CES_REGISTRY_URL_PREFIX}/${K8S_HELM_ARTIFACT_NAMESPACE} ${BINARY_HELM_ADDITIONAL_PUSH_ARGS}; \
     fi
 	@echo "Done."
-
-.PHONY: helm-update-dependencies
-helm-update-dependencies: ${BINARY_HELM} ## Update Helm chart dependencies
-	@$(BINARY_HELM) dependency update "${K8S_HELM_RESSOURCES}"
 
 ##@ K8s - Helm release targets
 
