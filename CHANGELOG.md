@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - the k8s target `check-all-vars` executes now also the `check-k8s-image-env-var` check
 - the k8s/helm targets `${K8S_HELM_TARGET}/Chart.yaml` (and thus `helm-generate`) may execute pre-targets configured in the new variable `HELM_PRE_GENERATE_TARGETS`
   - this target also checks with `validate-chart` if a source Helm `Chart.yaml` exists
-- the k8s/helm target `copy-helm-templates` copies all Helm files (including `Chart.yaml`) from the source directory to `target/k8s/helm`
+- the k8s/helm target `copy-helm-files` copies all Helm files (including `Chart.yaml`) from the source directory to `target/k8s/helm`
   ${COMPONENT_PRE_APPLY_TARGETS}
 - adds k8s/crd target `validate-crd-chart` to check for a source CRD `Chart.yaml`
 - adds k8s/crd target `validate-crd` to check if `K8S_CRD_COMPONENT_SOURCE` was properly set
