@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `manifests` can be found by including `build/make/k8s-crd.mk`
   - `generate` can be found by including `build/make/k8s-controller.mk`
 - the k8s/controller target `generate` renames to `generate-deepcopy` for better understandability
-- the k8s/crd target `crd-helm-generate-chart` aliases now to `${K8S_HELM_CRD_TARGET}/Chart.yaml` and executes prior two checks: `validate-crd-chart`, `validate-crd`
+- the k8s/crd target `crd-helm-generate-chart` aliases now to `${HELM_CRD_TARGET}/Chart.yaml` and executes prior two checks: `validate-crd-chart`, `validate-crd`
 - the k8s/dogu variable `DOGU_JSON_DEV_FILE` is no longer a relative path but absolute
 
 ### Removed
@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - the k8s target `check-all-vars` executes now also the `check-k8s-image-env-var` check
-- the k8s/helm targets `${K8S_HELM_TARGET}/Chart.yaml` (and thus `helm-generate`) may execute pre-targets configured in the new variable `HELM_PRE_GENERATE_TARGETS`
+- the k8s/helm targets `${HELM_TARGET_DIR}/Chart.yaml` (and thus `helm-generate`) may execute pre-targets configured in the new variable `HELM_PRE_GENERATE_TARGETS`
   - this target also checks with `validate-chart` if a source Helm `Chart.yaml` exists
 - the k8s/helm target `copy-helm-files` copies all Helm files (including `Chart.yaml`) from the source directory to `target/k8s/helm`
   ${COMPONENT_PRE_APPLY_TARGETS}
