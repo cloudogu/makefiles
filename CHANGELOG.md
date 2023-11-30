@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Make the targets for generate and copy manifests and the image-import configurable. External components have to override them with empty values because they do not have CRDs in go-code or images to build. [#172]
+
 ### Fixed
 - fixes wrong container image version `latest` during `image-import` [#172]
 - the k8s/CRD target `helm-package-release` renames to `helm-package` in order to harmonize with `crd-helm-package`

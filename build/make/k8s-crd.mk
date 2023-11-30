@@ -10,6 +10,9 @@ K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML ?= $(BUILD_DIR)/make/k8s-component.tpl
 # CRD_POST_MANIFEST_TARGETS can be used to post-process CRD YAMLs after their creation.
 CRD_POST_MANIFEST_TARGETS ?= crd-add-labels
 
+# This can be used by external components to prevent generate and copy controller manifests by overriding with an empty value.
+CRD_HELM_MANIFEST_TARGET?=manifests
+
 ##@ K8s - CRD targets
 
 .PHONY: manifests
@@ -29,7 +32,7 @@ crd-add-labels: $(BINARY_YQ)
 	done
 
 .PHONY: crd-helm-generate ## Generates the Helm CRD chart
-crd-helm-generate: manifests validate-crd-chart ${HELM_CRD_TARGET_DIR}/Chart.yaml ${K8S_POST_CRD_HELM_GENERATE_TARGETS}
+crd-helm-generate: ${CRD_HELM_MANIFEST_TARGET} validate-crd-chart ${HELM_CRD_TARGET_DIR}/Chart.yaml ${K8S_POST_CRD_HELM_GENERATE_TARGETS}
 
 # this is phony because of it is easier this way than the makefile-single-run way
 .PHONY: ${HELM_CRD_TARGET_DIR}/Chart.yaml
