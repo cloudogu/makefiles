@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-Breaking change ahead! 
+Breaking change ahead! [#170]
 
 This release cleans up lots of K8s targets and renames targets and variables in a more matching manner. 
 Please take the time to revise the changes for your project if you use them after a major version upgrade.
@@ -61,6 +61,8 @@ Please take the time to revise the changes for your project if you use them afte
   ${COMPONENT_PRE_APPLY_TARGETS}
 - adds k8s/crd target `validate-crd-chart` to check for a source CRD `Chart.yaml`
 - adds k8s/crd target `validate-crd` to check if `K8S_CRD_COMPONENT_SOURCE` was properly set
+- adds k8s/crd target `crd-helm-lint` to lint the CRD's Helm chart
+- adds k8s/component target `helm-lint` to lint the component's Helm chart
 
 ## [v8.8.0](https://github.com/cloudogu/makefiles/releases/tag/v8.7.3) 2023-11-21
 ### Added
