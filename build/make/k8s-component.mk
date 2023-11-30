@@ -82,7 +82,7 @@ helm-delete: ${BINARY_HELM} check-k8s-namespace-env-var ## Uninstalls the curren
 helm-reinstall: helm-delete helm-apply ## Uninstalls the current helm chart and reinstalls it.
 
 .PHONY: helm-chart-import
-helm-chart-import: check-all-vars check-k8s-artifact-id helm-generate helm-package-release image-import ## Imports the currently available chart into the cluster-local registry.
+helm-chart-import: check-all-vars check-k8s-artifact-id helm-generate helm-package image-import ## Imports the currently available chart into the cluster-local registry.
 	@if [[ ${STAGE} == "development" ]]; then \
 		echo "Import ${HELM_DEV_RELEASE_TGZ} into K8s cluster ${K3CES_REGISTRY_URL_PREFIX}..."; \
 		${BINARY_HELM} push ${HELM_DEV_RELEASE_TGZ} oci://${K3CES_REGISTRY_URL_PREFIX}/${HELM_ARTIFACT_NAMESPACE} ${BINARY_HELM_ADDITIONAL_PUSH_ARGS}; \
@@ -98,8 +98,8 @@ helm-chart-import: check-all-vars check-k8s-artifact-id helm-generate helm-packa
 helm-generate-release: update-urls ## Generates the final helm chart with release URLs.
 
 
-.PHONY: helm-package-release
-helm-package-release: helm-delete-existing-tgz ${HELM_RELEASE_TGZ} ## Generates and packages the helm chart with release URLs.
+.PHONY: helm-package
+helm-package: helm-delete-existing-tgz ${HELM_RELEASE_TGZ} ## Generates and packages the helm chart with release URLs.
 
 ${HELM_RELEASE_TGZ}: ${BINARY_HELM} ${HELM_TARGET_DIR}/Chart.yaml ${HELM_POST_GENERATE_TARGETS} ## Generates and packages the helm chart with release URLs.
 	@echo "Package generated helm chart"
