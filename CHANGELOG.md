@@ -6,6 +6,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+Breaking change ahead! [#170]
+
+This release cleans up lots of K8s targets and renames targets and variables in a more matching manner. 
+Please take the time to revise the changes for your project if you use them after a major version upgrade.
+
+### Changed
+
+#### General K8s and k8s dogu-related
+- the k8s variable `IMAGE_DEV` no longer contains a version tag because it makes editing YAML files easier
+  - you can append `${VERSION}` as it should already be defined in your main makefile.
+- k8s tool versions are now replaceable by these variables
+  - `BINARY_YQ_4_VERSION`, `BINARY_HELM_VERSION`, and `CONTROLLER_GEN_VERSION` can now be customized if needed
+    - simply set these variables before the inclusion of any `k8s*.mk` files
+  - the corresponding path and version variables move to the same place in `k8s.mk` for better maintenance experience
+- the variable `K8S_RESOURCE_TEMP_FOLDER` no longer contains a `make` subdirectory to simplify the directory structure in `target/`
+- the k8s/dogu variable `DOGU_JSON_DEV_FILE` is no longer a relative path but absolute
+- The k8s/dogu target `k8s-create-temporary-resource` renames to `create-dogu-resource`
+  - its output can be optionally defined by setting `K8S_RESOURCE_DOGU` but defaults to `target/k8s/${ARTIFACT_ID}.yaml
+
+#### Helm / components
+- the k8s/helm target `helm-generate-chart` renames to `helm-generate`
+  - `helm-generate` also provides now optional post-exec targets by setting `HELM_POST_GENERATE_TARGETS`
+- the k8s/helm target `helm-apply` also executes `image-import`
+  - this target also allows now optional pre-exec targets by setting `HELM_PRE_APPLY_TARGETS`
+- the k8s/helm target `helm-chart-import` also executes `image-import`
+- these overridable variables rename to their respective counterparts:
+  - `K8S_HELM_TARGET` to `HELM_TARGET_DIR`
+  - `K8S_HELM_RESSOURCES` to `HELM_SOURCE_DIR`
+  - `K8S_HELM_ARTIFACT_NAMESPACE` to `HELM_ARTIFACT_NAMESPACE`
+
+#### Helm-CRD
+- the k8s/crd targets `manifests` and `generate` are no longer specific to the controller implementation
+  - `manifests` can be found by including `build/make/k8s-crd.mk`
+    - this target also allows now optional post-exec targets by setting `CRD_POST_MANIFEST_TARGETS`
+  - `generate` can be found by including `build/make/k8s-controller.mk`
+- the k8s/crd target `crd-helm-generate-chart` renames to `crd-helm-generate` and executes prior two checks: `validate-crd-chart`, `validate-crd`
+  - `crd-helm-generate` allows also now optional post-exec targets by setting `K8S_POST_CRD_HELM_GENERATE_TARGETS`
+
+#### k8s controller
+- the k8s/controller target `generate` renames to `generate-deepcopy` for better understandability
+ 
+### Removed
+- the k8s targets `k8s-delete`, `k8s-generate`, and `k8s-apply` are removed in favor of Helm targets
+  - along with these targets, the variables `K8S_PRE_GENERATE_TARGETS`, `PRE_APPLY_TARGETS`, `K8S_POST_GENERATE_TARGETS` are removed
+  - instead these targets take their place: `HELM_PRE_GENERATE_TARGETS`, `HELM_PRE_APPLY_TARGETS`/`COMPONENT_PRE_APPLY_TARGETS`, `HELM_POST_GENERATE_TARGETS`
+- the k8s/controller target `k8s-create-temporary-resource` which used to produce monolithic YAML resources is removed
+
+### Added
+- the k8s target `check-all-vars` executes now also the `check-k8s-image-env-var` check
+- the k8s/helm targets `${HELM_TARGET_DIR}/Chart.yaml` (and thus `helm-generate`) may execute pre-targets configured in the new variable `HELM_PRE_GENERATE_TARGETS`
+  - this target also checks with `validate-chart` if a source Helm `Chart.yaml` exists
+- the k8s/helm target `copy-helm-files` copies all Helm files (including `Chart.yaml`) from the source directory to `target/k8s/helm`
+  ${COMPONENT_PRE_APPLY_TARGETS}
+- adds k8s/crd target `validate-crd-chart` to check for a source CRD `Chart.yaml`
+- adds k8s/crd target `validate-crd` to check if `K8S_CRD_COMPONENT_SOURCE` was properly set
+- adds k8s/crd target `crd-helm-lint` to lint the CRD's Helm chart
+- adds k8s/component target `helm-lint` to lint the component's Helm chart
 
 ## [v8.8.0](https://github.com/cloudogu/makefiles/releases/tag/v8.7.3) 2023-11-21
 ### Added
