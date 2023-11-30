@@ -382,7 +382,6 @@ This module provides generic targets for developing K8s Cloudogu EcoSystem
 This module provides targets for developing K8s Cloudogu EcoSystem components (including controllers)
 - General helm targets
   - `helm-init-chart` - Creates a Chart.yaml-template with zero values
-  - `helm-generate-chart` - Generates the final helm chart
 - Helm developing targets
    - `helm-generate` - Generates the final helm chart with dev-urls
    - `helm-apply` - Generates and installs the helm chart
@@ -416,7 +415,7 @@ This module provides targets for K8s Cloudogu EcoSystem controllers.
 #### k8s-crd.mk
 This module provides targets for managing K8S Custom Resource Definitions (CRDs) of CES controllers.
 
-- `crd-helm-generate-chart` - Generate the helm chart containing the CRDs
+- `crd-helm-generate` - Generate the helm chart containing the CRDs
 - `crd-helm-apply` - Generates and installs the helm chart containing the CRDs
 - `crd-helm-delete` - Uninstalls the helm chart containing the CRDs
 - `crd-helm-package` - Generates and packages the helm chart containing the CRDs

@@ -6,12 +6,17 @@ endif
 
 ## Variables
 
+BINARY_YQ = $(UTILITY_BIN_PATH)/yq
+BINARY_YQ_4_VERSION?=v4.40.3
+BINARY_HELM = $(UTILITY_BIN_PATH)/helm
+BINARY_HELM_VERSION?=v3.13.0
+CONTROLLER_GEN = $(UTILITY_BIN_PATH)/controller-gen
+CONTROLLER_GEN_VERSION?=v0.13.0
+
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # Options are set to exit when a recipe line exits non-zero or a piped command fails.
 SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
-
-BINARY_YQ = $(UTILITY_BIN_PATH)/yq
 
 # The productive tag of the image
 IMAGE ?=
@@ -22,18 +27,17 @@ STAGE?=production
 K3S_CLUSTER_FQDN?=k3ces.local
 K3S_LOCAL_REGISTRY_PORT?=30099
 K3CES_REGISTRY_URL_PREFIX="${K3S_CLUSTER_FQDN}:${K3S_LOCAL_REGISTRY_PORT}"
+## Image URL to use all building/pushing image targets
+IMAGE_DEV?=${K3CES_REGISTRY_URL_PREFIX}/${ARTIFACT_ID}
 
 # Variables for the temporary yaml files. These are used as template to generate a development resource containing
 # the current namespace and the dev image.
-K8S_RESOURCE_TEMP_FOLDER ?= $(TARGET_DIR)/make/k8s
-K8S_RESOURCE_TEMP_YAML ?= $(K8S_RESOURCE_TEMP_FOLDER)/$(ARTIFACT_ID)_$(VERSION).yaml
-
-PRE_APPLY_TARGETS ?= check-k8s-image-env-var image-import
+K8S_RESOURCE_TEMP_FOLDER ?= $(TARGET_DIR)/k8s
 
 ##@ K8s - Variables
 
 .PHONY: check-all-vars
-check-all-vars: check-k8s-artifact-id check-etc-hosts check-insecure-cluster-registry check-k8s-namespace-env-var ## Conduct a sanity check against selected build artefacts or local environment
+check-all-vars: check-k8s-image-env-var check-k8s-artifact-id check-etc-hosts check-insecure-cluster-registry check-k8s-namespace-env-var ## Conduct a sanity check against selected build artefacts or local environment
 
 .PHONY: check-k8s-namespace-env-var
 check-k8s-namespace-env-var:
@@ -62,32 +66,6 @@ check-insecure-cluster-registry:
 ${K8S_RESOURCE_TEMP_FOLDER}:
 	@mkdir -p $@
 
-.PHONY: k8s-delete
-k8s-delete: k8s-generate $(K8S_POST_GENERATE_TARGETS) ## Deletes all dogu related resources from the K8s cluster.
-	@echo "Delete old dogu resources..."
-	@kubectl delete -f $(K8S_RESOURCE_TEMP_YAML) --wait=false --ignore-not-found=true --namespace=${NAMESPACE}
-
-# The additional targets executed after the generate target, executed before each apply and delete. The generate target
-# produces a temporary yaml. This yaml is accessible via K8S_RESOURCE_TEMP_YAML an can be changed before the apply/delete.
-K8S_POST_GENERATE_TARGETS ?=
-# The additional targets executed before the generate target, executed before each apply and delete.
-K8S_PRE_GENERATE_TARGETS ?= k8s-create-temporary-resource
-
-.PHONY: k8s-generate
-k8s-generate: ${BINARY_YQ} $(K8S_RESOURCE_TEMP_FOLDER) $(K8S_PRE_GENERATE_TARGETS) ## Generates the final resource yaml.
-	@echo "Applying general transformations..."
-	@if [[ ${STAGE} == "development" ]]; then \
-	  $(BINARY_YQ) -i e "(select(.kind == \"Deployment\").spec.template.spec.containers[]|select(.image == \"*$(ARTIFACT_ID)*\").image)=\"$(IMAGE_DEV)\"" $(K8S_RESOURCE_TEMP_YAML); \
-	else \
-	  $(BINARY_YQ) -i e "(select(.kind == \"Deployment\").spec.template.spec.containers[]|select(.image == \"*$(ARTIFACT_ID)*\").image)=\"$(IMAGE)\"" $(K8S_RESOURCE_TEMP_YAML); \
-	fi
-	@echo "Done."
-
-.PHONY: k8s-apply
-k8s-apply: k8s-generate $(PRE_APPLY_TARGETS) $(K8S_POST_GENERATE_TARGETS) ## Applies all generated K8s resources to the current cluster and namespace.
-	@echo "Apply generated K8s resources..."
-	@sed -i "s/'{{ .Namespace }}'/$(NAMESPACE)/" $(K8S_RESOURCE_TEMP_YAML)
-	@kubectl apply -f $(K8S_RESOURCE_TEMP_YAML) --namespace=${NAMESPACE}
 
 ##@ K8s - Docker
 
@@ -129,8 +107,31 @@ __check_defined = \
     $(if $(value $1),, \
       $(error Undefined $1$(if $2, ($2))))
 
+##@ K8s - Download Utilities
+
 .PHONY: install-yq ## Installs the yq YAML editor.
 install-yq: ${BINARY_YQ}
 
-${BINARY_YQ}: $(UTILITY_BIN_PATH) ## Download yq locally if necessary.
-	$(call go-get-tool,$(BINARY_YQ),github.com/mikefarah/yq/v4@v4.25.1)
+${BINARY_YQ}: $(UTILITY_BIN_PATH)
+	$(call go-get-tool,$(BINARY_YQ),github.com/mikefarah/yq/v4@${BINARY_YQ_4_VERSION})
+
+##@ K8s - Download Kubernetes Utilities
+
+.PHONY: install-helm ## Download helm locally if necessary.
+install-helm: ${BINARY_HELM}
+
+${BINARY_HELM}: $(UTILITY_BIN_PATH)
+	$(call go-get-tool,$(BINARY_HELM),helm.sh/helm/v3/cmd/helm@${BINARY_HELM_VERSION})
+
+.PHONY: controller-gen
+controller-gen: ${CONTROLLER_GEN} ## Download controller-gen locally if necessary.
+
+${CONTROLLER_GEN}:
+	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@${CONTROLLER_GEN_VERSION})
+
+ENVTEST = $(UTILITY_BIN_PATH)/setup-envtest
+.PHONY: envtest
+envtest: ${ENVTEST} ## Download envtest-setup locally if necessary.
+
+${ENVTEST}:
+	$(call go-get-tool,$(ENVTEST),sigs.k8s.io/controller-runtime/tools/setup-envtest@latest)
