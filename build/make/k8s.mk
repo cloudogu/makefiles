@@ -29,6 +29,7 @@ K3S_LOCAL_REGISTRY_PORT?=30099
 K3CES_REGISTRY_URL_PREFIX="${K3S_CLUSTER_FQDN}:${K3S_LOCAL_REGISTRY_PORT}"
 ## Image URL to use all building/pushing image targets
 IMAGE_DEV?=${K3CES_REGISTRY_URL_PREFIX}/${ARTIFACT_ID}
+IMAGE_DEV_VERSION=${IMAGE_DEV}:${VERSION}
 
 # Variables for the temporary yaml files. These are used as template to generate a development resource containing
 # the current namespace and the dev image.
@@ -76,8 +77,8 @@ docker-build: check-k8s-image-env-var ## Builds the docker image of the K8s app.
 
 .PHONY: docker-dev-tag
 docker-dev-tag: check-k8s-image-dev-var docker-build ## Tags a Docker image for local K3ces deployment.
-	@echo "Tagging image with dev tag $(IMAGE_DEV)..."
-	@DOCKER_BUILDKIT=1 docker tag ${IMAGE} $(IMAGE_DEV)
+	@echo "Tagging image with dev tag $(IMAGE_DEV_VERSION)..."
+	@DOCKER_BUILDKIT=1 docker tag ${IMAGE} $(IMAGE_DEV_VERSION)
 
 .PHONY: check-k8s-image-dev-var
 check-k8s-image-dev-var:
@@ -88,8 +89,8 @@ endif
 
 .PHONY: image-import
 image-import: check-all-vars check-k8s-artifact-id docker-dev-tag ## Imports the currently available image into the cluster-local registry.
-	@echo "Import $(IMAGE_DEV) into K8s cluster ${K3S_CLUSTER_FQDN}..."
-	@docker push $(IMAGE_DEV):$(VERSION)
+	@echo "Import $(IMAGE_DEV_VERSION) into K8s cluster ${K3S_CLUSTER_FQDN}..."
+	@docker push $(IMAGE_DEV_VERSION)
 	@echo "Done."
 
 ## Functions
