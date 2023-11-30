@@ -89,7 +89,7 @@ endif
 .PHONY: image-import
 image-import: check-all-vars check-k8s-artifact-id docker-dev-tag ## Imports the currently available image into the cluster-local registry.
 	@echo "Import $(IMAGE_DEV) into K8s cluster ${K3S_CLUSTER_FQDN}..."
-	@docker push $(IMAGE_DEV)
+	@docker push $(IMAGE_DEV):$(VERSION)
 	@echo "Done."
 
 ## Functions

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- fixes wrong container image version `latest` during `image-import` 
+
 ## [v9.0.0](https://github.com/cloudogu/makefiles/releases/tag/v9.0.0) 2023-11-30
 Breaking change ahead! [#170]
 
@@ -66,7 +69,7 @@ Please take the time to revise the changes for your project if you use them afte
 - adds k8s/crd target `crd-helm-lint` to lint the CRD's Helm chart
 - adds k8s/component target `helm-lint` to lint the component's Helm chart
 
-## [v8.8.0](https://github.com/cloudogu/makefiles/releases/tag/v8.7.3) 2023-11-21
+## [v8.8.0](https://github.com/cloudogu/makefiles/releases/tag/v8.8.0) 2023-11-21
 ### Added
 - [#168] Publish targets for yarn to run publish tasks in a unified way
   - update the variable NODE_VERSION to define the used version of nodeJs (default: 8)
