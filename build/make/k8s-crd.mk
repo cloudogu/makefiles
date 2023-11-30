@@ -8,7 +8,7 @@ HELM_CRD_DEV_RELEASE_TGZ = ${HELM_CRD_TARGET_DIR}/${ARTIFACT_CRD_ID}-${DEV_CRD_V
 K8S_RESOURCE_CRD_COMPONENT ?= "${K8S_RESOURCE_TEMP_FOLDER}/component-${ARTIFACT_CRD_ID}-${VERSION}.yaml"
 K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML ?= $(BUILD_DIR)/make/k8s-component.tpl
 # CRD_POST_MANIFEST_TARGETS can be used to post-process CRD YAMLs after their creation.
-CRD_POST_MANIFEST_TARGETS ?=
+CRD_POST_MANIFEST_TARGETS ?= crd-add-labels
 
 ##@ K8s - CRD targets
 
@@ -18,7 +18,15 @@ manifests: ${CONTROLLER_GEN} manifests-run ${CRD_POST_MANIFEST_TARGETS} ## Gener
 .PHONY: manifests-run
 manifests-run:
 	@echo "Generate manifests..."
-	@$(CONTROLLER_GEN) crd paths="./..." output:crd:artifacts:config=k8s/helm-crd/templates
+	@$(CONTROLLER_GEN) crd paths="./..." output:crd:artifacts:config=${HELM_CRD_SOURCE_DIR}/templates
+
+.PHONY: crd-add-labels
+crd-add-labels: $(BINARY_YQ)
+	@echo "Adding labels to CRD..."
+	@for file in ${HELM_CRD_SOURCE_DIR}/templates/*.yaml ; do \
+		$(BINARY_YQ) -i e ".metadata.labels.app = \"ces\"" $${file} ;\
+		$(BINARY_YQ) -i e ".metadata.labels.\"app.kubernetes.io/name\" = \"${ARTIFACT_ID}\"" $${file} ;\
+	done
 
 .PHONY: crd-helm-generate ## Generates the Helm CRD chart
 crd-helm-generate: manifests validate-crd-chart ${HELM_CRD_TARGET_DIR}/Chart.yaml ${K8S_POST_CRD_HELM_GENERATE_TARGETS}

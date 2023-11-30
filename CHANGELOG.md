@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- fixes wrong container image version `latest` during `image-import` 
+- fixes wrong container image version `latest` during `image-import` [#172]
+
+### Added
+- runs k8s/CRD target `crd-add-labels` by default after the CRD generation target `manifest`
 
 ## [v9.0.0](https://github.com/cloudogu/makefiles/releases/tag/v9.0.0) 2023-11-30
 Breaking change ahead! [#170]
