@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v9.0.1](https://github.com/cloudogu/makefiles/releases/tag/v9.0.1) 2023-12-01
+### Changed
+- Make the targets for generate and copy manifests configurable. External components have to override them with empty values because they do not have CRDs in go-code. [#172]
+- Make the target to importing images configurable. Components with own images to build should override `IMAGE_IMPORT_TARGET` with `image-import`. [#172]
+- Make the target to check all environment variables configurable. Components with own images to build should override `CHECK_VAR_TARGETS` with `check-all-vars`. [#172] 
+
+### Fixed
+- fixes wrong container image version `latest` during `image-import` [#172]
+- the k8s/CRD target `helm-package-release` renames to `helm-package` in order to harmonize with `crd-helm-package`
+- the k8s/CRD target `manifests` honors now the variable `HELM_CRD_SOURCE_DIR` if set to a different value
+
+### Added
+- runs k8s/CRD target `crd-add-labels` by default after the CRD generation target `manifest`
+
 ## [v9.0.0](https://github.com/cloudogu/makefiles/releases/tag/v9.0.0) 2023-11-30
 Breaking change ahead! [#170]
 
@@ -66,7 +80,7 @@ Please take the time to revise the changes for your project if you use them afte
 - adds k8s/crd target `crd-helm-lint` to lint the CRD's Helm chart
 - adds k8s/component target `helm-lint` to lint the component's Helm chart
 
-## [v8.8.0](https://github.com/cloudogu/makefiles/releases/tag/v8.7.3) 2023-11-21
+## [v8.8.0](https://github.com/cloudogu/makefiles/releases/tag/v8.8.0) 2023-11-21
 ### Added
 - [#168] Publish targets for yarn to run publish tasks in a unified way
   - update the variable NODE_VERSION to define the used version of nodeJs (default: 8)
