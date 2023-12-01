@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v9.0.1](https://github.com/cloudogu/makefiles/releases/tag/v9.0.1) 2023-12-01
 ### Changed
 - Make the targets for generate and copy manifests configurable. External components have to override them with empty values because they do not have CRDs in go-code. [#172]
 - Make the target to importing images configurable. Components with own images to build should override `IMAGE_IMPORT_TARGET` with `image-import`. [#172]
