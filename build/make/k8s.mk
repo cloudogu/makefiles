@@ -42,7 +42,10 @@ CHECK_VAR_TARGETS?=check-all-vars-without-image
 ##@ K8s - Variables
 
 .PHONY: check-all-vars
-check-all-vars: check-all-vars-without-image check-k8s-image-env-var check-k8s-image-dev-var check-etc-hosts check-insecure-cluster-registry ## Conduct a sanity check against selected build artefacts or local environment
+check-all-vars: check-all-vars-without-image check-all-image-vars ## Conduct a sanity check against selected build artefacts or local environment
+
+.PHONY: check-all-image-vars
+check-all-image-vars: check-k8s-image-env-var check-k8s-image-dev-var check-etc-hosts check-insecure-cluster-registry
 
 .PHONY: check-all-vars-without-image
 check-all-vars-without-image: check-k8s-artifact-id check-k8s-namespace-env-var
