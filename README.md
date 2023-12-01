@@ -389,7 +389,7 @@ This module provides targets for developing K8s Cloudogu EcoSystem components (i
    - `helm-reinstall` - Uninstalls the current helm chart and re-installs it
    - `helm-chart-import` - Imports the currently available chart into the cluster-local registry
 - Release targets
-  - `helm-package-release` - Generates and packages the helm chart with release urls.
+  - `helm-package` - Generates and packages the helm chart with release urls.
   - `helm-generate-release` - Generates the final helm chart with release urls.
 - Component-oriented targets
    - `component-generate` - Generate the component YAML resource
