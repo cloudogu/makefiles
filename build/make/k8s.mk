@@ -35,16 +35,17 @@ IMAGE_DEV_VERSION=${IMAGE_DEV}:${VERSION}
 # the current namespace and the dev image.
 K8S_RESOURCE_TEMP_FOLDER ?= $(TARGET_DIR)/k8s
 
-# Components with only external images should override this and use check-all-vars-without-image.
-CHECK_VAR_TARGETS?=check-all-vars
+# This can be used by components with own images to check if all image env var are set.
+# These components should override this variable with `check-all-vars`.
+CHECK_VAR_TARGETS?=check-all-vars-without-image
 
 ##@ K8s - Variables
 
 .PHONY: check-all-vars
-check-all-vars: check-k8s-image-env-var check-all-vars-without-image ## Conduct a sanity check against selected build artefacts or local environment
+check-all-vars: check-all-vars-without-image check-k8s-image-env-var check-k8s-image-dev-var check-etc-hosts check-insecure-cluster-registry ## Conduct a sanity check against selected build artefacts or local environment
 
 .PHONY: check-all-vars-without-image
-check-all-vars-without-image: check-k8s-artifact-id check-etc-hosts check-insecure-cluster-registry check-k8s-namespace-env-var
+check-all-vars-without-image: check-k8s-artifact-id check-k8s-namespace-env-var
 
 .PHONY: check-k8s-namespace-env-var
 check-k8s-namespace-env-var:

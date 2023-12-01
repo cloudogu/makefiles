@@ -22,8 +22,9 @@ HELM_POST_GENERATE_TARGETS ?=
 HELM_PRE_APPLY_TARGETS ?=
 COMPONENT_PRE_APPLY_TARGETS ?=
 
-# This can be used by external components to prevent generate and copy controller manifests by overriding with an empty value.
-IMAGE_IMPORT_TARGET?=image-import
+# This can be used by components with own images to build and push to the dev registry.
+# These components should override this variable with `image-import`.
+IMAGE_IMPORT_TARGET?=
 
 ##@ K8s - Helm general
 .PHONY: helm-init-chart
