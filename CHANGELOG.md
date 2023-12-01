@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Make the targets for generate and copy manifests and the image-import configurable. External components have to override them with empty values because they do not have CRDs in go-code or images to build. [#172]
+- Make the target to check all environment variables configurable. External components with only external images should override `CHECK_VAR_TARGETS` with `check-all-vars-without-image`. [#172] 
 
 ### Fixed
 - fixes wrong container image version `latest` during `image-import` [#172]

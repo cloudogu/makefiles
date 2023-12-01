@@ -81,7 +81,7 @@ ${HELM_CRD_RELEASE_TGZ}: ${BINARY_HELM} crd-helm-generate ## Generates and packa
 	@${BINARY_HELM} package ${HELM_CRD_TARGET_DIR} -d ${HELM_CRD_TARGET_DIR} ${BINARY_HELM_ADDITIONAL_PACK_ARGS}
 
 .PHONY: crd-helm-chart-import
-crd-helm-chart-import: check-all-vars check-k8s-artifact-id crd-helm-generate crd-helm-package ## Imports the currently available Helm CRD chart into the cluster-local registry.
+crd-helm-chart-import: ${CHECK_VAR_TARGETS} check-k8s-artifact-id crd-helm-generate crd-helm-package ## Imports the currently available Helm CRD chart into the cluster-local registry.
 	@if [[ ${STAGE} == "development" ]]; then \
 		echo "Import ${HELM_CRD_DEV_RELEASE_TGZ} into K8s cluster ${K3CES_REGISTRY_URL_PREFIX}..."; \
 		${BINARY_HELM} push ${HELM_CRD_DEV_RELEASE_TGZ} oci://${K3CES_REGISTRY_URL_PREFIX}/${HELM_ARTIFACT_NAMESPACE} ${BINARY_HELM_ADDITIONAL_PUSH_ARGS}; \
