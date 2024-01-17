@@ -12,6 +12,7 @@ VERSION=$(shell $(BINARY_YQ) -e ".Version" $(DOGU_JSON_FILE))
 IMAGE=$(shell $(BINARY_YQ) -e ".Image" $(DOGU_JSON_FILE)):$(VERSION)
 IMAGE_DEV_WITHOUT_TAG=$(shell $(BINARY_YQ) -e ".Image" $(DOGU_JSON_FILE) | sed "s|registry\.cloudogu\.com\(.\+\)|${K3CES_REGISTRY_URL_PREFIX}\1|g")
 IMAGE_DEV=${IMAGE_DEV_WITHOUT_TAG}:${VERSION}
+IMAGE_DEV=${IMAGE_DEV_WITHOUT_TAG}
 
 include $(BUILD_DIR)/make/k8s.mk
 
