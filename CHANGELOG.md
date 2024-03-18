@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v9.0.3](https://github.com/cloudogu/makefiles/releases/tag/v9.0.3) 2024-03-18
+### Change
+- Pick up mockery version when the version was defined before including `mocks.mk`
+  - it is no longer necessary to set the version variable `MOCKERY_VERSION` _after_ including `mocks.mk`. Instead the variable can be overwritten before the include.
+
+### Fixed
+- Update [Mockery](https://github.com/vektra/mockery) to v2.42.1 to avoid error messages during mock generation [#176]
+  - these error messages occurred only with very recent Golang versions like Go 1.22. No errors were shown with Go 1.21
+
 ## [v9.0.2](https://github.com/cloudogu/makefiles/releases/tag/v9.0.2) 2024-01-18
 ### Fixed
 - Remove duplicate version-tag from Dogu-Image in ks8-dogu.mk [#174]
