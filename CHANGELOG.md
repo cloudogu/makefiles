@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- [#180] Properly delete previous helm packages to mitigate error where helm secrets get too big.
 
 ## [v9.0.3](https://github.com/cloudogu/makefiles/releases/tag/v9.0.3) 2024-03-18
 ### Change
