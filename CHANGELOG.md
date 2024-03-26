@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- [#180] Properly delete previous helm packages to mitigate error where helm secrets get too big.
 - Update CONTROLLER_GEN_VERSION to v0.14.0 to avoid panic during manifest-run when using go1.22 [#178]
 
 ## [v9.0.3](https://github.com/cloudogu/makefiles/releases/tag/v9.0.3) 2024-03-18
