@@ -18,7 +18,7 @@ include $(BUILD_DIR)/make/k8s.mk
 ##@ K8s - EcoSystem
 
 .PHONY: build
-build: image-import install-dogu-descriptor create-dogu-resource apply-dogu-resource ## Builds a new version of the dogu and deploys it into the K8s-EcoSystem.
+build: install-yq image-import install-dogu-descriptor create-dogu-resource apply-dogu-resource ## Builds a new version of the dogu and deploys it into the K8s-EcoSystem.
 
 ##@ K8s - Dogu - Resource
 
