@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v9.0.4](https://github.com/cloudogu/makefiles/releases/tag/v9.0.4) 2024-04-19
 ### Fixed
 - [#180] Properly delete previous helm packages to mitigate error where helm secrets get too big.
 - Update CONTROLLER_GEN_VERSION to v0.14.0 to avoid panic during manifest-run when using go1.22 [#178]
