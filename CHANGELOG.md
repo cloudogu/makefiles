@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- update Go version to 1.22 (for `make compile` and `make static analysis`) [#186]
+- update Go linter to 1.58.2 [#185]
+
+### Fixed
+- Fix false positive during Go linting with Go version 1.22 [#186]
 
 ## [v9.0.4](https://github.com/cloudogu/makefiles/releases/tag/v9.0.4) 2024-04-19
 ### Fixed
@@ -13,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update CONTROLLER_GEN_VERSION to v0.14.0 to avoid panic during manifest-run when using go1.22 [#178]
 
 ## [v9.0.3](https://github.com/cloudogu/makefiles/releases/tag/v9.0.3) 2024-03-18
-### Change
+### Changed
 - Pick up mockery version when the version was defined before including `mocks.mk`
   - it is no longer necessary to set the version variable `MOCKERY_VERSION` _after_ including `mocks.mk`. Instead the variable can be overwritten before the include.
 
