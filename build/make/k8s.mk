@@ -22,14 +22,45 @@ SHELL = /usr/bin/env bash -o pipefail
 IMAGE ?=
 
 # Set production as default stage. Use "development" as stage in your .env file to generate artifacts
-# with development images pointing to K3S_CLUSTER_FQDN.
+# with development images pointing to CES_REGISTRY_URL_PREFIX.
 STAGE?=production
+
+# Set the "local" as runtime-environment, to push images to the container-registry of the local cluster and to apply resources to the local cluster.
+# Use "remote" as runtime-environment in your .env file to push images to the container-registry at "registry.cloudogu.com/testing" and to apply resources to the configured kubernetes-context in KUBE_CONTEXT_NAME.
+RUNTIME_ENV?=local
+
+# The host and port of the local cluster
 K3S_CLUSTER_FQDN?=k3ces.local
 K3S_LOCAL_REGISTRY_PORT?=30099
-K3CES_REGISTRY_URL_PREFIX="${K3S_CLUSTER_FQDN}:${K3S_LOCAL_REGISTRY_PORT}"
+
+# The URL of the container-registry to use. Defaults to the registry of the local-cluster.
+# If RUNTIME_ENV is "remote" it is "registry.cloudogu.com/testing"
+CES_REGISTRY_HOST?="${K3S_CLUSTER_FQDN}:${K3S_LOCAL_REGISTRY_PORT}"
+CES_REGISTRY_NAMESPACE ?=
+ifeq (${RUNTIME_ENV}, remote)
+	CES_REGISTRY_HOST="registry.cloudogu.com"
+	CES_REGISTRY_NAMESPACE="/testing"
+endif
+
+# The name of the kube-context to use for applying resources.
+# If KUBE_CONTEXT_NAME is empty and RUNTIME_ENV is "remote" the currently configured kube-context is used.
+# If KUBE_CONTEXT_NAME is empty and RUNTIME_ENV is not "remote" the "k3ces.local" is used as kube-context.
+ifeq (${KUBE_CONTEXT_NAME}, )
+	ifeq (${RUNTIME_ENV}, remote)
+		KUBE_CONTEXT_NAME = $(shell kubectl config current-context)
+	else
+		KUBE_CONTEXT_NAME = k3ces.local
+	endif
+endif
+
+# The git branch-name in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -.
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$$//g' | cut -c1-63)
+# The short git commit-hash
+GIT_HASH := $(shell git rev-parse --short HEAD)
+
 ## Image URL to use all building/pushing image targets
-IMAGE_DEV?=${K3CES_REGISTRY_URL_PREFIX}/${ARTIFACT_ID}
-IMAGE_DEV_VERSION=${IMAGE_DEV}:${VERSION}
+IMAGE_DEV?=$(CES_REGISTRY_HOST)$(CES_REGISTRY_NAMESPACE)/$(ARTIFACT_ID)/$(GIT_BRANCH)
+IMAGE_DEV_VERSION=$(IMAGE_DEV):$(VERSION)
 
 # Variables for the temporary yaml files. These are used as template to generate a development resource containing
 # the current namespace and the dev image.
@@ -64,13 +95,17 @@ check-k8s-artifact-id:
 
 .PHONY: check-etc-hosts
 check-etc-hosts:
-	@grep -E "^.+\s+${K3S_CLUSTER_FQDN}\$$" /etc/hosts > /dev/null || \
-		(echo "Missing /etc/hosts entry for ${K3S_CLUSTER_FQDN}" && exit 1)
+	@if [[ ${RUNTIME_ENV} == "local" ]]; then \
+		grep -E "^.+\s+${K3S_CLUSTER_FQDN}\$$" /etc/hosts > /dev/null || \
+      		(echo "Missing /etc/hosts entry for ${K3S_CLUSTER_FQDN}" && exit 1) \
+	fi
 
 .PHONY: check-insecure-cluster-registry
 check-insecure-cluster-registry:
-	@grep "${K3CES_REGISTRY_URL_PREFIX}" /etc/docker/daemon.json > /dev/null || \
-		(echo "Missing /etc/docker/daemon.json for ${K3CES_REGISTRY_URL_PREFIX}" && exit 1)
+	@if [[ ${RUNTIME_ENV} == "local" ]]; then \
+		grep "${CES_REGISTRY_HOST}" /etc/docker/daemon.json > /dev/null || \
+			(echo "Missing /etc/docker/daemon.json for ${CES_REGISTRY_HOST}" && exit 1) \
+	fi
 
 ##@ K8s - Resources
 
@@ -80,26 +115,36 @@ ${K8S_RESOURCE_TEMP_FOLDER}:
 
 ##@ K8s - Docker
 
+.PHONY: check-runtime
+check-runtime:
+	@echo "RUNTIME_ENV is $(RUNTIME_ENV)..."
+	@echo "CES_REGISTRY_HOST is $(CES_REGISTRY_HOST)..."
+	@echo "KUBE_CONTEXT_NAME=$(KUBE_CONTEXT_NAME)"
+	@echo "GIT_BRANCH=$(GIT_BRANCH)"
+	@echo "GIT_HASH=$(GIT_HASH)"
+	@echo "IMAGE_DEV=$(IMAGE_DEV)"
+	@echo "IMAGE_DEV_VERSION=$(IMAGE_DEV_VERSION)"
+
 .PHONY: docker-build
-docker-build: check-k8s-image-env-var ## Builds the docker image of the K8s app.
+docker-build: check-runtime check-k8s-image-env-var ## Builds the docker image of the K8s app.
 	@echo "Building docker image $(IMAGE)..."
 	@DOCKER_BUILDKIT=1 docker build . -t $(IMAGE)
 
 .PHONY: docker-dev-tag
-docker-dev-tag: check-k8s-image-dev-var docker-build ## Tags a Docker image for local K3ces deployment.
+docker-dev-tag: check-runtime check-k8s-image-dev-var docker-build ## Tags a Docker image for local K3ces deployment.
 	@echo "Tagging image with dev tag $(IMAGE_DEV_VERSION)..."
 	@DOCKER_BUILDKIT=1 docker tag ${IMAGE} $(IMAGE_DEV_VERSION)
 
 .PHONY: check-k8s-image-dev-var
 check-k8s-image-dev-var:
 ifeq (${IMAGE_DEV},)
-	@echo "Missing make variable IMAGE_DEV detected. It should look like \$${K3CES_REGISTRY_URL_PREFIX}/docker-image:tag"
+	@echo "Missing make variable IMAGE_DEV detected. It should look like \$${CES_REGISTRY_HOST}/docker-image:tag"
 	@exit 19
 endif
 
 .PHONY: image-import
-image-import: check-all-vars check-k8s-artifact-id docker-dev-tag ## Imports the currently available image into the cluster-local registry.
-	@echo "Import $(IMAGE_DEV_VERSION) into K8s cluster ${K3S_CLUSTER_FQDN}..."
+image-import: check-all-vars check-k8s-artifact-id docker-dev-tag ## Imports the currently available image into the configured ces-registry.
+	@echo "Import $(IMAGE_DEV_VERSION) into K8s cluster ${KUBE_CONTEXT_NAME}..."
 	@docker push $(IMAGE_DEV_VERSION)
 	@echo "Done."
 
