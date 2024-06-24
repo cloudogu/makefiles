@@ -28,6 +28,7 @@ STAGE?=production
 # Set the "local" as runtime-environment, to push images to the container-registry of the local cluster and to apply resources to the local cluster.
 # Use "remote" as runtime-environment in your .env file to push images to the container-registry at "registry.cloudogu.com/testing" and to apply resources to the configured kubernetes-context in KUBE_CONTEXT_NAME.
 RUNTIME_ENV?=local
+$(info RUNTIME_ENV=$(RUNTIME_ENV))
 
 # The host and port of the local cluster
 K3S_CLUSTER_FQDN?=k3ces.local
@@ -41,6 +42,7 @@ ifeq (${RUNTIME_ENV}, remote)
 	CES_REGISTRY_HOST="registry.cloudogu.com"
 	CES_REGISTRY_NAMESPACE="/testing"
 endif
+$(info CES_REGISTRY_HOST=$(CES_REGISTRY_HOST))
 
 # The name of the kube-context to use for applying resources.
 # If KUBE_CONTEXT_NAME is empty and RUNTIME_ENV is "remote" the currently configured kube-context is used.
@@ -52,6 +54,7 @@ ifeq (${KUBE_CONTEXT_NAME}, )
 		KUBE_CONTEXT_NAME = k3ces.local
 	endif
 endif
+$(info KUBE_CONTEXT_NAME=$(KUBE_CONTEXT_NAME))
 
 # The git branch-name in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -.
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$$//g' | cut -c1-63)
@@ -107,6 +110,25 @@ check-insecure-cluster-registry:
 			(echo "Missing /etc/docker/daemon.json for ${CES_REGISTRY_HOST}" && exit 1) \
 	fi
 
+# If the RUNTIME_ENV is "remote" checks if the current docker-client has credentials for CES_REGISTRY_HOST
+# If no credentials could be found, the credentials are queried and docker-login is performed
+check-docker-credentials:
+	@if [[ "$(RUNTIME_ENV)" == "remote" ]]; then \
+		if ! grep -q $(CES_REGISTRY_HOST) ~/.docker/config.json ; then \
+			echo "Error: Docker is not logged in to $(CES_REGISTRY_HOST)"; \
+			read -p "Enter Docker Username for $(CES_REGISTRY_HOST): " username; \
+			read -sp "Enter Docker Password for $(CES_REGISTRY_HOST): " password; \
+			echo ""; \
+			echo "$$password" | docker login -u "$$username" --password-stdin $(CES_REGISTRY_HOST); \
+			if [ $$? -eq 0 ]; then \
+				echo "Docker login to $(CES_REGISTRY_HOST) successful"; \
+			else \
+				echo "Docker login to $(CES_REGISTRY_HOST) failed"; \
+				exit 1; \
+			fi \
+		fi \
+	fi
+
 ##@ K8s - Resources
 
 ${K8S_RESOURCE_TEMP_FOLDER}:
@@ -115,23 +137,13 @@ ${K8S_RESOURCE_TEMP_FOLDER}:
 
 ##@ K8s - Docker
 
-.PHONY: check-runtime
-check-runtime:
-	@echo "RUNTIME_ENV is $(RUNTIME_ENV)..."
-	@echo "CES_REGISTRY_HOST is $(CES_REGISTRY_HOST)..."
-	@echo "KUBE_CONTEXT_NAME=$(KUBE_CONTEXT_NAME)"
-	@echo "GIT_BRANCH=$(GIT_BRANCH)"
-	@echo "GIT_HASH=$(GIT_HASH)"
-	@echo "IMAGE_DEV=$(IMAGE_DEV)"
-	@echo "IMAGE_DEV_VERSION=$(IMAGE_DEV_VERSION)"
-
 .PHONY: docker-build
-docker-build: check-runtime check-k8s-image-env-var ## Builds the docker image of the K8s app.
+docker-build: check-docker-credentials check-k8s-image-env-var ## Builds the docker image of the K8s app.
 	@echo "Building docker image $(IMAGE)..."
 	@DOCKER_BUILDKIT=1 docker build . -t $(IMAGE)
 
 .PHONY: docker-dev-tag
-docker-dev-tag: check-runtime check-k8s-image-dev-var docker-build ## Tags a Docker image for local K3ces deployment.
+docker-dev-tag: check-k8s-image-dev-var docker-build ## Tags a Docker image for local K3ces deployment.
 	@echo "Tagging image with dev tag $(IMAGE_DEV_VERSION)..."
 	@DOCKER_BUILDKIT=1 docker tag ${IMAGE} $(IMAGE_DEV_VERSION)
 
