@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v9.1.0](https://github.com/cloudogu/makefiles/releases/tag/v9.1.0) 2024-06-28
+### Added
+- Add support for remote runtimes and container-registries for k8s-make-targets [#18]
+  - The make-targets for k8s like dogu-`build`, `helm-apply` or `component-apply` now support deploying to remote kubernetes-clusters
+
 ## [v9.0.5](https://github.com/cloudogu/makefiles/releases/tag/v9.0.5) 2024-05-23
 ### Changed
 - update Go version to 1.22 (for `make compile` and `make static analysis`) [#186]
