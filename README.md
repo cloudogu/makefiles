@@ -363,7 +363,7 @@ tests in `${yourProjectDir}/batsTests` (overrideable with the variable `TESTS_DI
 The k8s-modules support remote runtimes and container-registries.
 The environment-variable `RUNTIME_ENV`controls which runtime-environment to use:
   * `local`: uses the local k8s-cluster at `k3ces-local` and the container-registry of this local-cluster
-  * `remote`: uses the currently configured cluster of the kube-config and the container-registry at `regsitry.cloudogu.com/testing`
+  * `remote`: uses the currently configured cluster of the kube-config and the container-registry at `registry.cloudogu.com/testing`
 
 To manually override the kube-context the environment-variable `KUBE_CONTEXT_NAME` can be used.
 
