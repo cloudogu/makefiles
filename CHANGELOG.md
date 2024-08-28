@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Add make target `govulncheck` to scan go repositories for vulnerabilities using [govulncheck](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
+
 ### Changed
 - `bats.mk`: 
   - Raise BATS image version to 1.11.0
@@ -16,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v9.1.0](https://github.com/cloudogu/makefiles/releases/tag/v9.1.0) 2024-06-28
 ### Added
-- Add support for remote runtimes and container-registries for k8s-make-targets [#18]
+- Add support for remote runtimes and container-registries for k8s-make-targets [#188]
   - The make-targets for k8s like dogu-`build`, `helm-apply` or `component-apply` now support deploying to remote kubernetes-clusters
 
 ## [v9.0.5](https://github.com/cloudogu/makefiles/releases/tag/v9.0.5) 2024-05-23
