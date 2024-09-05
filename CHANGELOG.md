@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v9.2.1](https://github.com/cloudogu/makefiles/releases/tag/v9.2.1) 2024-09-05
+### Fixed
+- Add missing yq dependency on docker-build target
+
 ## [v9.2.0](https://github.com/cloudogu/makefiles/releases/tag/v9.2.0) 2024-08-28
 ### Added
 - Add make target `govulncheck` to scan go repositories for vulnerabilities using [govulncheck](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
