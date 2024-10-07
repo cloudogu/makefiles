@@ -2,6 +2,7 @@
 
 UNIT_TEST_DIR=$(TARGET_DIR)/unit-tests
 XUNIT_JSON=$(UNIT_TEST_DIR)/report.json
+XUNIT_XML=$(UNIT_TEST_DIR)/unit-tests.xml
 UNIT_TEST_LOG=$(UNIT_TEST_DIR)/unit-tests.log
 COVERAGE_REPORT=$(UNIT_TEST_DIR)/coverage.out
 
@@ -27,6 +28,8 @@ endif
 		rm -f $(UNIT_TEST_LOG).tmp ; \
 	done
 	@cat $(UNIT_TEST_LOG) >> $@
+	@cat $(UNIT_TEST_LOG) | $(GO_JUNIT_REPORT) -parser gojson > $(XUNIT_XML)
+
 	@if grep '^FAIL' $(UNIT_TEST_LOG); then \
 		exit 1; \
 	fi
