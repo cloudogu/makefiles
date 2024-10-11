@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v9.3.1](https://github.com/cloudogu/makefiles/releases/tag/v9.3.1) 2024-10-11
 ### Changed
 - Update go linter to 1.61.0 to support go 1.23
 - use go 1.23 as default for linting
