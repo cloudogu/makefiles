@@ -2,7 +2,7 @@
 
 STATIC_ANALYSIS_DIR=$(TARGET_DIR)/static-analysis
 GOIMAGE?=golang
-GOTAG?=1.22
+GOTAG?=1.23
 CUSTOM_GO_MOUNT?=-v /tmp:/tmp
 
 REVIEW_DOG=$(TMP_DIR)/bin/reviewdog
