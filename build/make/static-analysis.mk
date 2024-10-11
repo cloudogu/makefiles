@@ -7,7 +7,7 @@ CUSTOM_GO_MOUNT?=-v /tmp:/tmp
 
 REVIEW_DOG=$(TMP_DIR)/bin/reviewdog
 LINT=$(TMP_DIR)/bin/golangci-lint
-LINT_VERSION?=v1.58.2
+LINT_VERSION?=v1.61.0
 # ignore tests and mocks
 LINTFLAGS=--tests=false --exclude-files="^.*_mock.go$$" --exclude-files="^.*/mock.*.go$$" --timeout 10m --issues-exit-code 0
 ADDITIONAL_LINTER=-E bodyclose -E containedctx -E contextcheck -E decorder -E dupl -E errname -E forcetypeassert -E funlen -E unparam
