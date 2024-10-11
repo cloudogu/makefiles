@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Update go linter to 1.61.0
+- Update go linter to 1.61.0 to support go 1.23
 - use go 1.23 as default for linting
 - use go 1.23 as default for builds
 
