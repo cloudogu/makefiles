@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Update go linter to 1.61.0
+- use go 1.23 as default for linting
+- use go 1.23 as default for builds
+
 ## [v9.2.1](https://github.com/cloudogu/makefiles/releases/tag/v9.2.1) 2024-09-05
 ### Fixed
 - Add missing yq dependency on docker-build target
