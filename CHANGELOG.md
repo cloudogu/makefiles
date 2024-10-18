@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v9.3.2](https://github.com/cloudogu/makefiles/releases/tag/v9.3.2) 2024-10-18
+### Changed
+- Use v2 api version for k8s dogu deployment [#198] 
+
 ## [v9.3.1](https://github.com/cloudogu/makefiles/releases/tag/v9.3.1) 2024-10-11
 ### Changed
 - Update go linter to 1.61.0 to support go 1.23
