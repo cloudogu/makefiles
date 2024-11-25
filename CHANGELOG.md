@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v9.4.0](https://github.com/cloudogu/makefiles/releases/tag/v9.4.0) 2024-11-25
+### Added
+- [#205] make step for prereleasing dogu
+
 ## [v9.3.2](https://github.com/cloudogu/makefiles/releases/tag/v9.3.2) 2024-10-18
 ### Changed
 - Use v2 api version for k8s dogu deployment [#198] 
