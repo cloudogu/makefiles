@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Create Release-note Entry for new version during "make dogu-release"
-- New make target "update-build-libs" to get newest version of build libs for jenkins pipeline
+- Create Release-note Entry for new version during "make dogu-release" [#203]
+- New make target "update-build-libs" to get newest version of build libs for jenkins pipeline [#203]
 
 ## [v9.3.2](https://github.com/cloudogu/makefiles/releases/tag/v9.3.2) 2024-10-18
 ### Changed
