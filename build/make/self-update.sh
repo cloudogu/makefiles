@@ -5,13 +5,6 @@ set -o pipefail
 
 TYPE="${1}"
 
-# switch for script entrypoint
-if [[ "${TYPE}" == "buildlibs" ]];then
-  update_build_libs
-else
-  echo "Unknown target ${TYPE}"
-fi
-
 update_build_libs() {
   echo "Get newest version of ces-build-lib and dogu-build-lib"
   update_jenkinsfile
@@ -43,6 +36,13 @@ update_jenkinsfile() {
   sed -i "s/ces-build-lib@[[:digit:]].[[:digit:]].[[:digit:]]/ces-build-lib@$(get_highest_version ces)/g" Jenkinsfile
   sed -i "s/dugu-build-lib@[[:digit:]].[[:digit:]].[[:digit:]]/dogu-build-lib@$(get_highest_version dogu)/g" Jenkinsfile
 }
+
+# switch for script entrypoint
+if [[ "${TYPE}" == "buildlibs" ]];then
+  update_build_libs
+else
+  echo "Unknown target ${TYPE}"
+fi
 
 
 
