@@ -207,7 +207,7 @@ update_changelog() {
   git commit -m "Update changelog"
 }
 
-update_realeasenotes() {
+update_releasenotes() {
   local NEW_RELEASE_VERSION="${1}"
 
   # ReleaseNotes update
@@ -238,7 +238,7 @@ update_realeasenotes() {
     find . -name "*release_notes*.md" -print0 | while read -d $'\0' file
     do
       # Check if new version tag still exists
-      while ! grep --silent "${NEW_RELEASENOTE_TITLE}" "${file}"; do
+      while ! grep --silent "$(echo $NEW_RELEASENOTE_TITLE | sed -e 's/[]\/$*.^[]/\\&/g')" "${file}"; do
         echo ""
         echo -e "\e[31mYour ${file} does not contain \"${NEW_RELEASENOTE_TITLE}\"!\e[0m"
         wait_for_ok "Please update your ${file} now."
