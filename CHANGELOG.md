@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Create Release-note Entry for new version during "make dogu-release" [#203]
+- New make target "update-build-libs" to get newest version of build libs for jenkins pipeline [#203]
 
 ## [v9.4.0](https://github.com/cloudogu/makefiles/releases/tag/v9.4.0) 2024-11-25
 ### Added
