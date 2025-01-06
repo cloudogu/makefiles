@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- possibility to pass DRY_RUN parameter to "make dogu-release" target [#209]
+- use "make dogu-release DRY_RUN=true" to start a dry-run release [#209]
 
 ## [v9.5.0](https://github.com/cloudogu/makefiles/releases/tag/v9.5.0) 2024-12-10
 ### Added
