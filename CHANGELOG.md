@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed Typo in Regex for finding current dogu-build-lib-Version
 
+### Changed
+- change unittest-report generation from xml to json to generate valid report files for jenkins [#194]
+
 ## [v9.5.0](https://github.com/cloudogu/makefiles/releases/tag/v9.5.0) 2024-12-10
 ### Added
 - Create Release-note Entry for new version during "make dogu-release" [#203]
