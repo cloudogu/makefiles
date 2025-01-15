@@ -5,13 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v9.5.2](https://github.com/cloudogu/makefiles/releases/tag/v9.5.2) 2024-01-14
-### Fixed
-- Append datetime to version for prerelease namespaces
-
+## [v9.5.2](https://github.com/cloudogu/makefiles/releases/tag/v9.5.2) 2024-01-15
+### Added
+ - [#201] prerelease make step for testing on stageing tests
+ 
 ## [v9.5.1](https://github.com/cloudogu/makefiles/releases/tag/v9.5.1) 2024-01-14
 ### Fixed
 - Fixed Typo in Regex for finding current dogu-build-lib-Version
+- Append datetime to version for prerelease namespaces
 
 ### Changed
 - change unittest-report generation from xml to json to generate valid report files for jenkins [#194]
