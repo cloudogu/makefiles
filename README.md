@@ -63,6 +63,7 @@ include build/make/yarn.mk
 include build/make/bower.mk
 # only include this in repositories which support the automatic release process (like dogus or golang apps)
 include build/make/release.mk
+include build/make/prerelease.mk
 # either k8s-dogu.mk
 include build/make/k8s-dogu.mk
 # or k8s-controller.mk; only include this in k8s-controller repositories
@@ -353,6 +354,14 @@ Additionally, to the regular `dogu-release` the module contains a `dogu-cve-rele
 build of a dogu eliminates critical CVEs. If this is the case, a release process will be triggered.
 
 Only include this module in dogu or Golang repositories that support a dedicated release flow!
+
+### prerelase.mk
+
+This module is only used during the development build within the jenkins pipeline. For every develop-build. a new Version is created.
+The dogu will be pushed in an extra `prerelease_*` namespace.
+
+To trigger the namespace and version change manually use `make prerelease_namespace`.
+
 ### bats.mk
 
 This module enables you to run BATS shell tests via the `unit-test-shell` target. All you need is a directory with BATS
@@ -430,3 +439,10 @@ This module provides targets for managing K8S Custom Resource Definitions (CRDs)
 - `crd-component-generate` - Generate the CRD component YAML resource
 - `crd-component-apply` - Applies the CRD component yaml resource to the actual defined context.
 - `crd-component-delete` - Deletes the CRD component yaml resource from the actual defined context.
+ 
+### self-update.mk
+This module provides targets that automatically update dependencies and build- and helper functions to the latest version.
+
+- `update-makefiles` - get the configured version of all make targets and build files
+- `update-build-libs` - patches the Jenkinsfile and adds the latest versions of the build libs to the pipeline header.
+- `set-dogu-version` - set the version number in dogus.json, pom.xml, Dockerfile, Makefile without creating a new release
