@@ -69,6 +69,8 @@ include build/make/k8s-dogu.mk
 # or k8s-controller.mk; only include this in k8s-controller repositories
 include build/make/k8s-controller.mk
 include build/make/bats.mk
+# trivy-scan for dogu-images
+include build/make/trivyscan.mk
 ```
 
 ## Overview over make targets
@@ -446,3 +448,12 @@ This module provides targets that automatically update dependencies and build- a
 - `update-makefiles` - get the configured version of all make targets and build files
 - `update-build-libs` - patches the Jenkinsfile and adds the latest versions of the build libs to the pipeline header.
 - `set-dogu-version` - set the version number in dogus.json, pom.xml, Dockerfile, Makefile without creating a new release
+
+### trivyscan.mk
+This module provides a target for scanning dogu images with trivy
+
+- `trivyscan` - Use trivy to scan image tagged with the version within the dogu.json. The image needs to be build first. Per default it will only show CRITICAL CVEs.
+
+Usage:
+`make trivyscan` or `make trivyscan SEVERITY='HIGH,CRITICAL'`
+
