@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## [v9.8.0](https://github.com/cloudogu/makefiles/releases/tag/v9.8.0) 2025-03-28
+## [v9..0](https://github.com/cloudogu/makefiles/releases/tag/v9.8.0) 2025-03-28
 ### Added
 - [#224] `APPEND_CRD_SUFFIX`-flag that decides if `-crd`-Suffix should be appended to the `ARTIFACT_ID`
 ### Changed
