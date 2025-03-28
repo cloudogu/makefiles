@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [v9.9.0](https://github.com/cloudogu/makefiles/releases/tag/v9.8.0) 2025-03-28
+### Added
+- [#224] `APPEND_CRD_SUFFIX`-flag that decides if `-crd`-Suffix should be appended to the `ARTIFACT_ID`
+### Changed
+- [#224] `ARTIFACT_CRD_ID` is now equal to `ARTIFACT_ID` if `APPEND_CRD_SUFFIX` is `false`.
+- Update go version tag to `1.24`
+- Update golangci-lint to `v1.64.8`
+- Update mockery to `v2.53.3`
+
 ## [v9.8.0](https://github.com/cloudogu/makefiles/releases/tag/v9.8.0) 2025-03-14
 ### Added
 - [#218] Custom Maketarget for scanning dogu-images with trivy
