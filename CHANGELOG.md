@@ -6,8 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+## [v9.9.1](https://github.com/cloudogu/makefiles/releases/tag/v9.9.1) 2025-04-09
+### Changed
+- Fixed sed command in prerelease.sh to only grab version from label
 
-## [v9.9.0](https://github.com/cloudogu/makefiles/releases/tag/v9.8.0) 2025-03-28
+## [v9.9.0](https://github.com/cloudogu/makefiles/releases/tag/v9.9.0) 2025-03-28
 ### Added
 - [#224] `APPEND_CRD_SUFFIX`-flag that decides if `-crd`-Suffix should be appended to the `ARTIFACT_ID`
 ### Changed
