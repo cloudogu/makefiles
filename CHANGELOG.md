@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Changed
+- use json test output only in CI-Mode
+
 ## [v9.9.1](https://github.com/cloudogu/makefiles/releases/tag/v9.9.1) 2025-04-09
 ### Changed
 - Fixed sed command in prerelease.sh to only grab version from label
