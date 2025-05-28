@@ -111,10 +111,12 @@ crd-component-generate: ${K8S_RESOURCE_TEMP_FOLDER} ## Generate the CRD componen
 	fi
 
 .PHONY: crd-component-apply
-crd-component-apply: check-k8s-namespace-env-var crd-helm-chart-import crd-component-generate ## Applies the CRD component YAML resource to the actual defined context.
+crd-component-apply:
+	@if [[ ! ("${RUNTIME_ENV}" == "remote" && "${STAGE}" == "production") ]]; then \
+	check-k8s-namespace-env-var crd-helm-chart-import crd-component-generate \ ## Applies the CRD component YAML resource to the actual defined context.
 	@kubectl apply -f "${K8S_RESOURCE_CRD_COMPONENT}" --namespace="${NAMESPACE}" --context="${KUBE_CONTEXT_NAME}"
 	@echo "Done."
-
+	fi
 .PHONY: crd-component-delete
 crd-component-delete: check-k8s-namespace-env-var crd-component-generate ## Deletes the CRD component YAML resource from the actual defined context.
 	@kubectl delete -f "${K8S_RESOURCE_CRD_COMPONENT}" --namespace="${NAMESPACE}" --context="${KUBE_CONTEXT_NAME}" || true
