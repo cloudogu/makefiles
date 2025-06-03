@@ -11,7 +11,7 @@ Breaking change ahead! [#223]
 
 ### Changed
 - [#223] update golangci to v2.1.6
-  - if a config file is used or additional flags are set in your project, please check if it is still compatible
+  - if a config file is used or additional LINTFLAGS are set in your project, please check if it is still compatible
   - please do not configure LINT_VERSION <v2.0.0 as the configuration set by the makefiles will not be compatible
 - [#223] remove mock exclusions flags from golangci as it is an integrated feature now
 
