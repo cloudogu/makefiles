@@ -98,7 +98,7 @@ abort_dry_run_release() {
 # - update_versions_stage_modified_files - stage a modified file to prepare the file for the up-coming commit
 update_versions() {
   local NEW_RELEASE_VERSION="${1}"
-  local TYPE="${2}"
+  local TYPE="${2:-""}"
 
   if [[ $(type -t update_versions_modify_files) == function ]]; then
     local preSkriptExitCode=0
