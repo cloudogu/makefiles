@@ -29,6 +29,11 @@ node('') {
             make 'clean'
         }
 
+        stage('Check Makefiles') {
+            // Dry-run make to check for errors in Makefiles
+            make '-n'
+        }
+
         if (gitflow.isReleaseBranch()) {
             String controllerVersion = makefile.getVersion()
             String releaseVersion = "v${controllerVersion}".toString()
