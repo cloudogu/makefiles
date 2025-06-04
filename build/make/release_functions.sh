@@ -25,6 +25,10 @@ get_current_version_by_makefile() {
   grep '^VERSION=[0-9[:alpha:].-]*$' Makefile | sed s/VERSION=//g
 }
 
+get_current_version_makefiles_repo() {
+  grep '^MAKEFILES_VERSION=[0-9[:alpha:].-]*$' Makefile | sed s/MAKEFILES_VERSION=//g
+}
+
 get_current_version_by_dogu_json() {
   jq ".Version" --raw-output dogu.json
 }
@@ -94,6 +98,7 @@ abort_dry_run_release() {
 # - update_versions_stage_modified_files - stage a modified file to prepare the file for the up-coming commit
 update_versions() {
   local NEW_RELEASE_VERSION="${1}"
+  local TYPE="${2}"
 
   if [[ $(type -t update_versions_modify_files) == function ]]; then
     local preSkriptExitCode=0
@@ -119,7 +124,11 @@ update_versions() {
   # Update version in Makefile
   if [ -f "Makefile" ]; then
     echo "Updating version in Makefile..."
-    sed -i "s/\(^VERSION=\)\(.*\)$/\1${NEW_RELEASE_VERSION}/" Makefile
+    if [[ "${TYPE}" == "makefiles" ]]; then
+      sed -i "s/\(^MAKEFILES_VERSION=\)\(.*\)$/\1${NEW_RELEASE_VERSION}/" Makefile
+    else
+      sed -i "s/\(^VERSION=\)\(.*\)$/\1${NEW_RELEASE_VERSION}/" Makefile
+    fi
   fi
 
   # Update version in package.json

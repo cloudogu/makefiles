@@ -41,6 +41,8 @@ echo "=====Starting Release process====="
 
 if [[ "${TYPE}" == "dogu"  || "${TYPE}" == "dogu-cve-release" ]];then
   CURRENT_TOOL_VERSION=$(get_current_version_by_dogu_json)
+elif [[ "${TYPE}" == "makefiles" ]]; then
+  CURRENT_TOOL_VERSION=$(get_current_version_makefiles_repo)
 else
   CURRENT_TOOL_VERSION=$(get_current_version_by_makefile)
 fi
@@ -54,7 +56,11 @@ else
   start_git_flow_release "${NEW_RELEASE_VERSION}"
 fi
 
-update_versions "${NEW_RELEASE_VERSION}"
+if [[ "${TYPE}" == "makefiles" ]]; then
+  update_versions "${NEW_RELEASE_VERSION}" makefiles
+else
+  update_versions "${NEW_RELEASE_VERSION}"
+fi
 update_changelog "${NEW_RELEASE_VERSION}" "${FIXED_CVE_LIST}"
 update_releasenotes "${NEW_RELEASE_VERSION}"
 show_diff
