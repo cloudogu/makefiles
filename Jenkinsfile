@@ -37,11 +37,11 @@ node('') {
         if (gitflow.isReleaseBranch()) {
             String controllerVersion = makefile.getVersion()
             String releaseVersion = "v${controllerVersion}".toString()
-    
+
             stage('Finish Release') {
                 gitflow.finishRelease(releaseVersion, productionReleaseBranch)
             }
-    
+
             stage('Add Github-Release') {
                 releaseId = github.createReleaseWithChangelog(releaseVersion, changelog, productionReleaseBranch)
             }
