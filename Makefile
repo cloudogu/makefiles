@@ -10,3 +10,8 @@ include build/make/clean.mk
 include build/make/digital-signature.mk
 include build/make/release.mk
 include build/make/bats.mk
+
+##@ Makefiles Release
+.PHONY: makefiles-release
+makefiles-release: ## Start a Makefiles release
+	build/make/release.sh makefiles
