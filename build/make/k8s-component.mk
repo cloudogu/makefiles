@@ -142,7 +142,7 @@ ${K8S_RESOURCE_COMPONENT_CR_TEMPLATE_YAML}: ${K8S_RESOURCE_TEMP_FOLDER}
 	fi
 
 .PHONY: component-apply
-component-apply: check-k8s-namespace-env-var ${COMPONENT_PRE_APPLY_TARGETS} ${IMAGE_IMPORT_TARGET} helm-generate helm-chart-import component-generate ## Applies the component yaml resource to the actual defined context.
+component-apply: isLocal check-k8s-namespace-env-var ${COMPONENT_PRE_APPLY_TARGETS} ${IMAGE_IMPORT_TARGET} helm-generate helm-chart-import component-generate ## Applies the component yaml resource to the actual defined context.
 	@kubectl apply -f "${K8S_RESOURCE_COMPONENT}" --namespace="${NAMESPACE}" --context="${KUBE_CONTEXT_NAME}"
 	@echo "Done."
 

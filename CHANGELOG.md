@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.1.1] - 2025-06-05
+### Fixed
+- component-apply and crd-component-apply cannot be executed when:
+    - RUNTIME_ENV == remote and Stage == Production.
+    - this is so that there's no accidental push to production harbor.
+
 ## [v10.1.0] - 2025-06-05
 ### Added
 - Add automatic release process
