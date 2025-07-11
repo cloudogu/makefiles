@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.2.0] - 2025-07-11
+### Changed
+- [#233] Allow "component-apply" and "crd-component-apply" in development-stage on remote-environments.
+- [#233] In development-stage add a timestamp as buildnumber to helm-chart-version to force helm to use the updated chart.
+
 ## [v10.1.1] - 2025-06-05
 ### Fixed
 - component-apply and crd-component-apply cannot be executed when:
