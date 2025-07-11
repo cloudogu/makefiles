@@ -204,12 +204,13 @@ envtest: ${ENVTEST} ## Download envtest-setup locally if necessary.
 ${ENVTEST}:
 	$(call go-get-tool,$(ENVTEST),sigs.k8s.io/controller-runtime/tools/setup-envtest@latest)
 
-.PHONY: isLocal
-isLocal:
-	@if [[ ! ("${RUNTIME_ENV}" == "remote" || "${STAGE}" == "production") ]]; then \
-		echo "command executed locally, command continue execution."; \
+.PHONY: isProduction
+isProduction:
+	@if [[ "${STAGE}" == "production" ]]; then \
+		echo "Command executed in production stage. Aborting."; \
+		exit 1; \
 	else \
-		echo "command executed remotely or on production, command aborted"; exit 1; \
+		echo "Command executed in development stage. Continuing."; \
 	fi
 
 
