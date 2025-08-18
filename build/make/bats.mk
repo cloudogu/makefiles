@@ -53,10 +53,10 @@ unit-test-shell-local: $(BASH_SRC) $(PASSWD) $(ETCGROUP) $(HOME_DIR) buildTestIm
 		"${BATS_DIR}"/customBatsEntrypoint.sh make unit-test-shell-generic-no-junit
 
 unit-test-shell-generic:
-	@bats --formatter junit --output ${BASH_TEST_REPORT_DIR} ${TESTS_DIR}
+	@bats --report-formatter junit --formatter junit --output ${BASH_TEST_REPORT_DIR} ${TESTS_DIR}
 
 unit-test-shell-generic-no-junit:
-	@bats ${TESTS_DIR}
+	@bats --report-formatter junit ${TESTS_DIR}
 
 .PHONY buildTestImage:
 buildTestImage:
