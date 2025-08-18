@@ -56,7 +56,7 @@ unit-test-shell-generic:
 	@bats --report-formatter junit --formatter junit --output ${BASH_TEST_REPORT_DIR} ${TESTS_DIR}
 
 unit-test-shell-generic-no-junit:
-	@bats --report-formatter junit ${TESTS_DIR}
+	@bats --report-formatter junit --output ${BASH_TEST_REPORT_DIR} ${TESTS_DIR}
 
 .PHONY buildTestImage:
 buildTestImage:
