@@ -18,15 +18,19 @@ unit-test-shell: unit-test-shell-$(ENVIRONMENT)
 
 $(BATS_ASSERT):
 	@git clone --depth 1 https://github.com/bats-core/bats-assert $@
+	@rm -rf $@/.git
 
 $(BATS_MOCK):
 	@git clone --depth 1 https://github.com/grayhemp/bats-mock $@
+	@rm -rf $@/.git
 
 $(BATS_SUPPORT):
 	@git clone --depth 1 https://github.com/bats-core/bats-support $@
+	@rm -rf $@/.git
 
 $(BATS_FILE):
 	@git clone --depth 1 https://github.com/bats-core/bats-file $@
+	@rm -rf $@/.git
 
 $(BASH_SRC):
 	BASH_SRC:=$(shell find "${WORKDIR}" -type f -name "*.sh")
