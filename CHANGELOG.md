@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.2.1] - 2025-08-20
+### Changed
+- [#235] Updates BATS version to 1.12
+
+### Fixed
+- [#235] Fixes bug in which `make unit-test-shell` doesn't generate a xUnit report file. 
+
 ## [v10.2.0] - 2025-07-11
 ### Changed
 - [#233] Allow "component-apply" and "crd-component-apply" in development-stage on remote-environments.
