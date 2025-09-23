@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- [#238] Upgrade golang to v1.25
+- [#238] Upgrade Controller-gen to v0.19.0
+
 ## [v10.2.1] - 2025-08-20
 ### Changed
 - [#235] Updates BATS version to 1.12
