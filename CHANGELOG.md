@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.3.0] - 2025-09-24
 ### Changed
 - [#238] Upgrade golang to v1.25
 - [#238] Upgrade Controller-gen to v0.19.0
