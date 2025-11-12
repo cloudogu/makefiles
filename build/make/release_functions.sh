@@ -25,6 +25,11 @@ get_current_version_by_makefile() {
   grep '^VERSION=[0-9[:alpha:].-]*$' Makefile | sed s/VERSION=//g
 }
 
+get_base_version_by_makefile() {
+  BASE_VERSION=$(grep '^BASE_VERSION=[0-9[:alpha:].-]*$' Makefile | sed s/BASE_VERSION=//g)
+  echo "${BASE_VERSION}"
+}
+
 get_current_version_by_dogu_json() {
   jq ".Version" --raw-output dogu.json
 }
@@ -52,24 +57,47 @@ validate_new_version() {
 
 start_git_flow_release() {
   local NEW_RELEASE_VERSION="${1}"
+  local BASE_RELEASE_VERSION="${2}"
+  local BASE_DEV_BRANCH_NAME
+
   # Do gitflow
   git flow init --defaults --force
 
   local mainBranchExists
   mainBranchExists="$(git show-ref refs/remotes/origin/main || echo "")"
-  if [ -n "$mainBranchExists" ]; then
-    echo 'Using "main" branch for production releases'
-    git flow config set master main
-    git checkout main
-    git pull origin main
+  if [[ -z "$BASE_RELEASE_VERSION" ]]; then
+      echo "BASE_RELEASE_VERSION variable is empty"
+      if [ -n "$mainBranchExists" ]; then
+        echo 'Using "main" branch for production releases'
+        git flow config set master main
+        git checkout main
+        git pull origin main
+      else
+        echo 'Using "master" branch for production releases'
+        git checkout master
+        git pull origin master
+      fi
+      BASE_DEV_BRANCH_NAME="develop"
   else
-    echo 'Using "master" branch for production releases'
-    git checkout master
-    git pull origin master
+      echo "BASE_RELEASE_VERSION variable is not empty"
+      if [ -n "$mainBranchExists" ]; then
+        BASE_MAIN_BRANCH_NAME="master/${BASE_RELEASE_VERSION}"
+      else
+        BASE_MAIN_BRANCH_NAME="main/${BASE_RELEASE_VERSION}"
+      fi
+
+      echo "Using ${BASE_MAIN_BRANCH_NAME} branch for production releases"
+      git flow config set master ${BASE_MAIN_BRANCH_NAME}
+      git checkout ${BASE_MAIN_BRANCH_NAME}
+      git pull origin ${BASE_MAIN_BRANCH_NAME}
+      BASE_DEV_BRANCH_NAME="dev/${BASE_RELEASE_VERSION}"
   fi
 
-  git checkout develop
-  git pull origin develop
+  git flow config set develop ${BASE_DEV_BRANCH_NAME}
+
+  git checkout ${BASE_DEV_BRANCH_NAME}
+  git pull origin ${BASE_DEV_BRANCH_NAME}
+  git flow config
   git flow release start v"${NEW_RELEASE_VERSION}"
 }
 

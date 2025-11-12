@@ -39,11 +39,15 @@ DRY_RUN="${3:-""}"
 
 echo "=====Starting Release process====="
 
+local BASE_VERSION
+
 if [[ "${TYPE}" == "dogu"  || "${TYPE}" == "dogu-cve-release" ]];then
   CURRENT_TOOL_VERSION=$(get_current_version_by_dogu_json)
 else
   CURRENT_TOOL_VERSION=$(get_current_version_by_makefile)
 fi
+
+BASE_VERSION=$(get_base_version_by_makefile)
 
 NEW_RELEASE_VERSION="$(read_new_version)"
 
@@ -51,7 +55,7 @@ validate_new_version "${NEW_RELEASE_VERSION}"
 if [[ -n "${DRY_RUN}" ]]; then
   start_dry_run_release "${NEW_RELEASE_VERSION}"
 else
-  start_git_flow_release "${NEW_RELEASE_VERSION}"
+  start_git_flow_release "${NEW_RELEASE_VERSION}" "${BASE_VERSION}"
 fi
 
 update_versions "${NEW_RELEASE_VERSION}"
