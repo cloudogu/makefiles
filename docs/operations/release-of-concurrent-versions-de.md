@@ -9,8 +9,8 @@ Dies ist bei nebenläufigen Versionen nicht möglich, da sich sonst Konflikte au
 Der Ablauf des Release für nebenläufige Versionen ist relativ ähnlich zu dem Standard-Release-Prozess.
 Um weiterhin Gitflow verwenden zu können, kommen vier kleine Anpassungen an das Projekt hinzu:
 1. Setzen der Variable `BASE_VERSION` in der Makefile
-2. Erstellen eines Branches `dev/BASE_VERSION`
-3. Erstellen eines Branches `main/BASE_VERSION`
+2. Erstellen eines Branches `BASE_VERSION/develop`
+3. Erstellen eines Branches `BASE_VERSION/main`
 4. Anpassen des Jenkinsfiles
 
 ### Setzen der BASE_VERSION
@@ -19,19 +19,19 @@ Ist ein Projekt bspw. schon auf der Version `7.4.3` und es sind noch Bugfixes an
 Die Bennenung ist hauptsächlich für die Erstellung der neuen Branches in den nächsten Schritten wichtig.
 
 ### Erstellung neuer develop-Branch
-Der neue develop-Branch für die nebenläufige Version muss `dev/BASE_VERSION` benannt werden. 
+Der neue develop-Branch für die nebenläufige Version muss `BASE_VERSION/develop` benannt werden. 
 Dieser wird im Release-Prozess automatisch für gitflow gesetzt, wenn die `BASE_VERSION` in der `Makefile` eingetragen ist.
 
 ### Erstellung neuer main-Branch
-Der neue main-Branch für die nebenläufige Version muss `main/BASE_VERSION` oder `master/BASE_VERSION` benannt werden.
+Der neue main-Branch für die nebenläufige Version muss `BASE_VERSION/main` benannt werden.
 Dieser wird im Release-Prozess automatisch für gitflow gesetzt, wenn die `BASE_VERSION` in der `Makefile` eingetragen ist.
 
 
 ### Anpassung Jenkinsfile
 Im `Jenkinsfile` müssen die neuen Branches korrekt definiert sein:
 ```groovy
-productionReleaseBranch = "main/BASE_VERSION"
-developmentBranch = "dev/BASE_VERSION"
+productionReleaseBranch = "BASE_VERSION/main"
+developmentBranch = "BASE_VERSION/develop"
 ```
 Dadurch können sie später beim Abschluss des Release verwendet werden, sodass der release-Branch korrekt gemergt wird.
 ```groovy

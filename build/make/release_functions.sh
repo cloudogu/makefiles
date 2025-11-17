@@ -80,17 +80,13 @@ start_git_flow_release() {
       BASE_DEV_BRANCH_NAME="develop"
   else
       echo "BASE_RELEASE_VERSION variable is not empty"
-      if [ -n "$mainBranchExists" ]; then
-        BASE_MAIN_BRANCH_NAME="master/${BASE_RELEASE_VERSION}"
-      else
-        BASE_MAIN_BRANCH_NAME="main/${BASE_RELEASE_VERSION}"
-      fi
 
+      BASE_MAIN_BRANCH_NAME="${BASE_RELEASE_VERSION}/main"
       echo "Using ${BASE_MAIN_BRANCH_NAME} branch for production releases"
       git flow config set master ${BASE_MAIN_BRANCH_NAME}
       git checkout ${BASE_MAIN_BRANCH_NAME}
       git pull origin ${BASE_MAIN_BRANCH_NAME}
-      BASE_DEV_BRANCH_NAME="dev/${BASE_RELEASE_VERSION}"
+      BASE_DEV_BRANCH_NAME="${BASE_RELEASE_VERSION}/develop"
   fi
 
   git flow config set develop ${BASE_DEV_BRANCH_NAME}
