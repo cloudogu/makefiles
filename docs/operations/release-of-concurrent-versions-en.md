@@ -28,14 +28,12 @@ This is automatically set for gitflow in the release process if the `BASE_VERSIO
 
 
 ### Adjusting Jenkinsfile
-The new branches must be defined correctly in the `Jenkinsfile`:
-```groovy
-productionReleaseBranch = "BASE_VERSION/main"
-developmentBranch = "BASE_VERSION/develop"
-```
+The new branches must be read out correctly in the `Jenkinsfile`:
 This allows them to be used later when completing the release, so that the release branch is merged correctly.
 ```groovy
 stage('Finish Release') {
+    productionReleaseBranch = makefile.getMainBranchName()
+    developmentBranch = makefile.getDevelopBranchName()
     gitflow.finishRelease(releaseVersion, productionReleaseBranch, developmentBranch)
 }
 ```

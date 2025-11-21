@@ -28,7 +28,7 @@ Dieser wird im Release-Prozess automatisch für gitflow gesetzt, wenn die `BASE_
 
 
 ### Anpassung Jenkinsfile
-Im `Jenkinsfile` müssen die neuen Branches korrekt definiert sein:
+Im `Jenkinsfile` müssen die neuen Branches ausgelesen werden. 
 Dadurch können sie später beim Abschluss des Release verwendet werden, sodass der release-Branch korrekt gemergt wird.
 ```groovy
 stage('Finish Release') {
