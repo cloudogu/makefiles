@@ -39,8 +39,6 @@ DRY_RUN="${3:-""}"
 
 echo "=====Starting Release process====="
 
-local BASE_VERSION
-
 if [[ "${TYPE}" == "dogu"  || "${TYPE}" == "dogu-cve-release" ]];then
   CURRENT_TOOL_VERSION=$(get_current_version_by_dogu_json)
 else
