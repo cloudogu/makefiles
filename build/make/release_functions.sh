@@ -330,12 +330,22 @@ show_diff() {
 finish_release_and_push() {
   local CURRENT_VERSION="${1}"
   local NEW_RELEASE_VERSION="${2}"
+  local BASE_RELEASE_VERSION="${3}"
 
   # Push changes and delete release branch
   wait_for_ok "Upgrade from version v${CURRENT_VERSION} to version v${NEW_RELEASE_VERSION} finished. Should the changes be pushed?"
   git push origin release/v"${NEW_RELEASE_VERSION}"
 
   echo "Switching back to develop and deleting branch release/v${NEW_RELEASE_VERSION}..."
-  git checkout develop
+
+  local BASE_DEV_BRANCH_NAME
+
+  if [[ -z "$BASE_RELEASE_VERSION" ]]; then
+      BASE_DEV_BRANCH_NAME="develop"
+  else
+      BASE_DEV_BRANCH_NAME="${BASE_RELEASE_VERSION}/develop"
+  fi
+
+  git checkout ${BASE_DEV_BRANCH_NAME}
   git branch -D release/v"${NEW_RELEASE_VERSION}"
 }
