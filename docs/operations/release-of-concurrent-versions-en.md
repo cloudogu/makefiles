@@ -9,8 +9,8 @@ This is not possible with concurrent versions, as it would otherwise cause confl
 The release process for concurrent versions is relatively similar to the standard release process.
 In order to continue using Gitflow, four small adjustments need to be made to the project:
 1. Set the variable `BASE_VERSION` in the Makefile.
-2. Create a branch `BASE_VERSION/develop`.
-3. Create a branch `BASE_VERSION/main`.
+2. Create a branch `BASE_VERSION/develop`, which is also available remotely.
+3. Create a branch `BASE_VERSION/main`, which is also available remotely.
 4. Adjust the Jenkinsfile.
 
 ### Setting the BASE_VERSION
@@ -32,8 +32,8 @@ The new branches must be read out correctly in the `Jenkinsfile`:
 This allows them to be used later when completing the release, so that the release branch is merged correctly.
 ```groovy
 stage('Finish Release') {
-    productionReleaseBranch = makefile.getMainBranchName()
-    developmentBranch = makefile.getDevelopBranchName()
+    productionReleaseBranch = makefile.determineGitFlowMainBranch(productionReleaseBranch)
+    developmentBranch = makefile.determineGitFlowDevelopBranch()
     gitflow.finishRelease(releaseVersion, productionReleaseBranch, developmentBranch)
 }
 ```

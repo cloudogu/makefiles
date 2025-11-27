@@ -9,8 +9,8 @@ Dies ist bei nebenläufigen Versionen nicht möglich, da sich sonst Konflikte au
 Der Ablauf des Release für nebenläufige Versionen ist relativ ähnlich zu dem Standard-Release-Prozess.
 Um weiterhin Gitflow verwenden zu können, kommen vier kleine Anpassungen an das Projekt hinzu:
 1. Setzen der Variable `BASE_VERSION` in der Makefile
-2. Erstellen eines Branches `BASE_VERSION/develop`
-3. Erstellen eines Branches `BASE_VERSION/main`
+2. Erstellen eines Branches `BASE_VERSION/develop`, der auch remote verfügbar ist.
+3. Erstellen eines Branches `BASE_VERSION/main`, der auch remote verfügbar ist.
 4. Anpassen des Jenkinsfiles
 
 ### Setzen der BASE_VERSION
@@ -32,8 +32,8 @@ Im `Jenkinsfile` müssen die neuen Branches ausgelesen werden.
 Dadurch können sie später beim Abschluss des Release verwendet werden, sodass der release-Branch korrekt gemergt wird.
 ```groovy
 stage('Finish Release') {
-    productionReleaseBranch = makefile.getMainBranchName()
-    developmentBranch = makefile.getDevelopBranchName()
+    productionReleaseBranch = makefile.determineGitFlowMainBranch(productionReleaseBranch)
+    developmentBranch = makefile.determineGitFlowDevelopBranch()
     gitflow.finishRelease(releaseVersion, productionReleaseBranch, developmentBranch)
 }
 ```
