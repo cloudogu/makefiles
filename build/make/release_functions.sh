@@ -109,8 +109,17 @@ start_dry_run_release() {
 
 abort_dry_run_release() {
   local NEW_RELEASE_VERSION="${1}"
+  local BASE_RELEASE_VERSION="${2}"
 
-  git checkout develop
+  local BASE_DEV_BRANCH_NAME
+
+  if [[ -z "$BASE_RELEASE_VERSION" ]]; then
+      BASE_DEV_BRANCH_NAME="develop"
+  else
+      BASE_DEV_BRANCH_NAME="${BASE_RELEASE_VERSION}/develop"
+  fi
+
+  git checkout ${BASE_DEV_BRANCH_NAME}
   git branch -D dryrun/v"${NEW_RELEASE_VERSION}"
 }
 

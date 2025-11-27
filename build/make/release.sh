@@ -62,7 +62,7 @@ update_releasenotes "${NEW_RELEASE_VERSION}"
 show_diff
 
 if [[ -n "${DRY_RUN}" ]]; then
-  abort_dry_run_release "${NEW_RELEASE_VERSION}"
+  abort_dry_run_release "${NEW_RELEASE_VERSION}" "${BASE_VERSION}"
 else
   finish_release_and_push "${CURRENT_TOOL_VERSION}" "${NEW_RELEASE_VERSION}" "${BASE_VERSION}"
 fi
