@@ -80,8 +80,8 @@ start_git_flow_release() {
       BASE_DEV_BRANCH_NAME="develop"
   else
       echo "BASE_RELEASE_VERSION variable is not empty"
-      if [[ ${NEW_RELEASE_VERSION} != *${BASE_RELEASE_VERSION}* ]]; then
-      echo "ERROR: Release version (${NEW_RELEASE_VERSION}) does not contain base version (${BASE_RELEASE_VERSION})"
+      if [[ ${NEW_RELEASE_VERSION} != ${BASE_RELEASE_VERSION}* ]]; then
+      echo "ERROR: Release version (${NEW_RELEASE_VERSION}) does not start with base version (${BASE_RELEASE_VERSION})"
       exit 1
       fi
 
