@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.5.0] - 2025-12-02
+### Added
+- Add BaseVersion to be able to create backport releases
+
 ## [v10.4.0] - 2025-09-25
 - [#240] Upgrade golangci-lint to v2.5.0
 
