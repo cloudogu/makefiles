@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - [#245] Change naming of cluster fqdn to `k3ces.localdomain`
 
+## [v10.6.0] - 2026-02-09
+### Changed
+- [#247] use ci-namespace while building on ci-environment
+
 ## [v10.5.0] - 2025-12-02
 ### Added
 - Add BaseVersion to be able to create backport releases
