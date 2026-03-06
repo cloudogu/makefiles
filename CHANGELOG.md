@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.6.1] - 2026-03-06
+### Fixed
+- [#245] Change naming of cluster fqdn to `k3ces.localdomain`
+  - The cas dogu does not support `*.local` as a local url (`*.localdomain` and `*.localhost` are allowed by cas)
+
 ## [v10.6.0] - 2026-02-09
 ### Changed
 - [#247] use ci-namespace while building on ci-environment
