@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.7.0] - 2026-03-12
+### Added
+- [#250] a separate ARTIFACT_ID for components.
+  - k8s-component.mk now uses COMPONENT_ARTIFACT_ID, which defaults to ARTIFACT_ID but can be overridden.
+
 ## [v10.6.1] - 2026-03-06
 ### Fixed
 - [#245] Change naming of cluster fqdn to `k3ces.localdomain`
