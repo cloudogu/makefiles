@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- [#250] a separate ARTIFACT_ID for components.
+  - k8s-component.mk now uses COMPONENT_ARTIFACT_ID, which defaults to ARTIFACT_ID but can be overridden.
 
 ## [v10.6.1] - 2026-03-06
 ### Fixed
