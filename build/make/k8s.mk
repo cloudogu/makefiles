@@ -25,8 +25,12 @@ IMAGE ?=
 # with development images pointing to CES_REGISTRY_URL_PREFIX.
 STAGE?=production
 
-# Set the "local" as runtime-environment, to push images to the container-registry of the local cluster and to apply resources to the local cluster.
-# Use "remote" as runtime-environment in your .env file to push images to the container-registry at "registry.cloudogu.com/testing" and to apply resources to the configured kubernetes-context in KUBE_CONTEXT_NAME.
+# Set "local" as runtime-environment to use the legacy in-cluster registry of the local cluster.
+# Set "k3d" as runtime-environment for local k3d development with local registry push/pull:
+# - push from host to localhost:5001
+# - pull in-cluster via k3d-registry-proxy.localhost:5000/local-dev
+# Use "remote" as runtime-environment in your .env file to push images to the container-registry at
+# "registry.cloudogu.com/testing" and to apply resources to the configured kubernetes-context in KUBE_CONTEXT_NAME.
 RUNTIME_ENV?=local
 $(info RUNTIME_ENV=$(RUNTIME_ENV))
 
@@ -34,25 +38,39 @@ $(info RUNTIME_ENV=$(RUNTIME_ENV))
 K3S_CLUSTER_FQDN?=k3ces.localdomain
 K3S_LOCAL_REGISTRY_PORT?=30099
 
-# The URL of the container-registry to use. Defaults to the registry of the local-cluster.
-# If RUNTIME_ENV is "remote" it is "registry.cloudogu.com/testing", if ENVIRONMENT is "ci" it is "registry.cloudogu.com/ci"
-# if run on ci (jenkins) the images must be pushed to a separate namespace in order to free space every night after the build.
+# The URL or image-prefix host to use for development images.
+# If RUNTIME_ENV is "remote" it is "registry.cloudogu.com/testing", if ENVIRONMENT is "ci" it is "registry.cloudogu.com/ci".
+# If run on ci (jenkins) the images must be pushed to a separate namespace in order to free space every night after the build.
 CES_REGISTRY_HOST?=${K3S_CLUSTER_FQDN}:${K3S_LOCAL_REGISTRY_PORT}
 CES_REGISTRY_NAMESPACE ?=
+IMAGE_PUSH_REGISTRY_HOST ?= $(CES_REGISTRY_HOST)
+IMAGE_PUSH_REGISTRY_NAMESPACE ?= $(CES_REGISTRY_NAMESPACE)
 ifeq (${RUNTIME_ENV}, remote)
 	CES_REGISTRY_HOST=registry.cloudogu.com
 	CES_REGISTRY_NAMESPACE=/testing
+	IMAGE_PUSH_REGISTRY_HOST=$(CES_REGISTRY_HOST)
+	IMAGE_PUSH_REGISTRY_NAMESPACE=$(CES_REGISTRY_NAMESPACE)
 	ifeq ($(ENVIRONMENT), ci)
 		CES_REGISTRY_NAMESPACE=/ci
+		IMAGE_PUSH_REGISTRY_NAMESPACE=$(CES_REGISTRY_NAMESPACE)
 	endif
+endif
+ifeq (${RUNTIME_ENV}, k3d)
+	CES_REGISTRY_HOST=k3d-registry-proxy.localhost:5000
+	CES_REGISTRY_NAMESPACE=/local-dev
+	IMAGE_PUSH_REGISTRY_HOST=localhost:5001
+	IMAGE_PUSH_REGISTRY_NAMESPACE=/local-dev
 endif
 $(info CES_REGISTRY_HOST=$(CES_REGISTRY_HOST))
 
 # The name of the kube-context to use for applying resources.
 # If KUBE_CONTEXT_NAME is empty and RUNTIME_ENV is "remote" the currently configured kube-context is used.
-# If KUBE_CONTEXT_NAME is empty and RUNTIME_ENV is not "remote" the "k3ces.localdomain" is used as kube-context.
+# If KUBE_CONTEXT_NAME is empty and RUNTIME_ENV is "k3d" the currently configured kube-context is used.
+# If KUBE_CONTEXT_NAME is empty and RUNTIME_ENV is neither "remote" nor "k3d" the "k3ces.localdomain" is used as kube-context.
 ifeq (${KUBE_CONTEXT_NAME}, )
 	ifeq (${RUNTIME_ENV}, remote)
+		KUBE_CONTEXT_NAME = $(shell kubectl config current-context)
+	else ifeq (${RUNTIME_ENV}, k3d)
 		KUBE_CONTEXT_NAME = $(shell kubectl config current-context)
 	else
 		KUBE_CONTEXT_NAME = k3ces.localdomain
@@ -68,6 +86,8 @@ GIT_HASH := $(shell git rev-parse --short HEAD)
 ## Image URL to use all building/pushing image targets
 IMAGE_DEV?=$(CES_REGISTRY_HOST)$(CES_REGISTRY_NAMESPACE)/$(ARTIFACT_ID)/$(GIT_BRANCH)
 IMAGE_DEV_VERSION=$(IMAGE_DEV):$(VERSION)
+IMAGE_DEV_PUSH?=$(IMAGE_PUSH_REGISTRY_HOST)$(IMAGE_PUSH_REGISTRY_NAMESPACE)/$(ARTIFACT_ID)/$(GIT_BRANCH)
+IMAGE_DEV_PUSH_VERSION=$(IMAGE_DEV_PUSH):$(VERSION)
 
 # Variables for the temporary yaml files. These are used as template to generate a development resource containing
 # the current namespace and the dev image.
@@ -159,9 +179,17 @@ ifeq (${IMAGE_DEV},)
 endif
 
 .PHONY: image-import
-image-import: check-all-vars check-k8s-artifact-id docker-dev-tag ## Imports the currently available image into the configured ces-registry.
-	@echo "Import $(IMAGE_DEV_VERSION) into K8s cluster ${KUBE_CONTEXT_NAME}..."
-	@docker push $(IMAGE_DEV_VERSION)
+image-import: check-all-vars check-k8s-artifact-id docker-dev-tag ## Imports the currently available image into the configured runtime target.
+	@if [[ "${RUNTIME_ENV}" == "k3d" ]]; then \
+		echo "Push $(IMAGE_DEV_VERSION) for k3d registry workflow..."; \
+		echo "Push target: $(IMAGE_DEV_PUSH_VERSION)"; \
+		echo "Pull target: $(IMAGE_DEV_VERSION)"; \
+		DOCKER_BUILDKIT=1 docker tag $(IMAGE_DEV_VERSION) $(IMAGE_DEV_PUSH_VERSION); \
+		docker push $(IMAGE_DEV_PUSH_VERSION); \
+	else \
+		echo "Import $(IMAGE_DEV_VERSION) into K8s cluster ${KUBE_CONTEXT_NAME}..."; \
+		docker push $(IMAGE_DEV_VERSION); \
+	fi
 	@echo "Done."
 
 ## Functions
@@ -216,5 +244,3 @@ isProduction:
 	else \
 		echo "Command executed in development stage. Continuing."; \
 	fi
-
-
