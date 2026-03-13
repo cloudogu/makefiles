@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.7.1] - 2026-03-13
+### Added
+- [#250] Add pre build hook before applying dogu resource to k8s cluster
+
 ## [v10.7.0] - 2026-03-12
 ### Added
 - [#250] a separate ARTIFACT_ID for components.
