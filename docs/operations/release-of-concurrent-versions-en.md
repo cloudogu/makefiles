@@ -11,7 +11,7 @@ In order to continue using Gitflow, four small adjustments need to be made to th
 1. Set the variable `BASE_VERSION` in the Makefile.
 2. Create a branch `BASE_VERSION/develop`, which is also available remotely.
 3. Create a branch `BASE_VERSION/main`, which is also available remotely.
-4. Update Makefiles to at least 10.5.0 on `BASE_VERSION/develop` and on `BASE_VERSION/main`
+4. Update Makefiles to at least 10.5.0 on `main/master`, `develop`, `BASE_VERSION/develop` and on `BASE_VERSION/main`
 5. Adjust the Jenkinsfile.
 
 ### Setting the `BASE_VERSION`
