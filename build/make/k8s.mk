@@ -6,6 +6,8 @@ endif
 
 ## Variables
 
+K8S_MK_INCLUDE_MARKER="k8s.mk"
+
 BINARY_YQ = $(UTILITY_BIN_PATH)/yq
 BINARY_YQ_4_VERSION?=v4.40.3
 BINARY_HELM = $(UTILITY_BIN_PATH)/helm

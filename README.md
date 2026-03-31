@@ -252,6 +252,10 @@ package yourpackagegoeshere
 
 The default build tag name is defined in the global variable `GO_BUILD_TAG_INTEGRATION_TEST?=integration`. While this should fit most projects it is possible to modify the name of the build tag. 
 
+### test-common.mk
+
+This module contains xUnit report generation by providing the `GO_JUNIT_REPORT` target. 
+
 #### Pre- and Post-targets
 
 This target can be supplemented with pre- and post-targets by setting make targets to the corresponding variables in your `Makefile` (both are optional):
@@ -394,6 +398,8 @@ This module provides generic targets for developing K8s Cloudogu EcoSystem
    - `check-k8s-artifact-id`
    - `check-etc-hosts`
    - `check-insecure-cluster-registry`
+
+This file will be included automatically if you include `k8s-component.mk` and/or `k8s-dogu.mk`.
 
 #### k8s-component.mk
 

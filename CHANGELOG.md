@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.7.3] - 2026-03-31
+### Changed
+- [#254] k8s.mk and test-common.mk will now included automatically and conditionally while reducing warnings
+
 ## [v10.7.2] - 2026-03-16
 ### Fixed
 - Extend backport release documentation
