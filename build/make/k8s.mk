@@ -10,10 +10,23 @@ K8S_MK_INCLUDE_MARKER="k8s.mk"
 
 BINARY_YQ = $(UTILITY_BIN_PATH)/yq
 BINARY_YQ_4_VERSION?=v4.40.3
+
 BINARY_HELM = $(UTILITY_BIN_PATH)/helm
 BINARY_HELM_VERSION?=v3.13.0
+BINARY_HELM_URL?=https://get.helm.sh/helm-${BINARY_HELM_VERSION}-linux-amd64.tar.gz
+BINARY_HELM_SUM?=138676351483e61d12dfade70da6c03d471bbdcac84eaadeb5e1d06fa114a24f
+BINARY_HELM_ARCHIVE_PATH?=linux-amd64/helm
+BINARY_HELM_ARCHIVE_STRIP?=1
+
 CONTROLLER_GEN = $(UTILITY_BIN_PATH)/controller-gen
 CONTROLLER_GEN_VERSION?=v0.19.0
+
+BINARY_CRANE_VERSION=v0.21.4
+BINARY_CRANE=$(UTILITY_BIN_PATH)/crane
+BINARY_CRANE_URL?=https://github.com/google/go-containerregistry/releases/download/${BINARY_CRANE_VERSION}/go-containerregistry_Linux_x86_64.tar.gz
+BINARY_CRANE_SUM?=3b6032bcf412e14cf3baf964a4065f2966af906ec947ab22478df5f74705c892
+BINARY_CRANE_ARCHIVE_PATH?=crane
+BINARY_CRANE_ARCHIVE_STRIP?=0
 
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # Options are set to exit when a recipe line exits non-zero or a piped command fails.
@@ -195,7 +208,13 @@ ${BINARY_YQ}: $(UTILITY_BIN_PATH)
 install-helm: ${BINARY_HELM}
 
 ${BINARY_HELM}: $(UTILITY_BIN_PATH)
-	$(call go-get-tool,$(BINARY_HELM),helm.sh/helm/v3/cmd/helm@${BINARY_HELM_VERSION})
+	$(call curl-get-tool-from-tar,$(BINARY_HELM),$(BINARY_HELM_URL),$(BINARY_HELM_SUM),$(BINARY_HELM_ARCHIVE_PATH),$(BINARY_HELM_ARCHIVE_STRIP))
+
+.PHONY: install-crane ## Installs crane.
+install-crane: ${BINARY_CRANE}
+
+${BINARY_CRANE}: $(UTILITY_BIN_PATH)
+	$(call curl-get-tool-from-tar,$(BINARY_CRANE),$(BINARY_CRANE_URL),$(BINARY_CRANE_SUM),$(BINARY_CRANE_ARCHIVE_PATH),$(BINARY_CRANE_ARCHIVE_STRIP))
 
 .PHONY: controller-gen
 controller-gen: ${CONTROLLER_GEN} ## Download controller-gen locally if necessary.
