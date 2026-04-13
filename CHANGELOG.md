@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- [#256] Function to download archived files with cURL.
+  - Download helm binary with it because `go install` took too much time.
+  - Added target `install-crane` to install the crane utility.
+  - Update helm binary to v3.20.2
 
 ## [v10.7.3] - 2026-03-31
 ### Changed
