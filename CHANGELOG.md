@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.8.0] - 2026-04-13
+### Added
+- [#256] Function to download archived files with cURL.
+  - Download helm binary with it because `go install` took too much time.
+  - Added target `install-crane` to install the crane utility.
+  - Update helm binary to v3.20.2
+
 ## [v10.7.3] - 2026-03-31
 ### Changed
 - [#254] k8s.mk and test-common.mk will now included automatically and conditionally while reducing warnings
