@@ -35,6 +35,10 @@ GOPASS_BIN?=$(shell command -v gopass 2> /dev/null)
 
 EXCLUDED_TEMPLATE_FILES?=rich-parameters.yaml variables.yaml
 
+TRIVY_VERSION ?= latest
+TRIVY_IMAGE = aquasec/trivy:$(TRIVY_VERSION)
+
+export TRIVY_IMAGE
 
 ##@ Coder template development
 
