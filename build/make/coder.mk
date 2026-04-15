@@ -111,7 +111,7 @@ ${CONTAINER_IMAGE_TRIVY_SCAN_JSON}: ${CONTAINER_IMAGE_TAR}
 	${CONTAINER_BIN} run --rm --pull=always \
 		-v "trivy-cache:/root/.cache" \
 		-v "${CONTAINER_IMAGE_TAR}:/tmp/image.tar" \
-		aquasec/trivy -q \
+		$(TRIVY_IMAGE) -q \
 		image --scanners vuln --input /tmp/image.tar -f json --timeout 15m \
 		> ${CONTAINER_IMAGE_TRIVY_SCAN_JSON}
 
