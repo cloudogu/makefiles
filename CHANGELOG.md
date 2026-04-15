@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.9.0] - 2026-04-15
+- [#259] pass trivy version as parameter for coder target "trivyscanImage"
+  - default is "latest"
+
 ## [v10.8.0] - 2026-04-13
 ### Added
 - [#256] Function to download archived files with cURL.
