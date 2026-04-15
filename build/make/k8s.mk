@@ -33,6 +33,12 @@ BINARY_CRANE_ARCHIVE_STRIP?=0
 SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
 
+ifneq (${KUBECONFIG},)
+	# Values from the repo-local .env become plain make variables first. Export KUBECONFIG so
+	# recipe shells and nested kubectl/helm calls use the same kubeconfig file as the make logic.
+	export KUBECONFIG
+endif
+
 # The productive tag of the image
 IMAGE ?=
 
@@ -42,8 +48,8 @@ STAGE?=production
 
 # Set "local" as runtime-environment to use the legacy in-cluster registry of the local cluster.
 # Set "k3d" as runtime-environment for local k3d development with local registry push/pull:
-# - push from host to localhost:5001
-# - pull in-cluster via k3d-registry-proxy.localhost:5000/local-dev
+# - push from host to ${K3D_PUSH_REGISTRY_HOST}${K3D_PUSH_REGISTRY_NAMESPACE}
+# - pull in-cluster via ${K3D_PULL_REGISTRY_HOST}${K3D_PULL_REGISTRY_NAMESPACE}
 # Use "remote" as runtime-environment in your .env file to push images to the container-registry at
 # "registry.cloudogu.com/testing" and to apply resources to the configured kubernetes-context in KUBE_CONTEXT_NAME.
 RUNTIME_ENV?=local
@@ -52,6 +58,10 @@ $(info RUNTIME_ENV=$(RUNTIME_ENV))
 # The host and port of the local cluster
 K3S_CLUSTER_FQDN?=k3ces.localdomain
 K3S_LOCAL_REGISTRY_PORT?=30099
+K3D_PULL_REGISTRY_HOST?=k3d-registry-proxy.localhost:5000
+K3D_PULL_REGISTRY_NAMESPACE?=/local-dev
+K3D_PUSH_REGISTRY_HOST?=localhost:5001
+K3D_PUSH_REGISTRY_NAMESPACE?=$(K3D_PULL_REGISTRY_NAMESPACE)
 
 # The URL or image-prefix host to use for development images.
 # If RUNTIME_ENV is "remote" it is "registry.cloudogu.com/testing", if ENVIRONMENT is "ci" it is "registry.cloudogu.com/ci".
@@ -71,19 +81,25 @@ ifeq (${RUNTIME_ENV}, remote)
 	endif
 endif
 ifeq (${RUNTIME_ENV}, k3d)
-	CES_REGISTRY_HOST=k3d-registry-proxy.localhost:5000
-	CES_REGISTRY_NAMESPACE=/local-dev
-	IMAGE_PUSH_REGISTRY_HOST=localhost:5001
-	IMAGE_PUSH_REGISTRY_NAMESPACE=/local-dev
+	CES_REGISTRY_HOST=$(K3D_PULL_REGISTRY_HOST)
+	CES_REGISTRY_NAMESPACE=$(K3D_PULL_REGISTRY_NAMESPACE)
+	IMAGE_PUSH_REGISTRY_HOST=$(K3D_PUSH_REGISTRY_HOST)
+	IMAGE_PUSH_REGISTRY_NAMESPACE=$(K3D_PUSH_REGISTRY_NAMESPACE)
 endif
 $(info CES_REGISTRY_HOST=$(CES_REGISTRY_HOST))
 
 # The name of the kube-context to use for applying resources.
+# If KUBECONFIG is set and KUBE_CONTEXT_NAME is empty, the current context from this kubeconfig is used.
 # If KUBE_CONTEXT_NAME is empty and RUNTIME_ENV is "remote" the currently configured kube-context is used.
 # If KUBE_CONTEXT_NAME is empty and RUNTIME_ENV is "k3d" the currently configured kube-context is used.
+# Set KUBE_CONTEXT_NAME explicitly if the current kube-context does not point to the desired local k3d cluster.
 # If KUBE_CONTEXT_NAME is empty and RUNTIME_ENV is neither "remote" nor "k3d" the "k3ces.localdomain" is used as kube-context.
 ifeq (${KUBE_CONTEXT_NAME}, )
-	ifeq (${RUNTIME_ENV}, remote)
+	ifneq (${KUBECONFIG}, )
+		# Resolve the current context from the explicitly configured kubeconfig instead of the
+		# user's default ~/.kube/config. This keeps repo-local .env settings self-contained.
+		KUBE_CONTEXT_NAME = $(shell KUBECONFIG="${KUBECONFIG}" kubectl config current-context)
+	else ifeq (${RUNTIME_ENV}, remote)
 		KUBE_CONTEXT_NAME = $(shell kubectl config current-context)
 	else ifeq (${RUNTIME_ENV}, k3d)
 		KUBE_CONTEXT_NAME = $(shell kubectl config current-context)
