@@ -148,8 +148,6 @@ check-docker-credentials:
 		fi \
 	fi
 
-##@ K8s - Resources
-
 ${K8S_RESOURCE_TEMP_FOLDER}:
 	@mkdir -p $@
 
@@ -196,22 +194,22 @@ __check_defined = \
 
 ##@ K8s - Download Utilities
 
-.PHONY: install-yq ## Installs the yq YAML editor.
-install-yq: ${BINARY_YQ}
+.PHONY: install-yq
+install-yq: ${BINARY_YQ} ## Installs the yq YAML editor.
 
 ${BINARY_YQ}: $(UTILITY_BIN_PATH)
 	$(call go-get-tool,$(BINARY_YQ),github.com/mikefarah/yq/v4@${BINARY_YQ_4_VERSION})
 
 ##@ K8s - Download Kubernetes Utilities
 
-.PHONY: install-helm ## Download helm locally if necessary.
-install-helm: ${BINARY_HELM}
+.PHONY: install-helm
+install-helm: ${BINARY_HELM} ## Download helm locally if necessary.
 
 ${BINARY_HELM}: $(UTILITY_BIN_PATH)
 	$(call curl-get-tool-from-tar,$(BINARY_HELM),$(BINARY_HELM_URL),$(BINARY_HELM_SUM),$(BINARY_HELM_ARCHIVE_PATH),$(BINARY_HELM_ARCHIVE_STRIP))
 
-.PHONY: install-crane ## Installs crane.
-install-crane: ${BINARY_CRANE}
+.PHONY: install-crane
+install-crane: ${BINARY_CRANE} ## Installs crane.
 
 ${BINARY_CRANE}: $(UTILITY_BIN_PATH)
 	$(call curl-get-tool-from-tar,$(BINARY_CRANE),$(BINARY_CRANE_URL),$(BINARY_CRANE_SUM),$(BINARY_CRANE_ARCHIVE_PATH),$(BINARY_CRANE_ARCHIVE_STRIP))
