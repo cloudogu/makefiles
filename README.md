@@ -377,8 +377,25 @@ tests in `${yourProjectDir}/batsTests` (overrideable with the variable `TESTS_DI
 
 The k8s-modules support remote runtimes and container-registries.
 The environment-variable `RUNTIME_ENV`controls which runtime-environment to use:
-  * `local`: uses the local k8s-cluster at `k3ces-local` and the container-registry of this local-cluster
+  * `local`: uses the legacy local k8s-cluster at `k3ces.localdomain` and the in-cluster registry of this local cluster
+  * `k3d`: uses a local k3d cluster, pushes from the host to a writable local registry and pulls in-cluster from the proxy registry
   * `remote`: uses the currently configured cluster of the kube-config and the container-registry at `registry.cloudogu.com/testing`
+
+For `k3d`, the defaults are:
+
+- pull in-cluster via `k3d-registry-proxy.localhost:5000/local-dev`
+- push from the host via `localhost:5001/local-dev`
+- use the current kube-context unless `KUBE_CONTEXT_NAME` is set explicitly
+
+You can also set `KUBECONFIG` in the repository-local `.env`.
+If `KUBE_CONTEXT_NAME` is not set, the current context is then resolved from this kubeconfig and used for all `kubectl` and `helm` calls.
+
+The `k3d` registry endpoints can be overridden with:
+
+- `K3D_PULL_REGISTRY_HOST`
+- `K3D_PULL_REGISTRY_NAMESPACE`
+- `K3D_PUSH_REGISTRY_HOST`
+- `K3D_PUSH_REGISTRY_NAMESPACE`
 
 To manually override the kube-context the environment-variable `KUBE_CONTEXT_NAME` can be used.
 
@@ -462,4 +479,3 @@ This module provides a target for scanning dogu images with trivy
 
 Usage:
 `make trivyscan` or `make trivyscan SEVERITY='HIGH,CRITICAL'`
-
