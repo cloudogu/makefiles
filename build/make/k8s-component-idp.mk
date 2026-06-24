@@ -33,12 +33,12 @@ helm-prepare-idp: pull-idp build-subchart-idp helm-dependency-pull-idp update-su
 
 .PHONY: helm-push-idp
 helm-push-idp:
-	@IDP_VERSION=$$(${BINARY_YQ}  '.version' "$(IDP_CHART_FILE)"); \
+	@IDP_VERSION=$$(${BINARY_YQ} '.version' "$(IDP_CHART_FILE)"); \
 	IDP_DEV_VERSION_SUFFIX="$(IDP_DEV_VERSION_SUFFIX)"; \
 	if [[ ! "$$IDP_VERSION" == *dev* ]]; then \
 	  echo "IDP Helm-Chart is not a dev version. Changing version to dev..."; \
 	  IDP_VERSION="$$IDP_VERSION" IDP_DEV_VERSION_SUFFIX="$$IDP_DEV_VERSION_SUFFIX" \
-	  ${BINARY_YQ}  -i '.version = strenv(IDP_VERSION) + strenv(IDP_DEV_VERSION_SUFFIX)' "$(IDP_CHART_FILE)"; \
+	  ${BINARY_YQ} -i '.version = strenv(IDP_VERSION) + strenv(IDP_DEV_VERSION_SUFFIX)' "$(IDP_CHART_FILE)"; \
 	  IDP_VERSION="$$IDP_VERSION$$IDP_DEV_VERSION_SUFFIX"; \
 	fi; \
 	IDP_PACKAGE_NAME="$(IDP_CHART_DIR)/$(DEPLOYED_IDP_RELEASE_NAME)-$$IDP_VERSION.tgz"; \
@@ -61,19 +61,19 @@ build-subchart-idp: helm-chart-import
 .PHONY: update-subchart-values-idp # Overwrite this target if path are different or multiple images are required.
 update-subchart-values-idp:
 	@echo "Updating values in $(IDP_DEV_VALUES_FILE)..."
-	@${BINARY_YQ}  -n '."$(ARTIFACT_ID)".image.registry = "$(CES_REGISTRY_HOST)"' > "$(IDP_DEV_VALUES_FILE)" # Always create a new file
-	@${BINARY_YQ}  -i '."$(ARTIFACT_ID)".image.repository = "$(CES_REGISTRY_NAMESPACE_SUB)/$(ARTIFACT_ID)/$(GIT_BRANCH)"' "$(IDP_DEV_VALUES_FILE)"
-	@${BINARY_YQ}  -i '."$(ARTIFACT_ID)".image.tag = "$(VERSION)"' "$(IDP_DEV_VALUES_FILE)" # Use regular version for images and no "dev" prefix with random numbers because the imagePullPolicy: Always will ensure to load the newest image in the cluster.
+	@${BINARY_YQ} -n '."$(ARTIFACT_ID)".image.registry = "$(CES_REGISTRY_HOST)"' > "$(IDP_DEV_VALUES_FILE)" # Always create a new file
+	@${BINARY_YQ} -i '."$(ARTIFACT_ID)".image.repository = "$(CES_REGISTRY_NAMESPACE_SUB)/$(ARTIFACT_ID)/$(GIT_BRANCH)"' "$(IDP_DEV_VALUES_FILE)"
+	@${BINARY_YQ} -i '."$(ARTIFACT_ID)".image.tag = "$(VERSION)"' "$(IDP_DEV_VALUES_FILE)" # Use regular version for images and no "dev" prefix with random numbers because the imagePullPolicy: Always will ensure to load the newest image in the cluster.
 
 .PHONY: update-subchart-dependency-idp
 update-subchart-dependency-idp:
 	@echo "Updating subchart $(ARTIFACT_ID) in $(IDP_CHART_FILE)..."
-	@${BINARY_YQ}  -i '(.dependencies[] | select(.name == "$(ARTIFACT_ID)")) |= (.repository = "oci://$(HELM_PULL_REGISTRY_HOST)/$(HELM_ARTIFACT_NAMESPACE)" | .version = "$(COMPONENT_DEV_VERSION)")' "$(IDP_CHART_FILE)"
+	@${BINARY_YQ} -i '(.dependencies[] | select(.name == "$(ARTIFACT_ID)")) |= (.repository = "oci://$(HELM_PULL_REGISTRY_HOST)/$(HELM_ARTIFACT_NAMESPACE)" | .version = "$(COMPONENT_DEV_VERSION)")' "$(IDP_CHART_FILE)"
 
 .PHONY: pull-idp
 pull-idp:
 	@set -euo pipefail; \
-	idpInstalledVersion=$$(${BINARY_HELM} -n "$(NAMESPACE)" get metadata "$(DEPLOYED_IDP_RELEASE_NAME)" -o yaml | ${BINARY_YQ}  '.version'); \
+	idpInstalledVersion=$$(${BINARY_HELM} -n "$(NAMESPACE)" get metadata "$(DEPLOYED_IDP_RELEASE_NAME)" -o yaml | ${BINARY_YQ} '.version'); \
 	echo "IDP Component installed version: $${idpInstalledVersion}"; \
 	idpRegistryNamespace=$$(kubectl -n "$(NAMESPACE)" get comp "$(DEPLOYED_IDP_RELEASE_NAME)" --no-headers -o custom-columns=":spec.namespace"); \
 	echo "IDP Component registry namespace: $${idpRegistryNamespace}"; \
