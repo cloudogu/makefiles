@@ -38,8 +38,8 @@ crd-add-labels: $(BINARY_YQ)
 		$(BINARY_YQ) -i e ".metadata.labels.\"app.kubernetes.io/name\" = \"${ARTIFACT_CRD_ID}\"" $${file} ;\
 	done
 
-.PHONY: crd-helm-generate ## Generates the Helm CRD chart
-crd-helm-generate: ${CRD_HELM_MANIFEST_TARGET} validate-crd-chart ${HELM_CRD_TARGET_DIR}/Chart.yaml ${K8S_POST_CRD_HELM_GENERATE_TARGETS}
+.PHONY: crd-helm-generate
+crd-helm-generate: ${CRD_HELM_MANIFEST_TARGET} validate-crd-chart ${HELM_CRD_TARGET_DIR}/Chart.yaml ${K8S_POST_CRD_HELM_GENERATE_TARGETS} ## Generates the Helm CRD chart
 
 # this is phony because of it is easier this way than the makefile-single-run way
 .PHONY: ${HELM_CRD_TARGET_DIR}/Chart.yaml

@@ -27,8 +27,8 @@ yarn-publish-ci: ## Execute yarn publish with '--non-interactive' flag to suppre
 	  node:$(NODE_VERSION) \
 	  yarn publish --non-interactive
 
-.PHONY yarn-publish: ## Execute yarn publish
-yarn-publish: $(YARN_BUILD_TARGET)
+.PHONY yarn-publish:
+yarn-publish: $(YARN_BUILD_TARGET) ## Execute yarn publish
 	@echo "Executing yarn publish..."
 	@docker run --rm \
 	  -u "$(UID_NR):$(GID_NR)" \

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Add support for local `k3d` development workflows in the k8s make targets.
+- Add target `helm-apply-idp` to apply a lop-idp subchart to an existing cluster.
+
 
 ## [v10.10.0] - 2026-06-30
 ### Added
@@ -14,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v10.9.1] - 2026-06-09
 ### Fixed
 - [#261] Fix checkstyle format in static analysis and do not pipe stdout to the report file.
+
 
 ## [v10.9.0] - 2026-04-15
 ### Added
