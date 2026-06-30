@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.10.0] - 2026-06-30
+### Added
+- Add support for local `k3d` development workflows in the k8s make targets.
+
 ## [v10.9.1] - 2026-06-09
 ### Fixed
 - [#261] Fix checkstyle format in static analysis and do not pipe stdout to the report file.
