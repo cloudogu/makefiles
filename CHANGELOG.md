@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.10.1] - 2026-08-14
+### Fixed
+- [#267] Add UIDs 1000 to 1002 in BATS image and fix potential Jenkins CI failures 
+
 ## [v10.10.0] - 2026-06-30
 ### Added
 - Add support for local `k3d` development workflows in the k8s make targets.
