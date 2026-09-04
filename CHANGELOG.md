@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v10.11.1] - 2026-09-04
+### Fixed
+- [#271] Use correct golangci-lint script url.
+
 ## [v10.11.0] - 2026-09-01
 ### Added
 - [#269] Target to generate kubernetes clientsets for crd-components.
