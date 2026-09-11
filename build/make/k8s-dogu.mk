@@ -18,8 +18,11 @@ ifeq (${K8S_MK_INCLUDE_MARKER}, )
 endif
 
 # Immutable dev tags: when STAGE=development every `make build` produces a unique, non-overwriting image tag.
+# It is placed in the integer "extra" slot (after the single hyphen) that
+# cesapp-lib's core.ParseVersion expects, replacing any existing packaging revision: e.g. 3.12.1-2 -> 3.12.1-<ts>.
 DOGU_BUILD_VERSION := $(shell date +%s)
-DOGU_DEV_VERSION ?= $(VERSION).dev.$(DOGU_BUILD_VERSION)
+DOGU_VERSION_BASE := $(firstword $(subst -, ,$(VERSION)))
+DOGU_DEV_VERSION ?= $(DOGU_VERSION_BASE)-$(DOGU_BUILD_VERSION)
 ifeq (${STAGE}, development)
 	DOGU_TARGET_VERSION = $(DOGU_DEV_VERSION)
 else
