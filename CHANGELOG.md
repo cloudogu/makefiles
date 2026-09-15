@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- [#273] Use immutable image tags for dogu development builds.
+
+### Fixed
+- [#237] `go-get-tool` now rebuilds an installed tool binary when it was built with a different Go version than the project's active `go env GOVERSION`
 
 ## [v10.11.1] - 2026-09-04
 ### Fixed
