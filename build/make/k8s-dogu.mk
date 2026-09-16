@@ -50,7 +50,14 @@ install-dogu-descriptor: ${BINARY_YQ} $(TARGET_DIR) ## Installs a configmap with
 	@kubectl --context="${KUBE_CONTEXT_NAME}" create configmap "$(ARTIFACT_ID)-descriptor" --from-file=$(DOGU_JSON_DEV_FILE) --dry-run=client -o yaml | kubectl --context="${KUBE_CONTEXT_NAME}" --namespace=${NAMESPACE} apply -f -
 	@echo "Done."
 
-.PHONY: kill-pod
-kill-pod:
-	@echo "Restarting ${ARTIFACT_ID} Dogu!"
-	@kubectl -n ${NAMESPACE} delete pods -l "dogu.name=${ARTIFACT_ID}"
+.PHONY: restart-dogu
+restart-dogu:
+    @echo "Restarting ${ARTIFACT_ID} Dogu!"
+    @printf '%s\n' \
+        'apiVersion: k8s.cloudogu.com/v2' \
+        'kind: DoguRestart' \
+        'metadata:' \
+        '  generateName: ${ARTIFACT_ID}-restart-' \
+        'spec:' \
+        '  doguName: ${ARTIFACT_ID}' \
+        | kubectl -n ${NAMESPACE} create -f -
