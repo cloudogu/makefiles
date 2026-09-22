@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - [#254] k8s.mk and test-common.mk will now included automatically and conditionally while reducing warnings
+- [#276] Make Dockerfile version replace more robust
 
 ## [v10.7.2] - 2026-03-16
 ### Fixed
