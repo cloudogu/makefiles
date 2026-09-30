@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - [#237] `go-get-tool` now rebuilds an installed tool binary when it was built with a different Go version than the project's active `go env GOVERSION`
+- [#58] go.sum target has been replaced with tidy target syncing and creating go.sum file against go.mod
 
 ## [v10.11.1] - 2026-09-04
 ### Fixed
