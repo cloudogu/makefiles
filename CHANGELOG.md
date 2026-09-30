@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v11.0.0] - 2026-09-30
 ### Changed
 - **Breaking:** [#278] Upgrade mockery to `v3`
   - The mockery configuration now belongs to the repository. `make mocks` fails if no `.mockery.yaml` exists.
