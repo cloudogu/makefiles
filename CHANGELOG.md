@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+- **Breaking:** [#278] Upgrade mockery to `v3`
+  - The mockery configuration now belongs to the repository. `make mocks` fails if no `.mockery.yaml` exists.
+  - See the [migration guide](docs/development/mockery-v3-migration.md).
 - [#273] Use immutable image tags for dogu development builds.
+
+### Added
+- [#278] Targets `mocks-init` to create a `.mockery.yaml` and `mocks-delete` to delete generated mocks.
 
 ### Fixed
 - [#237] `go-get-tool` now rebuilds an installed tool binary when it was built with a different Go version than the project's active `go env GOVERSION`
