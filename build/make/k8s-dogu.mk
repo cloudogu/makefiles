@@ -21,7 +21,7 @@ endif
 # It is placed in the integer "extra" slot (after the single hyphen) that
 # cesapp-lib's core.ParseVersion expects, replacing any existing packaging revision: e.g. 3.12.1-2 -> 3.12.1-<ts>.
 DOGU_BUILD_VERSION := $(shell date +%s)
-DOGU_VERSION_BASE := $(firstword $(subst -, ,$(VERSION)))
+DOGU_VERSION_BASE = $(firstword $(subst -, ,$(VERSION)))
 DOGU_DEV_VERSION ?= $(DOGU_VERSION_BASE)-$(DOGU_BUILD_VERSION)
 ifeq (${STAGE}, development)
 	DOGU_TARGET_VERSION = $(DOGU_DEV_VERSION)
