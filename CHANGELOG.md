@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v11.1.1] - 2026-10-08
+### Fixed
+- Fixed indent after merge issue
+
 ## [v11.1.0] - 2026-10-08
 ### Added
 - Add Target to restart pod for dogu
