@@ -68,12 +68,12 @@ install-dogu-descriptor: ${BINARY_YQ} $(TARGET_DIR) ## Installs a configmap with
 
 .PHONY: restart-dogu
 restart-dogu:
-    @echo "Restarting ${ARTIFACT_ID} Dogu!"
-    @printf '%s\n' \
-        'apiVersion: k8s.cloudogu.com/v2' \
-        'kind: DoguRestart' \
-        'metadata:' \
-        '  generateName: ${ARTIFACT_ID}-restart-' \
-        'spec:' \
-        '  doguName: ${ARTIFACT_ID}' \
-        | kubectl -n ${NAMESPACE} create -f -
+	@echo "Restarting ${ARTIFACT_ID} Dogu!"
+	@printf '%s\n' \
+		'apiVersion: k8s.cloudogu.com/v2' \
+		'kind: DoguRestart' \
+		'metadata:' \
+		'  generateName: ${ARTIFACT_ID}-restart-' \
+		'spec:' \
+		'  doguName: ${ARTIFACT_ID}' \
+		| kubectl -n ${NAMESPACE} create -f -
