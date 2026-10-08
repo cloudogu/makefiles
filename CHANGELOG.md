@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- [#281] Fix empty dogu dev version on the first `make build` when `yq` is not yet installed
 
 ## [v11.1.1] - 2026-10-08
 ### Fixed
