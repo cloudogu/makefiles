@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v11.1.2] - 2026-10-20
+### Fixed
+- [#284] Upgrade Mockery to 3.8.1 as version 3.8.0 cannot be used with go 1.27.2
+
 ## [v11.1.1] - 2026-10-08
 ### Fixed
 - Fixed indent after merge issue
