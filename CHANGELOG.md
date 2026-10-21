@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v11.1.3] - 2026-10-21
+### Added
+- [#286] Server-Side Apply support for kubernetes CRD targets
+  - `ApplyConfigurations` will be generated in `/applyconfigurations`
+  - When generating the client will receive Service-Side Apply methods 
+
 ## [v11.1.2] - 2026-10-20
 ### Fixed
 - [#284] Upgrade Mockery to 3.8.1 as version 3.8.0 cannot be used with go 1.27.2
