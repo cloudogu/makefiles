@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v11.2.0] - 2026-10-28
+### Changed
+- [288] Add label `k8s.cloudogu.com/dogu.name` label to Dogu template
+  - This is required by Single-Dogu-Backup
+
 ## [v11.1.3] - 2026-10-21
 ### Added
 - [#286] Server-Side Apply support for kubernetes CRD targets
