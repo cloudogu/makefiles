@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v11.2.1] - 2026-11-12
+### Changed
+- [#291] Update `controller-gen` to `v0.23.0` to generate OpenAPI schemas for ssa.
+
 ## [v11.2.0] - 2026-10-28
 ### Changed
 - [288] Add label `k8s.cloudogu.com/dogu.name` label to Dogu template
