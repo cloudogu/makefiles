@@ -1,6 +1,6 @@
 #!groovy
 
-@Library('github.com/cloudogu/ces-build-lib@4.2.0')
+@Library('github.com/cloudogu/ces-build-lib@5.6.0')
 import com.cloudogu.ces.cesbuildlib.*
 
 // Creating necessary git objects
@@ -32,6 +32,11 @@ node('') {
         stage('Check Makefiles') {
             // Dry-run make to check for errors in Makefiles
             make '-n'
+        }
+
+        stage('Bats Tests') {
+            Bats bats = new Bats(this, docker)
+            bats.checkAndExecuteTests()
         }
 
         if (gitflow.isReleaseBranch()) {
