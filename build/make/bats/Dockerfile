@@ -4,7 +4,7 @@ ARG BATS_TAG
 FROM ${BATS_BASE_IMAGE:-bats/bats}:${BATS_TAG:-1.12.0}
 
 # Make bash more findable by scripts and tests
-RUN apk add make git bash
+RUN apk add make git bash yq-go
 # suppress git "detected dubious ownership" error/warning for repos which are checked out later
 RUN git config --global --add safe.directory /workspace
 # Add unprivileged users so Jenkins CI has less problems with the UID mapping inside this container. This avoids

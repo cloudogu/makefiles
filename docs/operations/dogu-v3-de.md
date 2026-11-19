@@ -61,3 +61,22 @@ make dogu-apply CLDK_DEV_PUSH_ARGS=--dry-run
 
 Wird `BINARY_CLDK_VERSION` geändert, muss auch `BINARY_CLDK_SUM` angepasst werden (siehe `checksums.txt` des cldk-Releases). 
 Ein bereits installiertes `.bin/cldk` wird nicht automatisch ersetzt; vorher löschen.
+
+## Release
+
+`make dogu-release` (aus `release.mk`) startet auch den Release von v3-Dogus.
+Enthält das Projekt eine `cldk.yaml`, wird das Dogu gleichzeitig als v2- und v3-Dogu released (Doppel-Release).
+Dafür wird [yq v4](https://github.com/mikefarah/yq) benötigt: `.bin/yq` (per `make install-yq`, braucht Go) oder yq im `PATH`.
+
+1. Nach der neuen v2-Dogu-Version (z. B. `3.96.4-4`) fragt der Release die neue Chart-Version ab.
+   Sie muss die Form `MAJOR.MINOR.PATCH` haben (ohne Prerelease) und größer als die aktuelle `version` im `Chart.yaml`
+   sein, sonst bricht der Release ab.
+2. Im `Chart.yaml` (Verzeichnis `chart` aus der `cldk.yaml`, Standard `k8s/helm`):
+   - `version` = neue Chart-Version,
+   - `appVersion` = App-Anteil der v2-Dogu-Version (`3.96.4-4` → `3.96.4`).
+3. In der `cldk.yaml` wird der `tag` des Images mit dem Dogu-Namen (`name` im `Chart.yaml`) auf die neue v2-Dogu-Version
+   gesetzt. Fehlt der `tag`, wird er ergänzt.
+4. Beide Dateien werden zusammen mit den übrigen Versionsänderungen committet.
+5. Der CHANGELOG-Abschnitt `## [v<v2-Dogu-Version>]` bekommt die Zeile `Chart-Version: <Chart-Version>`.
+
+Ohne `cldk.yaml` läuft der Release wie bisher.

@@ -50,14 +50,24 @@ BASE_VERSION=$(get_base_version_by_makefile)
 NEW_RELEASE_VERSION="$(read_new_version)"
 
 validate_new_version "${NEW_RELEASE_VERSION}"
+
+# Dogus with a cldk.yaml are released as v2 and v3 dogu, which additionally needs a new chart version.
+NEW_CHART_VERSION=""
+if [[ "${TYPE}" == "dogu" || "${TYPE}" == "dogu-cve-release" ]] && is_v3_dogu; then
+  validate_v3_dogu || exit 1
+  CURRENT_CHART_VERSION="$(get_current_chart_version)"
+  NEW_CHART_VERSION="$(read_new_chart_version "${CURRENT_CHART_VERSION}")"
+  validate_new_chart_version "${NEW_CHART_VERSION}" "${CURRENT_CHART_VERSION}" || exit 1
+fi
+
 if [[ -n "${DRY_RUN}" ]]; then
   start_dry_run_release "${NEW_RELEASE_VERSION}"
 else
   start_git_flow_release "${NEW_RELEASE_VERSION}" "${BASE_VERSION}"
 fi
 
-update_versions "${NEW_RELEASE_VERSION}"
-update_changelog "${NEW_RELEASE_VERSION}" "${FIXED_CVE_LIST}"
+update_versions "${NEW_RELEASE_VERSION}" "${NEW_CHART_VERSION}"
+update_changelog "${NEW_RELEASE_VERSION}" "${FIXED_CVE_LIST}" "${NEW_CHART_VERSION}"
 update_releasenotes "${NEW_RELEASE_VERSION}"
 show_diff
 

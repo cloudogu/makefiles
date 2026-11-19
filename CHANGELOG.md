@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - [#266] Support for v3 dogus
+  - `dogu-apply` builds the dogu and pushes/installs it under a new dev version with `cldk dogu dev-push`
+  - `dogu-release` additionally updates `Chart.yaml` and `cldk.yaml` for dogus with a `cldk.yaml` (double release)
 
 ## [v11.2.1] - 2026-11-12
 ### Changed
