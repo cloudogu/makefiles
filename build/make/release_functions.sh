@@ -3,6 +3,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# shellcheck source=SCRIPTDIR/release_v3_functions.sh
+source "$(dirname "${BASH_SOURCE[0]}")/release_v3_functions.sh"
+
 wait_for_ok() {
   printf "\n"
   local OK="false"
@@ -55,9 +58,12 @@ validate_new_version() {
   fi
 }
 
+# start_git_flow_release starts the git flow release branch release/<release name>.
+# A v3-only release passes an empty NEW_RELEASE_VERSION and its release name.
 start_git_flow_release() {
   local NEW_RELEASE_VERSION="${1}"
   local BASE_RELEASE_VERSION="${2}"
+  local RELEASE_NAME="${3:-v${NEW_RELEASE_VERSION}}"
   local BASE_DEV_BRANCH_NAME
 
   # Do gitflow
@@ -80,7 +86,7 @@ start_git_flow_release() {
       BASE_DEV_BRANCH_NAME="develop"
   else
       echo "BASE_RELEASE_VERSION variable is not empty"
-      if [[ ${NEW_RELEASE_VERSION} != ${BASE_RELEASE_VERSION}* ]]; then
+      if [[ -n "${NEW_RELEASE_VERSION}" && ${NEW_RELEASE_VERSION} != ${BASE_RELEASE_VERSION}* ]]; then
       echo "ERROR: Release version (${NEW_RELEASE_VERSION}) does not start with base version (${BASE_RELEASE_VERSION})"
       exit 1
       fi
@@ -98,18 +104,20 @@ start_git_flow_release() {
   git checkout ${BASE_DEV_BRANCH_NAME}
   git pull origin ${BASE_DEV_BRANCH_NAME}
   git flow config
-  git flow release start v"${NEW_RELEASE_VERSION}"
+  git flow release start "${RELEASE_NAME}"
 }
 
 start_dry_run_release() {
   local NEW_RELEASE_VERSION="${1}"
+  local RELEASE_NAME="${2:-v${NEW_RELEASE_VERSION}}"
 
-  git checkout -b dryrun/v"${NEW_RELEASE_VERSION}"
+  git checkout -b dryrun/"${RELEASE_NAME}"
 }
 
 abort_dry_run_release() {
   local NEW_RELEASE_VERSION="${1}"
   local BASE_RELEASE_VERSION="${2}"
+  local RELEASE_NAME="${3:-v${NEW_RELEASE_VERSION}}"
 
   local BASE_DEV_BRANCH_NAME
 
@@ -120,17 +128,20 @@ abort_dry_run_release() {
   fi
 
   git checkout ${BASE_DEV_BRANCH_NAME}
-  git branch -D dryrun/v"${NEW_RELEASE_VERSION}"
+  git branch -D dryrun/"${RELEASE_NAME}"
 }
 
-# update_versions updates files with the new release version and interactively asks the user for verification. If okay
-# the updated files will be staged to git and finally committed.
+# update_versions updates files with the new release version and interactively asks the user for verification.
+# If okay the updated files will be staged to git and finally committed.
+# If a new chart version is given, the Chart.yaml and the cldk.yaml of the v3 dogu are updated as well.
 #
 # extension points:
 # - update_versions_modify_files <newVersionNumber> - update a file with the new version number
 # - update_versions_stage_modified_files - stage a modified file to prepare the file for the up-coming commit
 update_versions() {
   local NEW_RELEASE_VERSION="${1}"
+  # optional: chart version of the v3 dogu, only set for dogus with a cldk.yaml
+  local NEW_CHART_VERSION="${2:-}"
 
   if [[ $(type -t update_versions_modify_files) == function ]]; then
     local preSkriptExitCode=0
@@ -171,6 +182,10 @@ update_versions() {
     mvn versions:set -DgenerateBackupPoms=false -DnewVersion="${NEW_RELEASE_VERSION}"
   fi
 
+  if [[ -n "${NEW_CHART_VERSION}" ]]; then
+    update_v3_versions "${NEW_RELEASE_VERSION}" "${NEW_CHART_VERSION}"
+  fi
+
   wait_for_ok "Please make sure that all versions have been updated correctly now (e.g. via \"git diff\")."
 
   ### The `git add` command has to be after the okay. Otherwise user-made changes to versions would not be added.
@@ -204,17 +219,34 @@ update_versions() {
     git add pom.xml
   fi
 
+  if [[ -n "${NEW_CHART_VERSION}" ]]; then
+    git add cldk.yaml "$(get_chart_file)"
+  fi
+
   git commit -m "Bump version"
 }
 
+# get_release_title prints the title of the CHANGELOG and release notes section of a release, e.g. "## [v1.2.3] - 2026-11-20".
+get_release_title() {
+  echo "## [${1}] - $(date --rfc-3339=date)"
+}
+
+# update_changelog adds a section for the new release to the CHANGELOG.md, titled with the release name.
+# If a chart version is given (double release), the section gets a note with the chart version of the v3 dogu.
+# A v3-only release passes an empty NEW_RELEASE_VERSION and its release name.
 update_changelog() {
   local NEW_RELEASE_VERSION="${1}"
   local FIXED_CVE_LIST="${2}"
+  local NEW_CHART_VERSION="${3:-}"
+  local RELEASE_NAME="${4:-v${NEW_RELEASE_VERSION}}"
 
   # Changelog update
-  local CURRENT_DATE
-  CURRENT_DATE=$(date --rfc-3339=date)
-  local NEW_CHANGELOG_TITLE="## [v${NEW_RELEASE_VERSION}] - ${CURRENT_DATE}"
+  local NEW_CHANGELOG_TITLE
+  NEW_CHANGELOG_TITLE="$(get_release_title "${RELEASE_NAME}")"
+  local NEW_CHANGELOG_SECTION_START="${NEW_CHANGELOG_TITLE}"
+  if [[ -n "${NEW_CHART_VERSION}" ]]; then
+    NEW_CHANGELOG_SECTION_START+="\nChart-Version: ${NEW_CHART_VERSION}\n"
+  fi
   # Check if "Unreleased" tag exists
   while ! grep --silent "## \[Unreleased\]" CHANGELOG.md; do
     echo ""
@@ -228,13 +260,13 @@ update_changelog() {
   fi
 
   # Add new title line to changelog
-  sed -i "s|## \[Unreleased\]|## \[Unreleased\]\n\n${NEW_CHANGELOG_TITLE}|g" CHANGELOG.md
+  sed -i "s|## \[Unreleased\]|## \[Unreleased\]\n\n${NEW_CHANGELOG_SECTION_START}|g" CHANGELOG.md
 
   # Wait for user to validate changelog changes
   wait_for_ok "Please make sure your CHANGELOG.md looks as desired."
 
   # Check if new version tag still exists
-  while ! grep --silent "## \[v${NEW_RELEASE_VERSION}\] - ${CURRENT_DATE}" CHANGELOG.md; do
+  while ! grep --silent --fixed-strings "${NEW_CHANGELOG_TITLE}" CHANGELOG.md; do
     echo ""
     echo -e "\e[31mYour CHANGELOG.md does not contain \"${NEW_CHANGELOG_TITLE}\"!\e[0m"
     wait_for_ok "Please update your CHANGELOG.md now."
@@ -244,13 +276,15 @@ update_changelog() {
   git commit -m "Update changelog"
 }
 
+# update_releasenotes adds a section for the new release to all release notes, titled with the release name.
+# A v3-only release passes an empty NEW_RELEASE_VERSION and its release name.
 update_releasenotes() {
   local NEW_RELEASE_VERSION="${1}"
+  local RELEASE_NAME="${2:-v${NEW_RELEASE_VERSION}}"
 
   # ReleaseNotes update
-  local CURRENT_DATE
-  CURRENT_DATE=$(date --rfc-3339=date)
-  local NEW_RELEASENOTE_TITLE="## [v${NEW_RELEASE_VERSION}] - ${CURRENT_DATE}"
+  local NEW_RELEASENOTE_TITLE
+  NEW_RELEASENOTE_TITLE="$(get_release_title "${RELEASE_NAME}")"
   rm -rf ".rn_changed"
   find . -name "*release_notes*.md" -print0 | while read -d $'\0' file
   do
@@ -336,16 +370,19 @@ show_diff() {
   echo "# # # # # # # # # #"
 }
 
+# finish_release_and_push pushes the release branch release/<release name> and deletes it locally.
+# A v3-only release passes the chart versions and its release name.
 finish_release_and_push() {
   local CURRENT_VERSION="${1}"
   local NEW_RELEASE_VERSION="${2}"
   local BASE_RELEASE_VERSION="${3}"
+  local RELEASE_NAME="${4:-v${NEW_RELEASE_VERSION}}"
 
   # Push changes and delete release branch
   wait_for_ok "Upgrade from version v${CURRENT_VERSION} to version v${NEW_RELEASE_VERSION} finished. Should the changes be pushed?"
-  git push origin release/v"${NEW_RELEASE_VERSION}"
+  git push origin release/"${RELEASE_NAME}"
 
-  echo "Switching back to develop and deleting branch release/v${NEW_RELEASE_VERSION}..."
+  echo "Switching back to develop and deleting branch release/${RELEASE_NAME}..."
 
   local BASE_DEV_BRANCH_NAME
 
@@ -356,5 +393,5 @@ finish_release_and_push() {
   fi
 
   git checkout ${BASE_DEV_BRANCH_NAME}
-  git branch -D release/v"${NEW_RELEASE_VERSION}"
+  git branch -D release/"${RELEASE_NAME}"
 }

@@ -1,0 +1,6 @@
+doguNamespace: official
+images:
+  sidecar:
+    tag: 1.0.0
+  nexus:
+    tag: 3.96.4-1

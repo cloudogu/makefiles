@@ -68,6 +68,8 @@ include build/make/prerelease.mk
 include build/make/k8s-dogu.mk
 # or k8s-controller.mk; only include this in k8s-controller repositories
 include build/make/k8s-controller.mk
+# dogu-v3.mk for v3 dogus with cldk; can be included alongside k8s-dogu.mk
+include build/make/dogu-v3.mk
 include build/make/bats.mk
 # trivy-scan for dogu-images
 include build/make/trivyscan.mk
@@ -362,6 +364,12 @@ This module holds the `dogu-release` or other binary release related targets for
 Additionally, to the regular `dogu-release` the module contains a `dogu-cve-release`. This target checks if a simple
 build of a dogu eliminates critical CVEs. If this is the case, a release process will be triggered.
 
+If the dogu contains a `cldk.yaml`, `dogu-release` also releases it as v3 dogu: it additionally asks for the new
+chart version and updates `Chart.yaml` and `cldk.yaml` with [yq v4](https://github.com/mikefarah/yq). Answering `n`
+to "Release the v2 dogu as well?" (or a dogu without `dogu.json`) releases only the chart on branch
+`release/chart/v<chart version>`,
+see [docs/operations/dogu-v3-en.md](docs/operations/dogu-v3-en.md#release).
+
 Only include this module in dogu or Golang repositories that support a dedicated release flow!
 
 ### prerelase.mk
@@ -419,7 +427,7 @@ This module provides generic targets for developing K8s Cloudogu EcoSystem
    - `check-etc-hosts`
    - `check-insecure-cluster-registry`
 
-This file will be included automatically if you include `k8s-component.mk` and/or `k8s-dogu.mk`.
+This file will be included automatically if you include `k8s-component.mk`, `k8s-dogu.mk` and/or `dogu-v3.mk`.
 
 #### k8s-component.mk
 
@@ -447,6 +455,17 @@ This module provides targets for developing Dogus with a K8s Cloudogu EcoSystem.
 
 - `build` - Builds a new version of the dogu and deploys it into the K8s-EcoSystem.
 - `install-dogu-descriptor` - Installs a configmap with current dogu.json into the cluster.
+
+#### dogu-v3.mk
+
+This module provides targets for developing v3 dogus with [cldk](https://github.com/cloudogu/cldk).
+It includes `k8s.mk` and can be included together with `k8s-dogu.mk`.
+
+- `install-cldk` - Installs cldk (`BINARY_CLDK_VERSION`) to `.bin/cldk`.
+- `dogu-apply` - Builds the dogu and pushes/installs it under a new dev version with `cldk dogu dev-push`. Needs `STAGE=development`.
+  Registry, cluster and namespace are derived from `RUNTIME_ENV`, `KUBE_CONTEXT_NAME` and `NAMESPACE` like for `k8s-dogu.mk`.
+
+See [docs/operations/dogu-v3-en.md](docs/operations/dogu-v3-en.md) ([Deutsch](docs/operations/dogu-v3-de.md)).
 
 #### k8s-controller.mk
 

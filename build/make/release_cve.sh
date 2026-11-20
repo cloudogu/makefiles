@@ -7,7 +7,7 @@ function readCveSeverityIfUnset() {
   if [ -z "${CVE_SEVERITY}" ]; then
     echo "CVE_SEVERITY is unset"
     while [[ -z ${CVE_SEVERITY} ]]; do
-      read -r -p "select the desired cve severity (CRITICAL, HIGH, MEDIUM, ...): " CVE_SEVERITY
+      read -r -p "select the desired cve severity (CRITICAL, HIGH, MEDIUM, ...): " CVE_SEVERITY || exit 1
     done
   fi
 }
@@ -16,13 +16,13 @@ function readCredentialsIfUnset() {
   if [ -z "${USERNAME}" ]; then
     echo "username is unset"
     while [[ -z ${USERNAME} ]]; do
-      read -r -p "type username for ${REGISTRY_URL}: " USERNAME
+      read -r -p "type username for ${REGISTRY_URL}: " USERNAME || exit 1
     done
   fi
   if [ -z "${PASSWORD}" ]; then
     echo "password is unset"
     while [[ -z ${PASSWORD} ]]; do
-      read -r -s -p "type password for ${REGISTRY_URL}: " PASSWORD
+      read -r -s -p "type password for ${REGISTRY_URL}: " PASSWORD || exit 1
     done
   fi
 }
