@@ -365,7 +365,10 @@ Additionally, to the regular `dogu-release` the module contains a `dogu-cve-rele
 build of a dogu eliminates critical CVEs. If this is the case, a release process will be triggered.
 
 If the dogu contains a `cldk.yaml`, `dogu-release` also releases it as v3 dogu: it additionally asks for the new
-chart version and updates `Chart.yaml` and `cldk.yaml` with [yq v4](https://github.com/mikefarah/yq), see [docs/operations/dogu-v3-en.md](docs/operations/dogu-v3-en.md#release).
+chart version and updates `Chart.yaml` and `cldk.yaml` with [yq v4](https://github.com/mikefarah/yq). Answering `n`
+to "Release the v2 dogu as well?" (or a dogu without `dogu.json`) releases only the chart on branch
+`release/chart/v<chart version>`,
+see [docs/operations/dogu-v3-en.md](docs/operations/dogu-v3-en.md#release).
 
 Only include this module in dogu or Golang repositories that support a dedicated release flow!
 

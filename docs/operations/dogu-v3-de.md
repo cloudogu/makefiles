@@ -68,7 +68,7 @@ Ein bereits installiertes `.bin/cldk` wird nicht automatisch ersetzt; vorher lö
 Enthält das Projekt eine `cldk.yaml`, wird das Dogu gleichzeitig als v2- und v3-Dogu released (Doppel-Release).
 Dafür wird [yq v4](https://github.com/mikefarah/yq) benötigt: `.bin/yq` (per `make install-yq`, braucht Go) oder yq im `PATH`.
 
-1. Nach der neuen v2-Dogu-Version (z. B. `3.96.4-4`) fragt der Release die neue Chart-Version ab.
+1. Nach der Frage „Release the v2 dogu as well?“ (`y`) und der neuen v2-Dogu-Version (z. B. `3.96.4-4`) fragt der Release die neue Chart-Version ab.
    Sie muss die Form `MAJOR.MINOR.PATCH` haben (ohne Prerelease) und größer als die aktuelle `version` im `Chart.yaml`
    sein, sonst bricht der Release ab.
 2. Im `Chart.yaml` (Verzeichnis `chart` aus der `cldk.yaml`, Standard `k8s/helm`):
@@ -78,5 +78,19 @@ Dafür wird [yq v4](https://github.com/mikefarah/yq) benötigt: `.bin/yq` (per `
    gesetzt. Fehlt der `tag`, wird er ergänzt.
 4. Beide Dateien werden zusammen mit den übrigen Versionsänderungen committet.
 5. Der CHANGELOG-Abschnitt `## [v<v2-Dogu-Version>]` bekommt die Zeile `Chart-Version: <Chart-Version>`.
+
+### Release nur für das v3-Dogu
+
+Das Chart kann ohne neue v2-Dogu-Version released werden, z. B. bei einer reinen Chart-Änderung:
+
+- Bei einem Doppel-Release-Dogu fragt der Release zuerst „Release the v2 dogu as well?“; mit `n` wird nur das Chart
+  released.
+- Ein Dogu ohne `dogu.json` (nur v3-Dogu) wird immer so released; der Release fragt nur die Chart-Version ab.
+- `dogu-cve-release` released immer beide (Doppel-Release), weil das neue Image eine neue v2-Dogu-Version braucht.
+
+Dann wird nur die `version` im `Chart.yaml` hochgezogen; `appVersion`, `cldk.yaml`, `dogu.json`, `Dockerfile` und die
+`VERSION` im `Makefile` bleiben unverändert (auch die Erweiterungspunkte aus `release_args.sh` entfallen).
+Der Release-Branch heißt `release/chart/v<Chart-Version>` (Dry-Run `dryrun/chart/v<Chart-Version>`), der
+CHANGELOG-Abschnitt `## [chart/v<Chart-Version>]`.
 
 Ohne `cldk.yaml` läuft der Release wie bisher.

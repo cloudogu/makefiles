@@ -68,7 +68,7 @@ An already installed `.bin/cldk` is not replaced automatically; delete it first.
 If the project contains a `cldk.yaml`, the dogu is released as v2 and v3 dogu at once (Doppel-Release).
 This needs [yq v4](https://github.com/mikefarah/yq): `.bin/yq` (via `make install-yq`, needs Go) or yq in the `PATH`.
 
-1. After the new v2 dogu version (e.g. `3.96.4-4`), the release asks for the new chart version.
+1. After the question "Release the v2 dogu as well?" (`y`) and the new v2 dogu version (e.g. `3.96.4-4`), the release asks for the new chart version.
    It must have the form `MAJOR.MINOR.PATCH` (no pre-release) and be greater than the current `version` in the
    `Chart.yaml`, otherwise the release aborts.
 2. In the `Chart.yaml` (directory `chart` from the `cldk.yaml`, default `k8s/helm`):
@@ -78,5 +78,18 @@ This needs [yq v4](https://github.com/mikefarah/yq): `.bin/yq` (via `make instal
    version. A missing `tag` is added.
 4. Both files are committed together with the other version changes.
 5. The CHANGELOG section `## [v<v2 dogu version>]` gets the line `Chart-Version: <chart version>`.
+
+### Release only the v3 dogu
+
+The chart can be released without a new v2 dogu version, e.g. for a change of the chart only:
+
+- For a double release dogu, the release first asks "Release the v2 dogu as well?"; with `n` only the chart is released.
+- A dogu without `dogu.json` (v3 dogu only) is always released this way; the release only asks for the chart version.
+- `dogu-cve-release` always releases both (double release), because the new image needs a new v2 dogu version.
+
+Then only the `version` in the `Chart.yaml` is updated; `appVersion`, `cldk.yaml`, `dogu.json`, `Dockerfile` and the
+`VERSION` in the `Makefile` stay unchanged (the extension points of `release_args.sh` are skipped as well).
+The release branch is `release/chart/v<chart version>` (dry run `dryrun/chart/v<chart version>`), the CHANGELOG
+section `## [chart/v<chart version>]`.
 
 Without a `cldk.yaml` the release works as before.

@@ -25,6 +25,19 @@ teardown() {
   unset WORKDIR
 }
 
+# init_dogu_repo makes the current directory a git repository on branch develop with the files of the current directory,
+# so that release.sh can start a dry run release.
+init_dogu_repo() {
+  mkdir -p build
+  ln -s "${MAKE_DIR}" build/make
+  printf '# Changelog\n\n## [Unreleased]\n### Changed\n- Something\n' > CHANGELOG.md
+  export GIT_AUTHOR_NAME=test GIT_AUTHOR_EMAIL=test@example.com GIT_COMMITTER_NAME=test GIT_COMMITTER_EMAIL=test@example.com
+  git init --quiet --initial-branch=develop
+  echo "build/" > .gitignore
+  git add .
+  git commit --quiet -m "initial"
+}
+
 @test "is_v3_dogu should succeed only if a cldk.yaml exists" {
   source "${MAKE_DIR}/release_functions.sh"
 
@@ -65,13 +78,89 @@ teardown() {
   assert_files_equal cldk.yaml "${FIXTURES_DIR}/expected/cldk.yaml"
 }
 
-@test "validate_v3_dogu should fail if the cldk.yaml contains no image named like the dogu" {
+@test "check_dogu_image_in_cldk_yaml should fail if the cldk.yaml contains no image named like the dogu" {
   source "${MAKE_DIR}/release_functions.sh"
   cp -r "${FIXTURES_DIR}/project/." .
   sed -i 's/^  nexus:/  other:/' cldk.yaml
 
-  run validate_v3_dogu
+  run check_dogu_image_in_cldk_yaml
 
   assert_failure 1
   assert_output --partial "no image 'nexus'"
+}
+
+@test "get_release_kind should release v2 without cldk.yaml, v3-only without dogu.json and ask a dogu with both" {
+  source "${MAKE_DIR}/release_functions.sh"
+
+  assert_equal "$(get_release_kind dogu)" "v2"
+  touch cldk.yaml
+  assert_equal "$(get_release_kind go-tool)" "v2"
+  assert_equal "$(get_release_kind dogu)" "v3-only"
+  touch dogu.json
+  assert_equal "$(get_release_kind dogu-cve-release)" "double"
+  assert_equal "$(get_release_kind dogu <<< "y")" "double"
+  assert_equal "$(get_release_kind dogu <<< "n")" "v3-only"
+}
+
+@test "update_chart_version should only set the chart version and commit it" {
+  source "${MAKE_DIR}/release_functions.sh"
+  cp -r "${FIXTURES_DIR}/project/." .
+  init_dogu_repo
+
+  run update_chart_version "0.1.0" <<< "ok"
+
+  assert_success
+  assert_equal "$(git log -1 --format=%s)" "Bump chart version"
+  assert_files_equal k8s/helm/Chart.yaml "${FIXTURES_DIR}/expected_v3_only/Chart.yaml"
+  assert_files_equal cldk.yaml "${FIXTURES_DIR}/project/cldk.yaml"
+}
+
+@test "release.sh dry run should release only the chart of a dogu without dogu.json" {
+  cp -r "${FIXTURES_DIR}/project/." .
+  init_dogu_repo
+
+  run bash -c "printf '0.1.0\nok\nok\n' | build/make/release.sh dogu '' true"
+
+  assert_success
+  assert_output --partial "Switched to a new branch 'dryrun/chart/v0.1.0'"
+  assert_output --partial "+version: 0.1.0"
+  assert_output --partial "+## [chart/v0.1.0] - "
+  refute_output --partial "Chart-Version:"
+  refute_output --partial "+appVersion"
+  refute_output --partial "cldk.yaml"
+  assert_equal "$(git branch --show-current)" "develop"
+}
+
+@test "release.sh dry run should release only the chart of a double release dogu if the v2 dogu is not released" {
+  cp -r "${FIXTURES_DIR}/project/." .
+  echo '{"Name": "official/nexus", "Version": "3.96.4-1"}' > dogu.json
+  init_dogu_repo
+
+  run bash -c "printf 'n\n0.1.0\nok\nok\n' | build/make/release.sh dogu '' true"
+
+  assert_success
+  assert_output --partial "Switched to a new branch 'dryrun/chart/v0.1.0'"
+  assert_output --partial "+version: 0.1.0"
+  assert_output --partial "+## [chart/v0.1.0] - "
+  refute_output --partial "dogu.json"
+  refute_output --partial "cldk.yaml"
+  assert_equal "$(git branch --show-current)" "develop"
+}
+
+@test "release.sh dry run should release a double release dogu as v2 and v3 dogu" {
+  cp -r "${FIXTURES_DIR}/project/." .
+  echo '{"Name": "official/nexus", "Version": "3.96.4-1"}' > dogu.json
+  init_dogu_repo
+
+  run bash -c "printf 'y\n3.97.0-2\n0.1.0\nok\nok\n' | build/make/release.sh dogu '' true"
+
+  assert_success
+  assert_output --partial "Switched to a new branch 'dryrun/v3.97.0-2'"
+  assert_output --partial '+  "Version": "3.97.0-2"'
+  assert_output --partial "+version: 0.1.0"
+  assert_output --partial '+appVersion: "3.97.0"'
+  assert_output --partial "+    tag: 3.97.0-2"
+  assert_output --partial "+## [v3.97.0-2] - "
+  assert_output --partial "+Chart-Version: 0.1.0"
+  assert_equal "$(git branch --show-current)" "develop"
 }
