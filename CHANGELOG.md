@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Updated
+- Update `crane` CLI from v0.21.0.4 to v0.22.1 for interacting with OCI registries
+  - this fixes arbitrary bugs and security issues
+  - you can find more about crane in their [GitHub release page](https://github.com/google/go-containerregistry/releases)
 
 ## [v11.2.1] - 2026-11-12
 ### Changed
