@@ -44,8 +44,13 @@ The Docker build then fails at `sha256sum -c`. Fix the checksum by hand.
 `Makefile`:
 
 ```makefile
+# Optional, defaults to Dockerfile. Space-separated paths relative to the repository root.
+CHECKSUM_FILES=Dockerfile integrationTests/Dockerfile
+
 include build/make/renovate.mk
 ```
+
+`CHECKSUM_FILES` only takes Dockerfiles; `**/[Dd]ockerfile*` in the Renovate rule below already covers them.
 
 `renovate.json` package rule:
 
