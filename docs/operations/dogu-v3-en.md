@@ -25,6 +25,7 @@ include build/make/dogu-v3.mk
 
 `dogu-apply` only runs in the development stage.
 Set `STAGE=development` in the `.env` of the project or on the command line.
+With `RUNTIME_ENV=remote`, `dogu-apply` first checks the docker login to `CES_REGISTRY_HOST` and asks for missing credentials (`check-docker-credentials`).
 
 Like for `k8s-dogu.mk`, `RUNTIME_ENV`, `KUBE_CONTEXT_NAME` and `NAMESPACE` (see `k8s.mk`) control where the dogu is pushed and installed.
 `dogu-apply` passes the values to cldk as `CLDK_DEV_*` variables:
@@ -36,7 +37,7 @@ Like for `k8s-dogu.mk`, `RUNTIME_ENV`, `KUBE_CONTEXT_NAME` and `NAMESPACE` (see 
 | `CLDK_DEV_PLAIN_HTTP`     | `true`, except with `RUNTIME_ENV=remote`                                        | `true`                                 |
 | `CLDK_DEV_DOGU_NAMESPACE` | with `RUNTIME_ENV=remote` `testing` (or `ci` with `ENVIRONMENT=ci`), else empty | empty (`doguNamespace` of `cldk.yaml`) |
 | `CLDK_DEV_KUBE_CONTEXT`   | `KUBE_CONTEXT_NAME`                                                             | current context                        |
-| `CLDK_DEV_KUBE_NAMESPACE` | `NAMESPACE`                                                                     | value of `NAMESPACE`                   |
+| `CLDK_DEV_KUBE_NAMESPACE` | `NAMESPACE`, `ecosystem` if `NAMESPACE` is not set                              | value of `NAMESPACE`                   |
 
 
 Each `CLDK_DEV_*` variable can be set in the environment or in the `.env` and then takes precedence;
@@ -60,7 +61,7 @@ make dogu-apply CLDK_DEV_PUSH_ARGS=--dry-run
 ```
 
 When changing `BINARY_CLDK_VERSION`, `BINARY_CLDK_SUM` must be changed as well (see `checksums.txt` of the cldk release).
-An already installed `.bin/cldk` is not replaced automatically; delete it first.
+An installed `.bin/cldk` with a different version is removed and downloaded again on the next call.
 
 ## Release
 

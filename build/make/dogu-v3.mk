@@ -22,7 +22,7 @@ CLDK_DEV_CLUSTER_REG?=$(CES_REGISTRY_HOST)
 CLDK_DEV_PLAIN_HTTP?=$(if $(filter remote,$(RUNTIME_ENV)),,true)
 CLDK_DEV_DOGU_NAMESPACE?=$(if $(filter remote,$(RUNTIME_ENV)),$(patsubst /%,%,$(CES_REGISTRY_NAMESPACE)))
 CLDK_DEV_KUBE_CONTEXT?=$(KUBE_CONTEXT_NAME)
-CLDK_DEV_KUBE_NAMESPACE?=$(NAMESPACE)
+CLDK_DEV_KUBE_NAMESPACE?=$(or $(NAMESPACE),ecosystem)
 
 # Additional arguments for `cldk dogu dev-push`, e.g. CLDK_DEV_PUSH_ARGS=--dry-run. Flags override the CLDK_DEV_* variables.
 CLDK_DEV_PUSH_ARGS?=
@@ -30,7 +30,7 @@ CLDK_DEV_PUSH_ARGS?=
 ##@ K8s - Dogu v3
 
 .PHONY: dogu-apply
-dogu-apply: isProduction ${BINARY_CLDK} ## Builds the v3 dogu and pushes/installs it under a new dev version with `cldk dogu dev-push`.
+dogu-apply: isProduction check-docker-credentials ${BINARY_CLDK} ## Builds the v3 dogu and pushes/installs it under a new dev version with `cldk dogu dev-push`.
 	@CLDK_DEV_REG="$(CLDK_DEV_REG)" \
 		CLDK_DEV_CLUSTER_REG="$(CLDK_DEV_CLUSTER_REG)" \
 		CLDK_DEV_PLAIN_HTTP="$(CLDK_DEV_PLAIN_HTTP)" \
@@ -44,5 +44,12 @@ dogu-apply: isProduction ${BINARY_CLDK} ## Builds the v3 dogu and pushes/install
 .PHONY: install-cldk
 install-cldk: ${BINARY_CLDK} ## Installs cldk.
 
-${BINARY_CLDK}: $(UTILITY_BIN_PATH)
+# Removes an installed cldk whose version differs from BINARY_CLDK_VERSION, so that ${BINARY_CLDK} downloads it again.
+.PHONY: cldk-version-check
+cldk-version-check:
+	@[ ! -x ${BINARY_CLDK} ] \
+		|| [ "$$(${BINARY_CLDK} version 2>/dev/null | awk '{print $$2}')" = "${BINARY_CLDK_VERSION}" ] \
+		|| { echo "Removing outdated cldk $$(${BINARY_CLDK} version 2>/dev/null)" ; rm -f ${BINARY_CLDK} ; }
+
+${BINARY_CLDK}: cldk-version-check $(UTILITY_BIN_PATH)
 	$(call curl-get-tool-from-tar,$(BINARY_CLDK),$(BINARY_CLDK_URL),$(BINARY_CLDK_SUM),$(BINARY_CLDK_ARCHIVE_PATH),$(BINARY_CLDK_ARCHIVE_STRIP))
