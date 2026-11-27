@@ -80,6 +80,34 @@ Dafür wird [yq v4](https://github.com/mikefarah/yq) benötigt: `.bin/yq` (per `
 4. Beide Dateien werden zusammen mit den übrigen Versionsänderungen committet.
 5. Der CHANGELOG-Abschnitt `## [v<v2-Dogu-Version>]` bekommt die Zeile `Chart-Version: <Chart-Version>`.
 
+Der Image-Tag wird nur in der `cldk.yaml` gepflegt. 
+`mirror-patch-tpl.yaml` und `values.yaml` des Charts bleiben unverändert.
+cldk schreibt die Image-Referenzen beim Push des Charts über die `mirror-patch-tpl.yaml` um.
+Sollen beide Dateien auch im Repository aktuell sein, kann das Dogu sie in seiner `release_args.sh` anpassen.
+
+Beispiel für Nexus:
+
+```bash
+#!/bin/bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+mirrorPatchTemplate="k8s/helm/mirror-patch-tpl.yaml"
+values="k8s/helm/values.yaml"
+
+update_versions_modify_files() {
+  local newReleaseVersion="${1}"
+
+  TAG="${newReleaseVersion}" ./.bin/yq -i '.values.images.nexus |= sub(":[^:]+$", ":" + strenv(TAG))' "${mirrorPatchTemplate}"
+  TAG="${newReleaseVersion}" ./.bin/yq -i '.nexus.image.tag = strenv(TAG)' "${values}"
+}
+
+update_versions_stage_modified_files() {
+  git add "${mirrorPatchTemplate}" "${values}"
+}
+```
+
 ### Release nur für das v3-Dogu
 
 Das Chart kann ohne neue v2-Dogu-Version released werden, z. B. bei einer reinen Chart-Änderung:
